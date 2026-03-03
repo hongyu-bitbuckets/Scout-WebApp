@@ -7,6 +7,7 @@ import { useNavigationConfirm } from '@/core/hooks/useNavigationConfirm';
 import { NavigationConfirmDialog } from '@/core/components/NavigationConfirmDialog';
 import { haptics } from '@/core/lib/haptics';
 import { Button } from '@/core/components/ui/button';
+import { lab } from 'd3';
 
 /**
  * Bottom Navigation Component
@@ -28,29 +29,35 @@ interface BottomNavItem {
 const navItems: BottomNavItem[] = [
   {
     icon: Binoculars,
-    label: 'Scout',
+    label: 'Match Scout',
     href: '/game-start',
   },
+{
+      icon: Binoculars,
+      label: 'Pit Scout',
+      href: '/pit-scouting',
+},
+
   {
     icon: Wifi,
     label: 'WiFi Data',
     href: '/peer-transfer',
   },
-  {
-    icon: QrCode,
-    label: 'QR Data',
-    href: '/qr-transfer',
-  },
-  {
-    icon: TrendingUp,
-    label: 'Strategy',
-    href: '/strategy-overview',
-  },
-  {
-    icon: Map,
-    label: 'Match',
-    href: '/match-strategy',
-  },
+  // {
+  //   icon: QrCode,
+  //   label: 'QR Data',
+  //   href: '/qr-transfer',
+  // },
+  // {
+  //   icon: TrendingUp,
+  //   label: 'Strategy',
+  //   href: '/strategy-overview',
+  // },
+  // {
+  //   icon: Map,
+  //   label: 'Match',
+  //   href: '/match-strategy',
+  // },
 ];
 
 export function BottomNavigation() {

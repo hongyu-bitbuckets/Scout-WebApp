@@ -8,7 +8,6 @@ import {
 } from "@/core/components/ui/collapsible"
 import {
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -17,15 +16,6 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "@/core/components/ui/sidebar"
-import { ModeToggle } from "../mode-toggle"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/core/components/ui/select"
-import { convertTeamRole } from "@/core/lib/utils";
 import { useNavigationConfirm } from "@/core/hooks/useNavigationConfirm";
 import { NavigationConfirmDialog } from "@/core/components/NavigationConfirmDialog";
 import { useScout } from "@/core/contexts/ScoutContext";
@@ -46,11 +36,8 @@ export function NavMain({
   }[]
 }) {
 
-  const { playerStation, setPlayerStation } = useScout();
+  const { playerStation } = useScout();
 
-  const handlePlayerStationChange = (value: string) => {
-    setPlayerStation(value);
-  };
 
   const { isMobile, setOpenMobile } = useSidebar();
   const {
@@ -108,7 +95,7 @@ export function NavMain({
   return (
     <>
       <SidebarGroup>
-        <SidebarMenuItem className="flex items-center pb-4">
+        {/* <SidebarMenuItem className="flex items-center pb-4">
           <div className="flex w-full gap-2">
             <Select
               value={playerStation}
@@ -129,21 +116,33 @@ export function NavMain({
             </Select>
             <ModeToggle />
           </div>
-        </SidebarMenuItem>
-        <SidebarGroupLabel>Platform</SidebarGroupLabel>
+        </SidebarMenuItem> */}
+
+        {/* <SidebarGroupLabel>Platform</SidebarGroupLabel> */}
+        
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center gap-2">
             <SidebarMenuButton tooltip={"Home"} onClick={() => proceedClick("/")}>
               <Home />
-              <span>Home</span>
+              <span>Get Started</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
+
           <SidebarMenuItem className="flex items-center gap-2">
-            <SidebarMenuButton tooltip={"Scout"} onClick={() => proceedClick("/game-start")}>
+            <SidebarMenuButton tooltip={"Match Scout"} onClick={() => proceedClick("/game-start")}>
               <Binoculars />
-              <span>Scout</span>
+              <span>Match Scout</span>
             </SidebarMenuButton>
-          </SidebarMenuItem>
+             </SidebarMenuItem>
+
+             <SidebarMenuItem className="flex items-center gap-2">
+            <SidebarMenuButton tooltip={"Pit Scout"} onClick={() => proceedClick("/pit-scouting")}>
+              <Binoculars />
+              <span>Pit Scout</span>
+            </SidebarMenuButton>
+             </SidebarMenuItem>
+  
+         
           {items.map((item) => (
             <Collapsible
               key={item.title}
