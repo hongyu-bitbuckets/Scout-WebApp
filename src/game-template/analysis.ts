@@ -86,6 +86,19 @@ export interface TeamStatsTemplate extends TeamStats {
     climbFromSideRate: number;
     climbFromMiddleRate: number;
     defenseRate: number;
+    defenseVeryEffectiveRate: number;
+    defenseSomewhatEffectiveRate: number;
+    defenseNotEffectiveRate: number;
+    defenseEffectivenessScore: number;
+    mostDefendedTeam: string;
+    mostEffectiveDefenseTarget: string;
+    defenseByTarget: Record<string, {
+        attempts: number;
+        very: number;
+        somewhat: number;
+        not: number;
+        effectivenessScore: number;
+    }>;
     autoShotOnTheMoveRate: number;
     autoShotStationaryRate: number;
     teleopShotOnTheMoveRate: number;
@@ -210,6 +223,13 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                 climbFromSideRate: 0,
                 climbFromMiddleRate: 0,
                 defenseRate: 0,
+                defenseVeryEffectiveRate: 0,
+                defenseSomewhatEffectiveRate: 0,
+                defenseNotEffectiveRate: 0,
+                defenseEffectivenessScore: 0,
+                mostDefendedTeam: 'None',
+                mostEffectiveDefenseTarget: 'None',
+                defenseByTarget: {},
                 autoShotOnTheMoveRate: 0,
                 autoShotStationaryRate: 0,
                 teleopShotOnTheMoveRate: 0,
@@ -481,6 +501,80 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             ? Math.round((weightedAccuracyTotal / (accuracySelectionCount * 5)) * 100)
             : 0;
 
+        const defenseByTargetAccumulator: Record<string, { attempts: number; very: number; somewhat: number; not: number; }> = {};
+        let totalDefenseEvents = 0;
+        let veryEffectiveCount = 0;
+        let somewhatEffectiveCount = 0;
+        let notEffectiveCount = 0;
+
+        entries.forEach((entry) => {
+            const teleopPath = entry.gameData?.teleop?.teleopPath;
+            if (!Array.isArray(teleopPath)) return;
+
+            teleopPath.forEach((waypoint) => {
+                if (!waypoint || typeof waypoint !== 'object') return;
+                const record = waypoint as Record<string, unknown>;
+                if (record.type !== 'defense') return;
+
+                totalDefenseEvents += 1;
+                const defendedTeamNumber = Number(record.defendedTeamNumber);
+                const targetKey = Number.isFinite(defendedTeamNumber) && defendedTeamNumber > 0
+                    ? String(defendedTeamNumber)
+                    : 'Unknown';
+
+                if (!defenseByTargetAccumulator[targetKey]) {
+                    defenseByTargetAccumulator[targetKey] = { attempts: 0, very: 0, somewhat: 0, not: 0 };
+                }
+
+                const targetSummary = defenseByTargetAccumulator[targetKey]!;
+                targetSummary.attempts += 1;
+
+                const effectiveness = record.defenseEffectiveness;
+                if (effectiveness === 'very') {
+                    veryEffectiveCount += 1;
+                    targetSummary.very += 1;
+                } else if (effectiveness === 'somewhat') {
+                    somewhatEffectiveCount += 1;
+                    targetSummary.somewhat += 1;
+                } else if (effectiveness === 'not') {
+                    notEffectiveCount += 1;
+                    targetSummary.not += 1;
+                }
+            });
+        });
+
+        const defenseByTarget: TeamStatsTemplate['defenseByTarget'] = Object.fromEntries(
+            Object.entries(defenseByTargetAccumulator).map(([team, stats]) => {
+                const weighted = (stats.very * 2) + stats.somewhat;
+                const effectivenessScore = stats.attempts > 0
+                    ? Math.round((weighted / (stats.attempts * 2)) * 100)
+                    : 0;
+
+                return [team, { ...stats, effectivenessScore }];
+            })
+        );
+
+        const mostDefendedTeam = Object.entries(defenseByTarget)
+            .filter(([team]) => team !== 'Unknown')
+            .sort(([, a], [, b]) => b.attempts - a.attempts)[0]?.[0] || 'None';
+
+        const mostEffectiveDefenseTargetEntry = Object.entries(defenseByTarget)
+            .filter(([team, stats]) => team !== 'Unknown' && stats.attempts > 0)
+            .sort(([, a], [, b]) => {
+                if (b.effectivenessScore !== a.effectivenessScore) {
+                    return b.effectivenessScore - a.effectivenessScore;
+                }
+                return b.attempts - a.attempts;
+            })[0];
+
+        const mostEffectiveDefenseTarget = mostEffectiveDefenseTargetEntry
+            ? `${mostEffectiveDefenseTargetEntry[0]} (${mostEffectiveDefenseTargetEntry[1].effectivenessScore}%)`
+            : 'None';
+
+        const defenseEffectivenessScore = totalDefenseEvents > 0
+            ? Math.round((((veryEffectiveCount * 2) + somewhatEffectiveCount) / (totalDefenseEvents * 2)) * 100)
+            : 0;
+
         // Calculate primary roles (most frequently played, supporting ties)
         const activeRoles = [
             { name: 'Cycler', count: totals.roleActiveCycler },
@@ -600,6 +694,19 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                 ? Math.round((totals.climbFromMiddle / endgameClimbLocationAttemptCount) * 100)
                 : 0,
             defenseRate: Math.round((totals.defense / matchCount) * 100),
+            defenseVeryEffectiveRate: totalDefenseEvents > 0
+                ? Math.round((veryEffectiveCount / totalDefenseEvents) * 100)
+                : 0,
+            defenseSomewhatEffectiveRate: totalDefenseEvents > 0
+                ? Math.round((somewhatEffectiveCount / totalDefenseEvents) * 100)
+                : 0,
+            defenseNotEffectiveRate: totalDefenseEvents > 0
+                ? Math.round((notEffectiveCount / totalDefenseEvents) * 100)
+                : 0,
+            defenseEffectivenessScore,
+            mostDefendedTeam,
+            mostEffectiveDefenseTarget,
+            defenseByTarget,
             autoShotOnTheMoveRate: autoShotTypeTotal > 0 ? Math.round((totals.autoShotOnTheMove / autoShotTypeTotal) * 100) : 0,
             autoShotStationaryRate: autoShotTypeTotal > 0 ? Math.round((totals.autoShotStationary / autoShotTypeTotal) * 100) : 0,
             teleopShotOnTheMoveRate: teleopShotTypeTotal > 0 ? Math.round((totals.teleopShotOnTheMove / teleopShotTypeTotal) * 100) : 0,
@@ -687,6 +794,17 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                 stats: [
                     { key: 'primaryActiveRole', label: 'Active Shift Role', type: 'text', color: 'green' },
                     { key: 'primaryInactiveRole', label: 'Inactive Shift Role', type: 'text', color: 'purple' },
+                ],
+            },
+            {
+                id: 'defense-intel',
+                title: 'Defense Intel',
+                tab: 'overview',
+                columns: 2,
+                stats: [
+                    { key: 'defenseEffectivenessScore', label: 'Defense Effectiveness', type: 'percentage', color: 'green' },
+                    { key: 'mostDefendedTeam', label: 'Most Defended Team', type: 'text', color: 'blue' },
+                    { key: 'mostEffectiveDefenseTarget', label: 'Most Effective Target', type: 'text', color: 'purple' },
                 ],
             },
 
@@ -818,6 +936,9 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                 tab: 'performance',
                 rates: [
                     { key: 'defenseRate', label: 'Played Defense (Any Phase)' },
+                    { key: 'defenseVeryEffectiveRate', label: 'Defense Very Effective' },
+                    { key: 'defenseSomewhatEffectiveRate', label: 'Defense Somewhat Effective' },
+                    { key: 'defenseNotEffectiveRate', label: 'Defense Not Effective' },
                     { key: 'noShowRate', label: 'No Show' },
                     { key: 'brokeDownRate', label: 'Broke Down' },
                     { key: 'trenchStuckRate', label: 'Got Stuck in Trench' },

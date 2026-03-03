@@ -27,6 +27,7 @@ export type ClimbLevel = 1 | 2 | 3;
 export type ClimbResult = 'success' | 'fail';
 export type ClimbLocation = 'side' | 'middle';
 export type ShotType = 'onTheMove' | 'stationary';
+export type DefenseEffectiveness = 'very' | 'somewhat' | 'not';
 
 // =============================================================================
 // WAYPOINT DATA
@@ -50,6 +51,9 @@ export interface PathWaypoint {
     climbStartTimeSecRemaining?: number | null;
     duration?: number; // For stuck events (ms)
     obstacleType?: 'bump' | 'trench'; // For stuck events
+    defendedTeamNumber?: number;
+    defenseTargetSource?: 'schedule' | 'custom';
+    defenseEffectiveness?: DefenseEffectiveness;
 }
 
 // =============================================================================

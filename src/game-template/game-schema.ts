@@ -394,6 +394,10 @@ export const strategyColumns = {
         "fuelTeleopOPR": { label: "Fuel OPR (Teleop)", visible: true, numeric: true },
         "statboticsTeleopFuel": { label: "Statbotics EPA (Teleop+Endgame Fuel)", visible: false, numeric: true },
         "coprHubTeleopPoints": { label: "TBA COPR (Hub Teleop)", visible: false, numeric: true },
+        "defenseEffectivenessScore": { label: "Defense Effectiveness %", visible: true, numeric: true, percentage: true },
+        "defenseVeryEffectiveRate": { label: "Defense Very %", visible: false, numeric: true, percentage: true },
+        "defenseSomewhatEffectiveRate": { label: "Defense Some %", visible: false, numeric: true, percentage: true },
+        "defenseNotEffectiveRate": { label: "Defense No Impact %", visible: false, numeric: true, percentage: true },
         "teleopShotOnTheMoveRate": { label: "Teleop Shot On Move %", visible: true, numeric: true, percentage: true },
         "teleopShotStationaryRate": { label: "Teleop Shot Stationary %", visible: true, numeric: true, percentage: true },
         "rawValues.teleopFuelPassed": { label: "Teleop Passed", visible: false, numeric: true },
@@ -430,7 +434,7 @@ export const strategyColumns = {
 export const strategyPresets: Record<string, string[]> = {
     essential: ["teamNumber", "matchCount", "rawValues.totalPoints", "rawValues.scaledTotalFuel", "fuelTotalOPR", "endgame.climbSuccessRate"],
     auto: ["teamNumber", "matchCount", "rawValues.autoPoints", "rawValues.autoFuel", "rawValues.scaledAutoFuel", "fuelAutoOPR", "autoShotOnTheMoveRate", "autoShotStationaryRate", "autoClimbRate", "autoClimbAttempts", "autoClimbFromSideRate", "autoClimbFromMiddleRate", "rawValues.autoClimbStartTimeSec"],
-    teleop: ["teamNumber", "matchCount", "rawValues.teleopPoints", "rawValues.teleopFuel", "rawValues.scaledTeleopFuel", "fuelTeleopOPR", "teleopShotOnTheMoveRate", "teleopShotStationaryRate", "rawValues.teleopFuelPassed", "endgame.usedTrenchInTeleopRate", "endgame.usedBumpInTeleopRate", "endgame.passedToAllianceFromNeutralRate", "endgame.passedToAllianceFromOpponentRate", "endgame.passedToNeutralRate"],
+    teleop: ["teamNumber", "matchCount", "rawValues.teleopPoints", "rawValues.teleopFuel", "rawValues.scaledTeleopFuel", "fuelTeleopOPR", "defenseEffectivenessScore", "teleopShotOnTheMoveRate", "teleopShotStationaryRate", "rawValues.teleopFuelPassed", "endgame.usedTrenchInTeleopRate", "endgame.usedBumpInTeleopRate", "endgame.passedToAllianceFromNeutralRate", "endgame.passedToAllianceFromOpponentRate", "endgame.passedToNeutralRate"],
     endgame: ["teamNumber", "matchCount", "rawValues.endgamePoints", "rawValues.endgameClimbStartTimeSec", "endgame.climbAttempts", "endgame.climbL1Rate", "endgame.climbL1Attempts", "endgame.climbL2Rate", "endgame.climbL2Attempts", "endgame.climbL3Rate", "endgame.climbL3Attempts", "endgame.climbFromSideRate", "endgame.climbFromMiddleRate"],
     basic: ["teamNumber", "eventKey", "matchCount"],
 };

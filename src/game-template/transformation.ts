@@ -263,6 +263,7 @@ export const gameDataTransformation: DataTransformation = {
             break;
           }
           case 'defense':
+            result.teleop.playedDefense = true;
             // Track defense by zone
             if (wp.zone === 'allianceZone') {
               result.teleop.defenseAllianceCount = (result.teleop.defenseAllianceCount || 0) + 1;
@@ -270,6 +271,13 @@ export const gameDataTransformation: DataTransformation = {
               result.teleop.defenseNeutralCount = (result.teleop.defenseNeutralCount || 0) + 1;
             } else if (wp.zone === 'opponentZone') {
               result.teleop.defenseOpponentCount = (result.teleop.defenseOpponentCount || 0) + 1;
+            }
+            if (wp.defenseEffectiveness === 'very') {
+              result.teleop.defenseVeryEffectiveCount = (result.teleop.defenseVeryEffectiveCount || 0) + 1;
+            } else if (wp.defenseEffectiveness === 'somewhat') {
+              result.teleop.defenseSomewhatEffectiveCount = (result.teleop.defenseSomewhatEffectiveCount || 0) + 1;
+            } else if (wp.defenseEffectiveness === 'not') {
+              result.teleop.defenseNotEffectiveCount = (result.teleop.defenseNotEffectiveCount || 0) + 1;
             }
             break;
           case 'steal':

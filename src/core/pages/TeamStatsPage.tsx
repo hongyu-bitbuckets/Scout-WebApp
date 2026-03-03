@@ -522,6 +522,8 @@ export function TeamStatsPage(props: TeamStatsPageProps) {
                                     compareStats={compareStats}
                                     rateSections={visibleRateSections}
                                     matchBadges={matchBadges}
+                                    selectedTeam={selectedTeam}
+                                    selectedEvent={selectedEvent}
                                 />
                             </TabsContent>
 
