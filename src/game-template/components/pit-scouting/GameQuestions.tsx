@@ -21,7 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/core/components/ui/dialog";
-import { ScoutOptionsSheet } from "@/core/components/game-start/ScoutOptionsSheet";
+import { ScoutOptionsSheet } from "@/core/components/game-start/ScoutOptions";
 import { AutoFieldMap } from "@/game-template/components/auto-path/AutoFieldMap";
 import type { PathWaypoint } from "@/game-template/components/field-map";
 import { GameSpecificScoutOptions } from "@/game-template/components/game-start/ScoutOptions";

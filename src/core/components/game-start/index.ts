@@ -16,3 +16,6 @@ export { default as StatusCard } from './StatusCard';
 // Sub-components from form
 export { EventNameSelector } from './EventNameSelector';
 export { default as GameStartSelectTeam } from './GameStartSelectTeam';
+
+export { ScoutOptionsSheet,CORE_SCOUT_OPTION_KEYS } from './ScoutOptions';
+export { PlayerStationSheet } from './PlayerStationOption';

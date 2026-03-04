@@ -2,8 +2,8 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { AlertTriangle } from 'lucide-react';
 import { ROLE_LABELS } from "@/core/types/scoutMetaData";
-import { PlayerStationSheet } from './PlayerStationSheet';
-import { ScoutOptionsSheet } from './ScoutOptionsSheet';
+import { PlayerStationSheet } from './PlayerStationOption';
+import { ScoutOptionsSheet } from './ScoutOptions';
 import type { ScoutOptionsState, ScoutOptionsContentProps } from '@/types';
 import type { ComponentType } from 'react';
 
