@@ -19,6 +19,11 @@ const stations = [
   { value: "blue-3", label: "Blue 3" },
 ];
 
+const commentScoutAlliances = [
+  { value: "red", label: "Red Alliance" },
+  { value: "blue", label: "Blue Alliance" },
+];
+
 export function PlayerStationSheet() {
   const { playerStation, setPlayerStation } = useScout();
   const [open, setOpen] = useState(false);
@@ -51,6 +56,56 @@ export function PlayerStationSheet() {
               }`}
             >
               {station.label}
+            </button>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+interface CommentScoutAllianceSheetProps {
+  alliance: "red" | "blue" | "";
+  onAllianceChange: (alliance: "red" | "blue") => void;
+  disabled?: boolean;
+}
+
+export function CommentScoutAllianceSheet({
+  alliance,
+  onAllianceChange,
+  disabled = false,
+}: CommentScoutAllianceSheetProps) {
+  const { setPlayerStation } = useScout();
+  const [open, setOpen] = useState(false);
+
+  const handleAllianceChange = (value: "red" | "blue") => {
+    setPlayerStation(value);
+    onAllianceChange(value);
+    setOpen(false);
+  };
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="outline" size="sm" disabled={disabled}>
+          <Settings2 className="h-4 w-4 mr-2" />
+          {alliance ? `${alliance.charAt(0).toUpperCase()}${alliance.slice(1)} Alliance` : "(Manual) Alliance"}
+        </Button>
+      </PopoverTrigger>
+
+      <PopoverContent className="w-48 p-2">
+        <div className="space-y-1">
+          {commentScoutAlliances.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => handleAllianceChange(option.value as "red" | "blue")}
+              className={`w-full text-left px-3 py-2 rounded text-sm ${
+                alliance === option.value
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-muted"
+              }`}
+            >
+              {option.label}
             </button>
           ))}
         </div>

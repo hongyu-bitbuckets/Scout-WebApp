@@ -20,7 +20,7 @@ import {
   CORE_SCOUT_OPTION_KEYS,
   ScoutOptionsSheet,
 } from "@/core/components/GameStartComponents/ScoutOptionsSheet";
-import { PlayerStationSheet } from "@/core/components/GameStartComponents/PlayerStationOption";
+import { CommentScoutAllianceSheet, PlayerStationSheet } from "@/core/components/GameStartComponents/PlayerStationOption";
 import { createMatchPrediction, getPredictionForMatch } from "@/core/lib/scoutGamificationUtils";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 import { useWorkflowNavigation } from "@/core/hooks/useWorkflowNavigation";
@@ -477,22 +477,13 @@ const GameStartPage = () => {
               </div>
 
               <div className="flex items-center gap-2">
-                {/* For comment scouters, only show alliance selection as a dropdown, not full player station */}
+                {/* Comment scouts use a station-style selector with red/blue only */}
                 {isCommentScouter ? (
-                  <div className="flex gap-2 items-center">
-                    <Label>Alliance</Label>
-                    <Select
-                      value={alliance}
-                      onValueChange={setAlliance}
-                      disabled={isRescoutMode}
-                    >
-                      <SelectTrigger className="w-40 h-12 text-lg" />
-                      <SelectContent>
-                        <SelectItem value="red">Red Alliance</SelectItem>
-                        <SelectItem value="blue">Blue Alliance</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <CommentScoutAllianceSheet
+                    alliance={alliance as "red" | "blue" | ""}
+                    onAllianceChange={setAlliance}
+                    disabled={isRescoutMode}
+                  />
                 ) : (
                   <PlayerStationSheet />
                 )}
