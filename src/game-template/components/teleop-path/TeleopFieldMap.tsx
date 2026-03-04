@@ -177,6 +177,8 @@ function TeleopFieldMapContent() {
         effectiveScoutOptions[GAME_SCOUT_OPTION_KEYS.disableHubFuelScoringPopup] === true;
     const disablePassingPopup =
         effectiveScoutOptions[GAME_SCOUT_OPTION_KEYS.disablePassingPopup] === true;
+    const disableDefensePopup =
+        effectiveScoutOptions[GAME_SCOUT_OPTION_KEYS.disableDefensePopup] === true;
     const disablePathDrawingTapOnly =
         effectiveScoutOptions[GAME_SCOUT_OPTION_KEYS.disableTeleopPathDrawingTapOnly] === true;
 
@@ -307,7 +309,26 @@ function TeleopFieldMapContent() {
         setSelectedDefenseEffectiveness(null);
     }, []);
 
+    const addDefenseAction = useCallback((zone: ZoneType, details?: {
+        defendedTeamNumber?: number;
+        defenseTargetSource?: 'schedule' | 'custom';
+        defenseEffectiveness?: DefenseEffectiveness;
+    }) => {
+        onAddAction({
+            id: generateId(),
+            type: 'defense',
+            timestamp: Date.now(),
+            zone,
+            ...details,
+        } as any);
+    }, [generateId, onAddAction]);
+
     const startDefenseFlow = useCallback((zone: ZoneType) => {
+        if (disableDefensePopup) {
+            addDefenseAction(zone);
+            return;
+        }
+
         const opponentTeams = getOpponentTeamsFromSchedule();
         setPendingDefenseZone(zone);
         setOpponentTeamOptions(opponentTeams);
@@ -316,7 +337,7 @@ function TeleopFieldMapContent() {
         setSelectedDefenseEffectiveness(null);
         setIsDefenseEffectivenessDialogOpen(false);
         setIsDefenseTargetDialogOpen(true);
-    }, [getOpponentTeamsFromSchedule]);
+    }, [addDefenseAction, disableDefensePopup, getOpponentTeamsFromSchedule]);
 
     const getSelectedDefenseTeamNumber = useCallback((): number | null => {
         const rawValue = customDefenseTeamInput.trim() !== '' ? customDefenseTeamInput : selectedDefenseTeam;
@@ -339,21 +360,16 @@ function TeleopFieldMapContent() {
         const teamNumber = getSelectedDefenseTeamNumber();
         if (!teamNumber || !pendingDefenseZone || !selectedDefenseEffectiveness) return;
 
-        onAddAction({
-            id: generateId(),
-            type: 'defense',
-            timestamp: Date.now(),
-            zone: pendingDefenseZone,
+        addDefenseAction(pendingDefenseZone, {
             defendedTeamNumber: teamNumber,
             defenseTargetSource: customDefenseTeamInput.trim() !== '' ? 'custom' : 'schedule',
             defenseEffectiveness: selectedDefenseEffectiveness,
-        } as any);
+        });
 
         resetDefenseDialogState();
     }, [
-        generateId,
+        addDefenseAction,
         getSelectedDefenseTeamNumber,
-        onAddAction,
         pendingDefenseZone,
         resetDefenseDialogState,
         customDefenseTeamInput,
