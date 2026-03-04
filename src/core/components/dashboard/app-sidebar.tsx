@@ -17,6 +17,7 @@ import {
 } from "@/core/components/ui/sidebar"
 import { Separator } from "@/core/components/ui/separator"
 import { haptics } from "@/core/lib/haptics"
+import { ScoutRole } from "@/core/types/scoutRole"
 
 const data = {
   navMain: [
@@ -40,27 +41,29 @@ const data = {
       title: "Data Actions",
       url: "#",
       icon: Settings,
-          items: [
+      items: [
 
-    {
-            title: "API Data",
-            url: "/api-data",
-              },
-              {
-                  title: "WiFi Transfer (Beta)",
-                  url: "/peer-transfer",
-              },
-          
-              {
-                title:"Match & Pit Assignments",
-                url: "/pit-assignments",
-              }
+        {
+          title: "API Data",
+          url: "/api-data",
+        },
+        {
+          title: "WiFi Transfer (Beta)",
+          url: "/peer-transfer",
+        },
 
-              
-          ]
-},
+        {
+          title: "Match & Pit Assignments",
+          url: "/pit-assignments",
 
-   
+          requiredRoles: ["leadership", "mentors"] as ScoutRole[]
+        }
+
+
+      ]
+    },
+
+
 
 
     {
@@ -68,7 +71,7 @@ const data = {
       url: "#",
       icon: SquarePen,
       items: [
-         {
+        {
           title: "Match Strategy",
           url: "/match-strategy",
         },
@@ -86,24 +89,24 @@ const data = {
           title: "Scout Data Validation",
           url: "/match-validation",
         },
-        
+
         {
           title: "Pick Lists",
           url: "/pick-list",
         }
       ],
-        },
+    },
 
 
 
- {
+    {
       title: "Archived/Unused Features",
       url: "#",
-          items: [
-                {
+      items: [
+        {
           title: "Clear Data",
           url: "/clear-data",
-              },
+        },
         {
           title: "JSON Data Transfer",
           url: "/json-transfer",
@@ -112,20 +115,34 @@ const data = {
           title: "QR Data Transfer",
           url: "/qr-transfer",
         },
-    
 
-        {title:"Achievements",
-        url: "/achievements"},
 
         {
-          title:"Scout Leaderboard",
+          title: "Achievements",
+          url: "/achievements",
+          requiredRoles: ["unlockLeaderboard"] as ScoutRole[]
+        },
+
+
+        {
+          title: "Scout Leaderboard",
           url: "/scout-management",
-        }
-      ]
+          requiredRoles: ["unlockLeaderboard"] as ScoutRole[]
+        },
+
+        ...(import.meta.env.DEV ? [
+          {
+            title: "Dev Utilities",
+            url: "/dev-utilities",
+          }] : [])
+
+      ],
+
     },
-
-
   ],
+
+
+
   navSecondary: [
     {
       title: "Get Help (WIP)",
@@ -133,6 +150,7 @@ const data = {
       // icon: IconHelp,
     },
   ],
+
   documents: [
     {
       name: "Saved Match Strategies (WIP)",
@@ -242,13 +260,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         onTouchEnd={handleTouchEnd}
       >
         <NavMain items={data.navMain} />
+
       </SidebarContent>
 
       <SidebarFooter>
         <NavUser />
       </SidebarFooter>
 
-      
+
     </Sidebar>
   )
 }

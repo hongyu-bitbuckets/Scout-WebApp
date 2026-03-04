@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { getOrCreateScoutByName, getScout } from '@/core/lib/scoutGamificationUtils';
-import { ScoutRole } from '../types/gamification';
+import { ScoutRole } from '@/core/types/scoutRole';
 
 interface ScoutContextType {
   currentScout: string;
@@ -9,7 +9,7 @@ interface ScoutContextType {
   playerStation: string;
   isLoading: boolean;
 
-  scoutRoles: ScoutRole[];
+  currentScoutRoles: ScoutRole[];
 
   setCurrentScout: (name: string) => Promise<void>;
   setPlayerStation: (station: string) => void;
@@ -17,7 +17,7 @@ interface ScoutContextType {
   removeScout: (name: string) => Promise<void>;
   refreshScout: () => Promise<void>;
 
-  setScoutRole: (role: ScoutRole[]) => void;
+  updateScoutRoles: (role: ScoutRole[]) => void;
   toggleScoutRole: (role: ScoutRole) => void;
 }
 
@@ -41,9 +41,8 @@ export const ScoutProvider: React.FC<ScoutProviderProps> = ({ children }) => {
   const [scoutsList, setScoutsList] = useState<string[]>([]);
   const [playerStation, setPlayerStationState] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
+  const [currentScoutRoles, setCurrentScoutRoles] = useState<ScoutRole[]>([]);
   
-  const [scoutRoles, setScoutRoleState] = useState<ScoutRole[]>([]);
-
   // Load initial data from localStorage
   const loadScouts = useCallback(async () => {
     try {
@@ -92,6 +91,8 @@ export const ScoutProvider: React.FC<ScoutProviderProps> = ({ children }) => {
       // Update state
       setCurrentScoutState(trimmedName);
       setCurrentScoutStakes(scout.stakes);
+
+      setCurrentScoutRoles(scout.scoutRoles || []);
       
       // Update localStorage
       localStorage.setItem('currentScout', trimmedName);
@@ -175,22 +176,24 @@ export const ScoutProvider: React.FC<ScoutProviderProps> = ({ children }) => {
     }
   }, [currentScout]);
 
-  const setScoutRole = useCallback((roles: ScoutRole[]) => {
-    setScoutRoleState(roles);
-    localStorage.setItem('scoutRole', JSON.stringify(roles));
+  const updateScoutRoles = useCallback((roles: ScoutRole[]) => {
+    setCurrentScoutRoles(roles);
+    localStorage.setItem('currentScoutRoles', JSON.stringify(roles));
   }, []);
 
   const toggleScoutRole = useCallback((role: ScoutRole) => {
-    setScoutRoleState(prevRoles => {
+    setCurrentScoutRoles(prevRoles => {
+
       let updatedRoles: ScoutRole[];
-      if (prevRoles.includes(role)) {
-        updatedRoles = prevRoles.filter(r => r !== role);
-      } else {
-        updatedRoles = [...prevRoles, role];
-      }
-      localStorage.setItem('scoutRole', JSON.stringify(updatedRoles));
+        if (prevRoles.includes(role)) {
+          updatedRoles = prevRoles.filter(r => r !== role);
+        } else {
+          updatedRoles = [...prevRoles, role];
+        }
+      localStorage.setItem('currentScoutRoles', JSON.stringify(updatedRoles));
       return updatedRoles;
-    });
+    }
+  );
   }, []);
 
   // Load scouts on mount
@@ -234,7 +237,8 @@ export const ScoutProvider: React.FC<ScoutProviderProps> = ({ children }) => {
     scoutsList,
     playerStation,
     isLoading,
-    scoutRoles,
+    
+    currentScoutRoles,
     
     setCurrentScout,
     setPlayerStation,
@@ -242,8 +246,9 @@ export const ScoutProvider: React.FC<ScoutProviderProps> = ({ children }) => {
     removeScout,
     refreshScout,
 
-    setScoutRole,
+    updateScoutRoles,
     toggleScoutRole,
+
   };
 
   return <ScoutContext.Provider value={value}>{children}</ScoutContext.Provider>;

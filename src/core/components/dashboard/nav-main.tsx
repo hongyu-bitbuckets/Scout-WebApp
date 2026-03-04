@@ -19,22 +19,28 @@ import {
 import { useNavigationConfirm } from "@/core/hooks/useNavigationConfirm";
 import { NavigationConfirmDialog } from "@/core/components/NavigationConfirmDialog";
 import { useScout } from "@/core/contexts/ScoutContext";
+import { ScoutRole } from "@/core/types/scoutRole";
 
 
 export function NavMain({
   items,
 }: {
+
   items: {
     title: string
     url: string
+    requiredRoles?: ScoutRole[]
     icon?: LucideIcon
     isActive?: boolean
+
     items?: {
       title: string
       url: string
-    }[]
+      requiredRoles?: ScoutRole[]}[]
   }[]
-}) {
+})
+
+{
 
   const { playerStation } = useScout();
 

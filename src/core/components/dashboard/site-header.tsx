@@ -115,16 +115,7 @@ export function SiteHeader() {
           <div className="flex items-center justify-center">
             <PageHelpTooltip />
           </div>
-          <Button variant="ghost" className="hidden sm:flex w-auto h-auto px-6">
-            <a
-              href="https://github.com/ShinyShips/Maneuver"
-              rel="noopener noreferrer"
-              target="_blank"
-              className="dark:text-foreground"
-            >
-              GitHub
-            </a>
-          </Button>
+       
         </div>
       </div>
     </header>
