@@ -2,6 +2,9 @@ import { cn } from "@/core/lib/utils";
 import { useScout } from "@/core/contexts/ScoutContext";
 import { Button, Card, CardContent } from "@/components";
 import { useNavigate } from "react-router-dom";
+import React from "react";
+import { ScoutRole, SCOUT_ROLES } from "../types/scoutRole";
+import { ROLE_LABELS } from "../types/scoutMetaData";
 
 /**
  * HomePage Props
@@ -15,18 +18,42 @@ interface HomePageProps {
   // demoDataDescription?: string;
   // demoDataStats?: string;
   // demoScheduleStats?: string;
+
 }
 
 
 const HomePage = ({
   appName = "Scout 2026 Rebuilt",
 }: HomePageProps = {}) => {
-  const { currentScout, currentScoutRoles } = useScout();
+  const { currentScout, currentScoutRoles, updateScoutRoles, addScout } = useScout();
+
+  // state for new profile creation
+  const [newName, setNewName] = React.useState("");
+  const [newRoles, setNewRoles] = React.useState<ScoutRole[]>([]);
+
+  const handleRoleToggle = (role: ScoutRole) => {
+    setNewRoles(prev =>
+      prev.includes(role) ? prev.filter(r => r !== role) : [...prev, role]
+    );
+  };
+
+  const handleCreateProfile = async () => {
+    if (!newName.trim()) return;
+    await addScout(newName.trim());
+    if (newRoles.length) {
+      updateScoutRoles(newRoles);
+    }
+    setNewName("");
+    setNewRoles([]);
+  };
   const navigate = useNavigate();
+
+
 
   return (
 
     <main className="relative h-screen w-full">
+
       <div className={cn("flex h-full w-full flex-col items-center justify-center gap-6 rounded-md border-2 border-dashed p-6", "bg-size-[40px_40px]")}>
         <h1 className="text-4xl font-bold">{appName}</h1>
         <h2 className="text-2xl font-semibold">Get Started</h2>
@@ -35,13 +62,59 @@ const HomePage = ({
           select/manage scouts using the sidebar.
         </h2>
 
+        {/* profile creation form */}
+        {/* Scout Profile Card */}
+        <Card className="w-full max-w-lg mx-4 mt-8">
+          <CardContent className="p-6">
+            <div className="text-center space-y-4">
+              <h2 className="text-lg font-semibold">Create New Scout Profile</h2>
+              <p className="text-sm text-muted-foreground">
+                Name and optionally select roles before hitting create.</p>
+
+              <input
+                className="w-full border rounded px-2 py-1"
+                placeholder="Scout name"
+                value={newName}
+                onChange={e => setNewName(e.target.value)}
+              />
+
+              <div className="mt-2 flex flex-wrap gap-1 justify-center">
+                {SCOUT_ROLES.map(role => {
+                  const active = newRoles.includes(role);
+                  const short = ROLE_LABELS[role]?.label
+                  return (
+                    <button
+                      key={role}
+                      onClick={() => handleRoleToggle(role)}
+                      className={cn(
+                        "text-xs px-2 py-0.5 rounded-md border transition",
+                        active
+                          ? "bg-primary text-primary-foreground border-transparent"
+                          : "bg-muted/60 text-muted-foreground border-transparent hover:bg-muted"
+                      )}
+                      aria-pressed={active}
+                      title={role}
+                    >
+                      {short}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <Button onClick={handleCreateProfile} disabled={!newName.trim()}>
+                Create Scout Profile
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Scout Profile Card */}
         <Card className="w-full max-w-lg mx-4 mt-8">
           <CardContent className="p-6">
             <div className="space-y-4">
               <div className="text-center">
                 <h2 className="text-lg font-semibold mb-2">Scout Profile</h2>
-                
+
                 {currentScout ? (
                   <>
                     <p className="text-sm text-muted-foreground mb-2">
