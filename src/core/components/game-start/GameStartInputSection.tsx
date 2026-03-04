@@ -11,26 +11,32 @@ interface StationInfo {
 
 interface Props {
   eventKey: string;
-  setEventKey: (k: string) => void;
   matchNumber: string;
-  setMatchNumber: (n: string) => void;
   debouncedMatchNumber: string;
   selectTeam: string;
-  setSelectTeam: (t: string) => void;
   stationInfo: StationInfo;
+
   assignmentSlot: string | null;
+
+  setEventKey: (k: string) => void;
+  setMatchNumber: (n: string) => void;
+  setSelectTeam: (t: string | null) => void;
 }
 
 const GameStartInputSection: React.FC<Props> = ({
   eventKey,
-  setEventKey,
+  
   matchNumber,
-  setMatchNumber,
+  
   debouncedMatchNumber,
   selectTeam,
-  setSelectTeam,
+  
   stationInfo,
   assignmentSlot,
+
+  setEventKey,
+  setMatchNumber,
+  setSelectTeam,
 }) => {
   const handleMatchNumberChange = (val: string) => {
     // allow only digits
