@@ -135,7 +135,7 @@ const HomePage = ({
               )}
 
               {canManage && (
-                <Button onClick={() => navigate("/scouts-profiles")} className="w-full">
+                <Button onClick={() => navigate("/scouts-profile")} className="w-full">
                   Manage Scout Profiles
                 </Button>
               )}
