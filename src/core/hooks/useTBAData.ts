@@ -105,8 +105,9 @@ export const useTBAData = () => {
         sessionStorage.removeItem("tbaApiKey");
       }
     } catch (err) {
-      toast.error("Failed to fetch match data from TBA");
-      console.error(err);
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      toast.error(`Failed to fetch match data from TBA: ${message}`);
+      console.error('Error fetching match data from TBA:', err);
     } finally {
       setMatchDataLoading(false);
     }

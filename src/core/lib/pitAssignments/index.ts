@@ -34,7 +34,7 @@ import {
   saveMatchAssignmentsForEvent,
   storePitAssignmentMeta,
   storeMineAssignments,
-  getPitAssignmentMeta,
+   getPitAssignmentMeta,
 } from './assignmentLoading';
 import {
   mergeAssignments,
