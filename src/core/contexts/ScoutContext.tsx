@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { getOrCreateScoutByName, getScout } from '@/core/lib/scoutGamificationUtils';
-import { ScoutRole } from '../types/gamification';
+import { ScoutRole } from '@/core/types/scoutRole';
+import { gamificationDB } from '@/game-template/gamification';
 
 interface ScoutContextType {
   currentScout: string;
@@ -9,7 +10,7 @@ interface ScoutContextType {
   playerStation: string;
   isLoading: boolean;
 
-  scoutRoles: ScoutRole[];
+  currentScoutRoles: ScoutRole[];
 
   setCurrentScout: (name: string) => Promise<void>;
   setPlayerStation: (station: string) => void;
@@ -17,8 +18,9 @@ interface ScoutContextType {
   removeScout: (name: string) => Promise<void>;
   refreshScout: () => Promise<void>;
 
-  setScoutRole: (role: ScoutRole[]) => void;
+  updateScoutRoles: (role: ScoutRole[]) => void;
   toggleScoutRole: (role: ScoutRole) => void;
+  toggleScoutRoleFor: (name: string, role: ScoutRole) => Promise<void>;
 }
 
 const ScoutContext = createContext<ScoutContextType | undefined>(undefined);
@@ -41,9 +43,8 @@ export const ScoutProvider: React.FC<ScoutProviderProps> = ({ children }) => {
   const [scoutsList, setScoutsList] = useState<string[]>([]);
   const [playerStation, setPlayerStationState] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
+  const [currentScoutRoles, setCurrentScoutRoles] = useState<ScoutRole[]>([]);
   
-  const [scoutRoles, setScoutRoleState] = useState<ScoutRole[]>([]);
-
   // Load initial data from localStorage
   const loadScouts = useCallback(async () => {
     try {
@@ -92,6 +93,8 @@ export const ScoutProvider: React.FC<ScoutProviderProps> = ({ children }) => {
       // Update state
       setCurrentScoutState(trimmedName);
       setCurrentScoutStakes(scout.stakes);
+
+      setCurrentScoutRoles(scout.scoutRoles || []);
       
       // Update localStorage
       localStorage.setItem('currentScout', trimmedName);
@@ -175,23 +178,80 @@ export const ScoutProvider: React.FC<ScoutProviderProps> = ({ children }) => {
     }
   }, [currentScout]);
 
-  const setScoutRole = useCallback((roles: ScoutRole[]) => {
-    setScoutRoleState(roles);
-    localStorage.setItem('scoutRole', JSON.stringify(roles));
-  }, []);
+  const updateScoutRoles = useCallback((roles: ScoutRole[]) => {
+    setCurrentScoutRoles(roles);
+    localStorage.setItem('currentScoutRoles', JSON.stringify(roles));
+
+    // Persist to DB and notify other windows/components
+    (async () => {
+      try {
+        if (!currentScout) return;
+        const scout = await getScout(currentScout) || await getOrCreateScoutByName(currentScout);
+        if (scout) {
+          // ensure scout object has scoutRoles
+          // @ts-ignore - underlying DB Scout type
+          scout.scoutRoles = roles;
+          await gamificationDB.scouts.put(scout);
+          window.dispatchEvent(new Event('scoutChanged'));
+        }
+      } catch (err) {
+        console.error('Error persisting scout roles:', err);
+      }
+    })();
+  }, [currentScout]);
 
   const toggleScoutRole = useCallback((role: ScoutRole) => {
-    setScoutRoleState(prevRoles => {
-      let updatedRoles: ScoutRole[];
-      if (prevRoles.includes(role)) {
-        updatedRoles = prevRoles.filter(r => r !== role);
-      } else {
-        updatedRoles = [...prevRoles, role];
+    // Compute updated roles based on current state, then persist
+    const updatedRoles = currentScoutRoles.includes(role)
+      ? currentScoutRoles.filter(r => r !== role)
+      : [...currentScoutRoles, role];
+
+    setCurrentScoutRoles(updatedRoles);
+    localStorage.setItem('currentScoutRoles', JSON.stringify(updatedRoles));
+
+    // Persist to DB and notify other windows/components
+    (async () => {
+      try {
+        if (!currentScout) return;
+        const scout = await getScout(currentScout) || await getOrCreateScoutByName(currentScout);
+        if (scout) {
+          // @ts-ignore
+          scout.scoutRoles = updatedRoles;
+          await gamificationDB.scouts.put(scout);
+          window.dispatchEvent(new Event('scoutChanged'));
+        }
+      } catch (err) {
+        console.error('Error persisting toggled scout role:', err);
       }
-      localStorage.setItem('scoutRole', JSON.stringify(updatedRoles));
-      return updatedRoles;
-    });
-  }, []);
+    })();
+  }, [currentScout, currentScoutRoles]);
+
+  // Toggle role for arbitrary scout (persist to DB)
+  const toggleScoutRoleFor = useCallback(async (name: string, role: ScoutRole) => {
+    try {
+      if (!name) return;
+      const scout = await getScout(name) || await getOrCreateScoutByName(name);
+      if (!scout) return;
+
+      const prevRoles: ScoutRole[] = scout.scoutRoles || [];
+      const updatedRoles: ScoutRole[] = prevRoles.includes(role) ? prevRoles.filter(r => r !== role) : [...prevRoles, role];
+
+      // @ts-ignore
+      scout.scoutRoles = updatedRoles;
+      await gamificationDB.scouts.put(scout);
+
+      // If we're updating the currently selected scout, sync local state
+      if (name === currentScout) {
+        setCurrentScoutRoles(updatedRoles);
+        localStorage.setItem('currentScoutRoles', JSON.stringify(updatedRoles));
+      }
+
+      // Notify other listeners/tabs
+      window.dispatchEvent(new Event('scoutChanged'));
+    } catch (err) {
+      console.error('Error toggling scout role for', name, err);
+    }
+  }, [currentScout]);
 
   // Load scouts on mount
   useEffect(() => {
@@ -234,7 +294,8 @@ export const ScoutProvider: React.FC<ScoutProviderProps> = ({ children }) => {
     scoutsList,
     playerStation,
     isLoading,
-    scoutRoles,
+    
+    currentScoutRoles,
     
     setCurrentScout,
     setPlayerStation,
@@ -242,8 +303,10 @@ export const ScoutProvider: React.FC<ScoutProviderProps> = ({ children }) => {
     removeScout,
     refreshScout,
 
-    setScoutRole,
+    updateScoutRoles,
     toggleScoutRole,
+    toggleScoutRoleFor,
+
   };
 
   return <ScoutContext.Provider value={value}>{children}</ScoutContext.Provider>;

@@ -1,3 +1,4 @@
+import type { ScoutRole } from './scoutRole';
 /**
  * Core Gamification Types
  */
@@ -10,11 +11,11 @@ export interface Scout {
     /** Scout's name (primary key - matches nav-user sidebar) */
     name: string;
 
-    /** Scout's role within the gamification system */
-    scoutRoles: ScoutRole[];
-
     /** Total stakes including bonuses from achievements */
     stakes: number;
+
+        scoutRoles: ScoutRole[];
+
 
     /** Stakes earned only from predictions (excludes achievement bonuses) */
     stakesFromPredictions: number;
@@ -42,14 +43,7 @@ export interface Scout {
  * Match prediction for gamification system
  * Scouts predict match winners before matches occur
  */
-export const ScoutRole = [
-    "commentScouter",
-    "dataScouter",
-    "leadership",
-    "mentors",
-    "minimalistScount",
-]as const;
-export type ScoutRole = typeof ScoutRole[number];
+
 
 export interface MatchPrediction {
     /** Unique prediction ID */
