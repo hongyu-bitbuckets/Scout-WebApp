@@ -98,7 +98,10 @@ const GameStartPage = () => {
   const states = location.state;
   const { ui } = useGame();
   const { getNextRoute, isConfigValid } = useWorkflowNavigation();
-  const { currentScout } = useScout();
+  const { currentScout, currentScoutRoles } = useScout();
+  
+  // Check if current scout has commentScouter role (role-based alliance restriction)
+  const isCommentScouter = currentScoutRoles?.includes("commentScouter");
 
   // Debug log when currentScout changes
   useEffect(() => {
@@ -133,7 +136,11 @@ const GameStartPage = () => {
     return { alliance: "", teamPosition: 0 };
   };
 
-  const stationInfo = parsePlayerStation();
+  // Restrict player station selection for comment scouters
+    // Removed duplicate declaration of currentScoutRoles and isCommentScouter
+  const stationInfo = isCommentScouter
+    ? { alliance: "", teamPosition: 0 } // comment scouters only choose alliance, not station
+    : parsePlayerStation();
 
   const getInitialMatchNumber = () => {
     if (states?.inputs?.matchNumber) {
@@ -144,9 +151,13 @@ const GameStartPage = () => {
     return storedMatchNumber || "1";
   };
 
-  const [alliance, setAlliance] = useState(
-    states?.inputs?.alliance || stationInfo.alliance || ""
-  );
+  // Alliance state: comment scouters can set freely, others use player station
+  const [alliance, setAlliance] = useState(() => {
+    // If restoring from state OR player station has alliance, use that
+    if (states?.inputs?.alliance) return states.inputs.alliance;
+    if (stationInfo.alliance) return stationInfo.alliance;
+    return "";
+  });
   const [matchNumber, setMatchNumber] = useState(getInitialMatchNumber());
   const [matchType, setMatchType] = useState<"qm" | "sf" | "f">("qm");
   const [debouncedMatchNumber, setDebouncedMatchNumber] = useState(matchNumber);
@@ -221,6 +232,14 @@ const GameStartPage = () => {
   useEffect(() => {
     localStorage.setItem(SCOUT_OPTIONS_STORAGE_KEY, JSON.stringify(scoutOptions));
   }, [scoutOptions]);
+
+  // Effect to auto-set alliance for station-driven scouters from player station
+  useEffect(() => {
+    if (!isCommentScouter && stationInfo.alliance) {
+      // Station-driven scouters automatically use player station alliance
+      setAlliance(stationInfo.alliance as 'red' | 'blue');
+    }
+  }, [isCommentScouter, stationInfo.alliance]);
 
   // Effect to pre-fill fields when in re-scout mode
   useEffect(() => {
@@ -457,7 +476,25 @@ const GameStartPage = () => {
               </div>
 
               <div className="flex items-center gap-2">
-                <PlayerStationSheet />
+                {/* For comment scouters, only show alliance selection as a dropdown, not full player station */}
+                {isCommentScouter ? (
+                  <div className="flex gap-2 items-center">
+                    <Label>Alliance</Label>
+                    <Select
+                      value={alliance}
+                      onValueChange={setAlliance}
+                      disabled={isRescoutMode}
+                    >
+                      <SelectTrigger className="w-40 h-12 text-lg" />
+                      <SelectContent>
+                        <SelectItem value="red">Red Alliance</SelectItem>
+                        <SelectItem value="blue">Blue Alliance</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ) : (
+                  <PlayerStationSheet />
+                )}
                 <ScoutOptionsSheet
                   options={scoutOptions}
                   onOptionChange={handleScoutOptionChange}
@@ -526,42 +563,55 @@ const GameStartPage = () => {
               )}
             </div>
 
-            {/* Alliance Selection with Buttons */}
-            <div className="space-y-2">
-              <Label>Alliance</Label>
-              <div className="grid grid-cols-2 gap-3">
-                <Button
-                  variant={alliance === "red" ? "default" : "outline"}
-                  onClick={() => setAlliance("red")}
-                  disabled={isRescoutMode}
-                  className={`h-12 text-lg font-semibold ${alliance === "red"
-                    ? "bg-red-500 hover:bg-red-600 text-white"
-                    : "hover:bg-red-50 hover:text-red-600 hover:border-red-300"
-                    } ${isRescoutMode ? 'cursor-not-allowed' : ''}`}
-                >
-                  <Badge
-                    variant={alliance === "red" ? "secondary" : "destructive"}
-                    className={`w-3 h-3 p-0 mr-2 ${alliance === "red" ? "bg-white" : "bg-red-500"}`}
-                  />
-                  Red Alliance
-                </Button>
-                <Button
-                  variant={alliance === "blue" ? "default" : "outline"}
-                  onClick={() => setAlliance("blue")}
-                  disabled={isRescoutMode}
-                  className={`h-12 text-lg font-semibold ${alliance === "blue"
-                    ? "bg-blue-500 hover:bg-blue-600 text-white"
-                    : "hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300"
-                    } ${isRescoutMode ? 'cursor-not-allowed' : ''}`}
-                >
-                  <Badge
-                    variant={alliance === "blue" ? "secondary" : "default"}
-                    className={`w-3 h-3 p-0 mr-2 ${alliance === "blue" ? "bg-white" : "bg-blue-500"}`}
-                  />
-                  Blue Alliance
-                </Button>
+            {/* Alliance Selection with Buttons - Only visible for manual-alliance roles */}
+            {isCommentScouter ? (
+              <div className="space-y-2">
+                <Label>Alliance</Label>
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    variant={alliance === "red" ? "default" : "outline"}
+                    onClick={() => setAlliance("red")}
+                    disabled={isRescoutMode}
+                    className={`h-12 text-lg font-semibold ${alliance === "red"
+                      ? "bg-red-500 hover:bg-red-600 text-white"
+                      : "hover:bg-red-50 hover:text-red-600 hover:border-red-300"
+                      } ${isRescoutMode ? 'cursor-not-allowed' : ''}`}
+                  >
+                    <Badge
+                      variant={alliance === "red" ? "secondary" : "destructive"}
+                      className={`w-3 h-3 p-0 mr-2 ${alliance === "red" ? "bg-white" : "bg-red-500"}`}
+                    />
+                    Red Alliance
+                  </Button>
+                  <Button
+                    variant={alliance === "blue" ? "default" : "outline"}
+                    onClick={() => setAlliance("blue")}
+                    disabled={isRescoutMode}
+                    className={`h-12 text-lg font-semibold ${alliance === "blue"
+                      ? "bg-blue-500 hover:bg-blue-600 text-white"
+                      : "hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300"
+                      } ${isRescoutMode ? 'cursor-not-allowed' : ''}`}
+                  >
+                    <Badge
+                      variant={alliance === "blue" ? "secondary" : "default"}
+                      className={`w-3 h-3 p-0 mr-2 ${alliance === "blue" ? "bg-white" : "bg-blue-500"}`}
+                    />
+                    Blue Alliance
+                  </Button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="space-y-2">
+                <Label>Alliance (Auto-set by player station)</Label>
+                <div className="flex items-center gap-2 h-12 px-3 rounded-md border border-input bg-muted">
+                  <Badge
+                    variant={alliance === "red" ? "destructive" : "default"}
+                    className={`w-3 h-3 p-0 ${alliance === "red" ? "bg-red-500" : "bg-blue-500"}`}
+                  />
+                  <span className="text-lg font-semibold capitalize">{alliance || "Not set"} Alliance</span>
+                </div>
+              </div>
+            )}
 
             {/* Alliance Prediction Selection */}
             <div className="space-y-2">

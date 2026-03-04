@@ -48,6 +48,19 @@ export class ScoutGamificationDB extends Dexie {
             });
         });
 
+        // Version 3: Normalize scout roles field
+        this.version(3).stores({
+            scouts: 'name, stakes, *scoutRoles, stakesFromPredictions, totalPredictions, correctPredictions, currentStreak, longestStreak, lastUpdated',
+            predictions: 'id, scoutName, eventKey, matchNumber, predictedWinner, timestamp, verified, [scoutName+eventKey+matchNumber]',
+            scoutAchievements: '[scoutName+achievementId], scoutName, achievementId, unlockedAt'
+        }).upgrade(tx => {
+            return tx.table('scouts').toCollection().modify(scout => {
+                if (!Array.isArray(scout.scoutRoles)) {
+                    scout.scoutRoles = [];
+                }
+            });
+        });
+
     }
 }
 

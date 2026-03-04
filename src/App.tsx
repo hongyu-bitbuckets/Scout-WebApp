@@ -138,7 +138,7 @@ function App() {
         {/* <Route path="/pit-scouting" element={<PitScoutingPage />} />  */}
         <Route path="/scout-management" element={<ScoutManagementDashboardPage />} />
         
-        <Route path="/pit-assignments" element={<PitAssignmentsPage />} />
+      
         <Route path="/achievements" element={<AchievementsPage />} />
         <Route path="/match-validation" element={<MatchValidationPage />} />
         <Route path="/dev-utilities" element={<DevUtilitiesPage />} />

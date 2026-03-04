@@ -62,9 +62,11 @@ export const ScoutProvider: React.FC<ScoutProviderProps> = ({ children }) => {
         try {
           const scout = await getOrCreateScoutByName(savedCurrentScout);
           setCurrentScoutStakes(scout.stakes);
+          setCurrentScoutRoles(scout.scoutRoles || []);
         } catch (error) {
           console.error('Error loading scout stakes:', error);
           setCurrentScoutStakes(0);
+          setCurrentScoutRoles([]);
         }
       }
 
@@ -93,7 +95,6 @@ export const ScoutProvider: React.FC<ScoutProviderProps> = ({ children }) => {
       // Update state
       setCurrentScoutState(trimmedName);
       setCurrentScoutStakes(scout.stakes);
-
       setCurrentScoutRoles(scout.scoutRoles || []);
       
       // Update localStorage
@@ -135,6 +136,7 @@ export const ScoutProvider: React.FC<ScoutProviderProps> = ({ children }) => {
       // Set as current scout
       setCurrentScoutState(trimmedName);
       setCurrentScoutStakes(scout.stakes);
+      setCurrentScoutRoles(scout.scoutRoles || []);
       localStorage.setItem('currentScout', trimmedName);
       
       console.log('✅ ScoutContext: Scout set to', trimmedName);
@@ -154,7 +156,9 @@ export const ScoutProvider: React.FC<ScoutProviderProps> = ({ children }) => {
     if (currentScout === name) {
       setCurrentScoutState('');
       setCurrentScoutStakes(0);
+      setCurrentScoutRoles([]);
       localStorage.removeItem('currentScout');
+      localStorage.removeItem('currentScoutRoles');
     }
   }, [scoutsList, currentScout]);
 
@@ -188,8 +192,6 @@ export const ScoutProvider: React.FC<ScoutProviderProps> = ({ children }) => {
         if (!currentScout) return;
         const scout = await getScout(currentScout) || await getOrCreateScoutByName(currentScout);
         if (scout) {
-          // ensure scout object has scoutRoles
-          // @ts-ignore - underlying DB Scout type
           scout.scoutRoles = roles;
           await gamificationDB.scouts.put(scout);
           window.dispatchEvent(new Event('scoutChanged'));
@@ -215,7 +217,6 @@ export const ScoutProvider: React.FC<ScoutProviderProps> = ({ children }) => {
         if (!currentScout) return;
         const scout = await getScout(currentScout) || await getOrCreateScoutByName(currentScout);
         if (scout) {
-          // @ts-ignore
           scout.scoutRoles = updatedRoles;
           await gamificationDB.scouts.put(scout);
           window.dispatchEvent(new Event('scoutChanged'));
@@ -236,7 +237,6 @@ export const ScoutProvider: React.FC<ScoutProviderProps> = ({ children }) => {
       const prevRoles: ScoutRole[] = scout.scoutRoles || [];
       const updatedRoles: ScoutRole[] = prevRoles.includes(role) ? prevRoles.filter(r => r !== role) : [...prevRoles, role];
 
-      // @ts-ignore
       scout.scoutRoles = updatedRoles;
       await gamificationDB.scouts.put(scout);
 

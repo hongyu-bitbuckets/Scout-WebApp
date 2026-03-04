@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { MatchScoutAssignmentSection } from "@/core/components/pit-assignments/MatchScoutAssignmentSection";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/core/components/animate-ui/radix/tabs";
 import { AlertCircle, Users, BarChart3 } from 'lucide-react';
 import { Alert, AlertDescription } from "@/core/components/ui/alert";
@@ -458,7 +459,7 @@ const PitAssignmentsPage: React.FC = () => {
         )}
       </div>
 
-      {/* Tabbed Interface for Team Display and Assignment Results */}
+      {/* Combined Tabbed Interface for Team Display, Pit Assignments, and Match Assignments */}
       {selectedEvent && currentTeams.length > 0 && (
         <Tabs
           value={activeTab}
@@ -466,7 +467,7 @@ const PitAssignmentsPage: React.FC = () => {
           enableSwipe={true}
           className="w-full"
         >
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="teams" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               Team Cards
@@ -474,6 +475,10 @@ const PitAssignmentsPage: React.FC = () => {
             <TabsTrigger value="assignments" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
               Table View
+            </TabsTrigger>
+            <TabsTrigger value="match-scout" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Match Scout Assign
             </TabsTrigger>
           </TabsList>
 
@@ -517,6 +522,12 @@ const PitAssignmentsPage: React.FC = () => {
                 onConfirmAssignments={assignmentMode === 'manual' && !assignmentsConfirmed ? handleConfirmAssignments : undefined}
                 pitAddresses={pitAddresses}
               />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="match-scout">
+            <div className="min-h-[400px] max-w-2xl mx-auto">
+              <MatchScoutAssignmentSection matchNumber={localStorage.getItem("currentMatchNumber") || "1"} />
             </div>
           </TabsContent>
         </Tabs>

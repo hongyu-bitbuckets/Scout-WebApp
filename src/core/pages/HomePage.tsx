@@ -6,7 +6,6 @@ import { hasAccess } from "@/core/components/permissions/HasAccess";
 import { SCOUT_ROLES, ScoutRole } from "../types/scoutRole";
 import React from "react";
 import { ROLE_LABELS } from "../types/scoutMetaData";
-import { Car } from "lucide-react";
 
 /**
  * HomePage Props
@@ -55,7 +54,11 @@ const HomePage = ({
     <main className="relative h-screen w-full">
 
 <>
-      <div className={cn("flex h-full w-full flex-col items-center justify-center gap-6 rounded-md border-2 border-dashed p-6", "bg-size-[40px_40px]")}>
+      <div className={cn("flex flex-col h-screen w-full justify-center items-center gap-6 2xl:pb-6",
+        "bg-size-[40px_40px]",
+        "bg-[linear-gradient(to_right,#e4e4e7_1px,transparent_1px),linear-gradient(to_bottom,#e4e4e7_1px,transparent_1px)]",
+          "dark:bg-[linear-gradient(to_right,#262626_1px,transparent_1px),linear-gradient(to_bottom,#262626_1px,transparent_1px)]"
+      )}>
         <h1 className="text-4xl font-bold">{appName}</h1>
         <h2 className="text-2xl font-semibold">Get Started</h2>
         <h2>
