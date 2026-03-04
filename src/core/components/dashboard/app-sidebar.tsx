@@ -238,7 +238,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar variant="inset" {...props}>
-
       <SidebarHeader
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
@@ -249,6 +248,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button] h-fit"
             >
+              
             </SidebarMenuButton>
             <Separator className="my-1" />
           </SidebarMenuItem>
@@ -260,7 +260,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         onTouchEnd={handleTouchEnd}
       >
         <NavMain items={data.navMain} />
-
       </SidebarContent>
 
       <SidebarFooter>

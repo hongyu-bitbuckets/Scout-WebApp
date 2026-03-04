@@ -1,4 +1,4 @@
-import { Binoculars, Wifi, QrCode, TrendingUp, Map } from 'lucide-react';
+import { Binoculars, Wifi } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { cn } from '@/core/lib/utils';
 import { usePWA } from '@/core/hooks/usePWA';
@@ -7,7 +7,6 @@ import { useNavigationConfirm } from '@/core/hooks/useNavigationConfirm';
 import { NavigationConfirmDialog } from '@/core/components/NavigationConfirmDialog';
 import { haptics } from '@/core/lib/haptics';
 import { Button } from '@/core/components/ui/button';
-import { lab } from 'd3';
 
 /**
  * Bottom Navigation Component

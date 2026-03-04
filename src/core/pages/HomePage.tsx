@@ -1,7 +1,6 @@
 import { cn } from "@/core/lib/utils";
 import { useScout } from "@/core/contexts/ScoutContext";
-import { SCOUT_ROLES, type ScoutRole } from "@/core/types/scoutRole";
-import React, { useState } from "react";
+import { SCOUT_ROLES } from "@/core/types/scoutRole";
 import { Button, Card, CardContent } from "@/components";
 
 /**
