@@ -2,9 +2,11 @@ import { cn } from "@/core/lib/utils";
 import { useScout } from "@/core/contexts/ScoutContext";
 import { Button, Card, CardContent } from "@/components";
 import { useNavigate } from "react-router-dom";
+import { hasAccess } from "@/core/components/permissions/HasAccess";
+import { SCOUT_ROLES, ScoutRole } from "../types/scoutRole";
 import React from "react";
-import { ScoutRole, SCOUT_ROLES } from "../types/scoutRole";
 import { ROLE_LABELS } from "../types/scoutMetaData";
+import { Car } from "lucide-react";
 
 /**
  * HomePage Props
@@ -47,13 +49,12 @@ const HomePage = ({
     setNewRoles([]);
   };
   const navigate = useNavigate();
-
-
+  const canManage = hasAccess(currentScoutRoles, ["leadership", "mentors"] as ScoutRole[]);
 
   return (
-
     <main className="relative h-screen w-full">
 
+<>
       <div className={cn("flex h-full w-full flex-col items-center justify-center gap-6 rounded-md border-2 border-dashed p-6", "bg-size-[40px_40px]")}>
         <h1 className="text-4xl font-bold">{appName}</h1>
         <h2 className="text-2xl font-semibold">Get Started</h2>
@@ -61,12 +62,11 @@ const HomePage = ({
           1. Select or create a scout profile, or
           select/manage scouts using the sidebar.
         </h2>
+        <div/>
 
-        {/* profile creation form */}
-        {/* Scout Profile Card */}
         <Card className="w-full max-w-lg mx-4 mt-8">
           <CardContent className="p-6">
-            <div className="text-center space-y-4">
+              <div className="text-center space-y-4">
               <h2 className="text-lg font-semibold">Create New Scout Profile</h2>
               <p className="text-sm text-muted-foreground">
                 Name and optionally select roles before hitting create.</p>
@@ -108,54 +108,45 @@ const HomePage = ({
           </CardContent>
         </Card>
 
-        {/* Scout Profile Card */}
         <Card className="w-full max-w-lg mx-4 mt-8">
-          <CardContent className="p-6">
-            <div className="space-y-4">
-              <div className="text-center">
-                <h2 className="text-lg font-semibold mb-2">Scout Profile</h2>
-
-                {currentScout ? (
-                  <>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Current: <span className="font-medium text-foreground">{currentScout}</span>
-                    </p>
-                    {currentScoutRoles && currentScoutRoles.length > 0 && (
-                      <div className="flex flex-wrap gap-1 justify-center mb-2">
-                        {currentScoutRoles.map(role => (
-                          <span
-                            key={role}
-                            className="text-xs px-2 py-1 rounded-md bg-primary/10 text-primary"
-                          >
-                            {role}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    No scout selected. Create or select a profile to get started.
+           <CardContent className="p-6">
+              <div className="text-center space-y-4">
+              <h2 className="text-lg font-semibold mb-2">Scout Profile</h2>
+              {currentScout ? (
+                <>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Current: <span className="font-medium text-foreground">{currentScout}</span>
                   </p>
-                )}
+                  {currentScoutRoles && currentScoutRoles.length > 0 && (
+                    <div className="flex flex-wrap gap-1 justify-center mb-2">
+                      {currentScoutRoles.map(r => (
+                        <span
+                          key={r}
+                          className="text-xs px-2 py-1 rounded-md bg-primary/10 text-primary"
+                        >
+                          {r}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground">No scout selected. Create or select a profile to get started.</p>
+              )}
+
+              {canManage && (
+                <Button onClick={() => navigate("/scouts-profiles")} className="w-full">
+                  Manage Scout Profiles
+                </Button>
+              )}
               </div>
+            </CardContent>
 
-              <Button onClick={() => navigate("/scouts-profile")} className="w-full">
-                Manage Scout Profiles
-              </Button>
-            </div>
-          </CardContent>
         </Card>
-
-
       </div>
-
-
-    </main >
-
+</>
+    </main>
   );
-
-
 };
 
 export default HomePage;

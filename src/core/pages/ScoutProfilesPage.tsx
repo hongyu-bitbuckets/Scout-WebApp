@@ -60,6 +60,23 @@ export default function ScoutProfilesPage() {
     return label;
   };
 
+  // confirm before making persistent changes
+  const handleToggleRole = async (scout: string, role: ScoutRole) => {
+    const currentlyHas = currentScoutRoles?.includes(role);
+    const action = currentlyHas ? "remove" : "add";
+    if (!window.confirm(`Are you sure you want to ${action} role "${role}" for scout ${scout}?`)) {
+      return;
+    }
+    await toggleScoutRoleFor(scout, role);
+  };
+
+  const handleDeleteScout = async (scout: string) => {
+    if (!window.confirm(`Delete scout profile "${scout}"? This cannot be undone.`)) {
+      return;
+    }
+    await removeScout(scout);
+  };
+
   return (
     <div className="min-h-screen container mx-auto px-4 pt-12 pb-24 space-y-6">
       <div className="flex items-center gap-2">
@@ -177,7 +194,7 @@ export default function ScoutProfilesPage() {
                           key={role}
                           onClick={async e => {
                             e.stopPropagation();
-                            await toggleScoutRoleFor(scout, role);
+                            await handleToggleRole(scout, role);
                           }}
                           className={cn(
                             "text-xs px-2 py-1 rounded-md border transition whitespace-nowrap",
@@ -199,7 +216,7 @@ export default function ScoutProfilesPage() {
                     size="sm"
                     onClick={async e => {
                       e.stopPropagation();
-                      await removeScout(scout);
+                      await handleDeleteScout(scout);
                     }}
                     className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
                   >
