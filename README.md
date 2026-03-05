@@ -1,4 +1,6 @@
-
+main -> yearly based
+CORE -> core functions we want to keep for every year
+Scout-XXXX -> final version
 
 | Repository | Description | Status |
 |------------|-------------|--------|
