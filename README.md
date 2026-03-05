@@ -1,10 +1,4 @@
-# Maneuver-2026
 
-**FRC 2026 REBUILT Scouting Application**
-
-Maneuver-2026 is a comprehensive scouting application built for the 2026 FRC game season: **REBUILT**. Built on the maneuver-core framework, it provides offline-first PWA capabilities, field-centric data collection, match validation, and advanced analytics—all optimized for the unique challenges of the 2026 game.
-
-## 🔗 Related Repositories
 
 | Repository | Description | Status |
 |------------|-------------|--------|
@@ -12,165 +6,7 @@ Maneuver-2026 is a comprehensive scouting application built for the 2026 FRC gam
 | **Maneuver-2025** | 2025 Reefscape implementation | [Live App](https://github.com/ShinyShips/Maneuver-2025) |
 | **Maneuver-2026** | 2026 REBUILT implementation (this repo) | Active Development |
 
-## 🎯 About This App
 
-Maneuver-2026 is specifically designed for the 2026 FRC game **REBUILT**, featuring:
-
-- **Fuel-Based Scoring**: Track fuel collection, scoring, and passing throughout the match
-- **Tower Climbing**: Support for autonomous Level 1 climbing and endgame Level 1/2/3 climbing
-- **Field-Centric Interface**: Scoring screens mirror the actual game field with zones (Alliance, Neutral, Opponent)
-- **Trench/Bump Navigation**: Track robot capabilities for going under trenches vs. over bumps
-
-## 💡 Design Philosophy
-
-Maneuver is **not** just another scouting app with basic counters and text inputs. The official Maneuver branches are designed with a focus on creating the **best possible UI/UX for scouting**.
-
-### What sets Maneuver apart:
-
-- **Field-Centric Interfaces** — Scoring screens mirror the game field, making data collection intuitive and fast
-- **Contextual Actions** — UI elements adapt to game phases (auto/teleop/endgame) rather than showing everything at once
-- **Visual Feedback** — Animations, color coding, and haptic responses confirm every action
-- **Scout-First Design** — Optimized for the chaos of competition: large touch targets, minimal scrolling, one-handed operation
-- **Data Visualization** — Statistics presented through charts, heat maps, and comparisons—not just tables of numbers
-
-> **For teams forking this template:** We encourage you to maintain this commitment to quality UX. Your scouts will thank you, and your data quality will improve.
-
-## 🏗️ Repository Structure
-
-```
-Maneuver-2026/
-├── src/
-│   ├── core/                    # 📦 Framework (from maneuver-core)
-│   │   ├── components/          # Reusable UI components
-│   │   ├── contexts/            # React contexts (Game, Theme, etc.)
-│   │   ├── db/                  # Dexie database setup
-│   │   ├── hooks/               # Custom React hooks
-│   │   ├── layouts/             # Page layouts
-│   │   ├── lib/                 # Utilities and helpers
-│   │   ├── pages/               # Application pages/routes
-│   │   └── types/               # TypeScript type definitions
-│   │
-│   ├── game-template/           # 🎮 2026 REBUILT Implementation
-│   │   ├── components/          # Game-specific UI (field maps, scoring)
-│   │   │   ├── auto-path/       # Autonomous path tracking
-│   │   │   ├── field-map/       # Interactive field canvas
-│   │   │   ├── teleop-path/     # Teleop path tracking
-│   │   │   ├── scoring/         # Fuel scoring components
-│   │   │   ├── endgame/         # Climb selection
-│   │   │   └── pit-scouting/    # 2026-specific pit questions
-│   │   ├── contexts/            # Scoring & path contexts
-│   │   ├── gamification/        # Achievements system
-│   │   ├── GAME_2026.md         # Complete game rules reference
-│   │   ├── game-schema.ts       # Single source of truth for 2026 config
-│   │   ├── scoring.ts           # Point calculations for fuel/climbing
-│   │   ├── transformation.ts    # Data transformation logic
-│   │   └── ...config files
-│   │
-│   ├── App.tsx                  # Main application entry
-│   └── main.tsx                 # React DOM render
-│
-├── docs/                        # 📚 Documentation
-└── public/                      # Static assets
-```
-
-### Key Directories
-
-| Directory | Purpose |
-|-----------|---------|
-| `src/core/` | Year-agnostic framework code (from maneuver-core) |
-| `src/game-template/` | 2026 REBUILT game implementation — **customize for your team's needs** |
-| `docs/` | Comprehensive documentation for framework features |
-
-## ✨ Features
-### 2026 REBUILT Game-Specific
-- **Fuel Tracking**: Score, pass, and steal fuel with field-accurate positioning
-- **Autonomous Path Tracking**: Record robot movements and scoring actions with canvas drawing
-- **Teleop Role Analysis**: Track Active vs Inactive shift strategies (Cycler, Clean Up, Passer, Thief, Defense)
-- **Tower Climbing**: Auto Level 1 (15pts) and Endgame Level 1/2/3 (10/20/30pts)
-- **Trench/Bump Navigation**: Track field traversal capabilities
-
-### Core Framework Features
-- **Offline-First PWA**: Works without internet, installs like a native app
-- **Match Scouting**: Pre-match setup, auto, teleop, endgame screens
-- **Pit Scouting**: Robot specifications and 2026-specific capabilities
-- **Data Transfer**: QR codes (fountain codes), JSON import/export, and WiFi transfer using WebRTC
-- **Match Validation**: Compare scouted data against TBA official results
-- **Team Statistics**: Averages, totals, performance analysis for 2026 metrics
-- **Match Strategy**: Pre-match planning with field annotations
-- **Pick Lists**: Alliance selection with drag-and-drop ordering
-- **Scout Gamification**: Achievements, leaderboards, and profile tracking
-- **Dark/Light Themes**: Full theme support
-- **Responsive Design**: Works on tablets and phones
-
-## 🚀 Quick Start
-
-### Using This App
-
-```bash
-# Clone the repository
-git clone https://github.com/ShinyShips/Maneuver-2026.git
-cd Maneuver-2026
-
-# Install dependencies
-npm install
-
-# Create .env from example
-cp .env.example .env
-# Edit .env and add your TBA API key
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-```
-
-### For Your Team
-
-If you want to customize this for your team:
-
-1. **Fork** this repository to your organization
-2. **Customize** strategy configs in `src/game-template/` for your team's preferences
-3. **Modify** pick list criteria in `pick-list-config.ts`
-4. **Adjust** achievements in `gamification/achievements.ts`
-5. **Deploy** to Netlify/Vercel using your fork
-
-### Receiving Framework Updates
-
-To pull bug fixes and framework enhancements from maneuver-core:
-
-```bash
-# Add maneuver-core as upstream remote
-git remote add upstream https://github.com/ShinyShips/maneuver-core.git
-
-# Fetch and merge updates (resolve conflicts favoring YOUR game-template/)
-git fetch upstream
-git merge upstream/main
-```
-git fetch upstream
-git merge upstream/main --allow-unrelated-histories
-# Resolve conflicts: keep YOUR version for game-template/, keep UPSTREAM for core/
-
-# Future updates are simple
-git fetch upstream
-git merge upstream/main
-```
-
-> **Tip**: When resolving conflicts, game-specific files in `src/game-template/` should keep your version, while framework files in `src/core/` should typically use the upstream version.
-
-### Environment Setup
-
-Copy `.env.example` to `.env` and add your API keys:
-
-```env
-# The Blue Alliance API Key
-# Get your key at: https://www.thebluealliance.com/account
-VITE_TBA_API_KEY=your_tba_api_key_here
-
-# Nexus Stats API Key (optional, for additional match data)
-# Get your key at: https://frc.nexus/
-VITE_NEXUS_API_KEY=your_nexus_api_key_here
-```
 
 ## 📚 Documentation
 
@@ -267,22 +103,13 @@ export const zones = {
 | API | The Blue Alliance (TBA) |
 | Deployment | Netlify / Vercel |
 
-## 🤝 Contributing
 
-Contributions to improve the 2026 implementation are welcome! Please:
-
-1. Test changes thoroughly with the 2026 game rules
-2. Keep framework changes in `src/core/` generic (consider contributing to maneuver-core)
-3. Document any new 2026-specific features
-4. Run `npm run build` to verify no type errors
-
-## 📝 License
-
-MIT License - see [LICENSE](LICENSE) for details.
-
-## 🙏 Credits
-
-Developed by **Andy Nguyen (ShinyShips) - FRC Team 3314 Alumni and Strategy Mentor** for the FRC community.
+First Ver: Developed by **Andy Nguyen (ShinyShips) - FRC Team 3314 Alumni and Strategy Mentor** for the FRC community.
+Second Ver: Developed by Hongyu Long
+- Customized development for 4183
+- Role setting
+- Scouter dashboard
+- Different navigation
 
 Built on the **maneuver-core** framework.
 
@@ -290,11 +117,3 @@ Special thanks to:
 - [The Blue Alliance](https://www.thebluealliance.com/) for their excellent API
 - [VScout](https://github.com/VihaanChhabria/VScout) by VihaanChhabria for initial inspiration
 - All the open-source libraries that make this possible
-
-## 📞 Support
-
-- **Issues**: [GitHub Issues](https://github.com/ShinyShips/Maneuver-2026/issues)
-- **Framework Issues**: [maneuver-core Issues](https://github.com/ShinyShips/maneuver-core/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/ShinyShips/Maneuver-2026/discussions)
-
----
