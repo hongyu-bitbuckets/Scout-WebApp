@@ -3,16 +3,16 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Badge } from "@/core/components/ui/badge";
-import { toast } from "sonner";
 import { ArrowRight } from "lucide-react";
-import { ScoringSections } from "@/game-template/components";
+import { StatusToggles } from "@/game-template/components";
 import { FIELD_ELEMENTS } from "@/game-template/components/field-map";
 import { formatDurationSecondsLabel } from "@/game-template/duration";
 import { AUTO_PHASE_DURATION_MS } from "@/game-template/constants";
 import { useWorkflowNavigation } from "@/core/hooks/useWorkflowNavigation";
 import { submitMatchData } from "@/core/lib/submitMatch";
 import { useGame } from "@/core/contexts/GameContext";
-import BallsShotCounter from "@/core/components/scouting/BallsShotCounter";
+import { workflowConfig } from "@/game-template/game-schema";
+import BallsShotCounter from "@/core/components/GameStartComponents/plusMinusButton";
 
 
 const AutoScoringPage = () => {
@@ -62,37 +62,9 @@ const AutoScoringPage = () => {
     localStorage.setItem("autoUndoHistory", JSON.stringify(undoHistory));
   }, [undoHistory]);
 
-  const addScoringAction = (action: any) => {
-    const newAction = { ...action, timestamp: Date.now() };
-    setScoringActions((prev: any) => [...prev, newAction]);
-    // Add to undo history
-    setUndoHistory((prev: any) => [...prev, { type: 'action', data: newAction }]);
-  };
-
   const updateRobotStatus = (updates: Partial<any>) => {
     setUndoHistory((history: any) => [...history, { type: 'status', data: robotStatus }]);
     setRobotStatus((prev: any) => ({ ...prev, ...updates }));
-  };
-
-
-  const undoLastAction = () => {
-    if (undoHistory.length === 0) {
-      toast.error("No actions to undo");
-      return;
-    }
-
-    const lastChange = undoHistory[undoHistory.length - 1];
-
-    if (lastChange.type === 'action') {
-      // Undo scoring action
-      setScoringActions((prev: any) => prev.slice(0, -1));
-    } else if (lastChange.type === 'status') {
-      // Restore previous status
-      setRobotStatus(lastChange.data);
-    }
-
-    // Remove from undo history
-    setUndoHistory((prev: any) => prev.slice(0, -1));
   };
 
   const handleBack = () => {
@@ -303,7 +275,7 @@ const AutoScoringPage = () => {
             </Card> */}
 
             {/* Robot Status Card */}
-            {/* {workflowConfig.pages.showAutoStatus && (
+             {workflowConfig.pages.showAutoStatus && (
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Robot Status</CardTitle>
@@ -318,7 +290,7 @@ const AutoScoringPage = () => {
               </Card>
             )}
 
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Auto Climb Start Time</CardTitle>
               </CardHeader>
@@ -352,30 +324,31 @@ const AutoScoringPage = () => {
                   />
                 </div>
               </CardContent>
-            </Card> */}
+            </Card> */} 
 
             {/* Undo Button */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Balls Shot</CardTitle>
+                <CardTitle className="text-center text-2xl">Fuel Scored</CardTitle>
               </CardHeader>
               <CardContent>
                 <BallsShotCounter
                   count={ballsShotCount}
                   onChange={(nextCount) => updateRobotStatus({ ballsShotCount: nextCount })}
+                  incrementLabel="+1 Fuel"
                 />
               </CardContent>
             </Card>
 
             {/* Undo Button */}
-            <Button
+            {/* <Button
               variant="outline"
               onClick={undoLastAction}
               disabled={undoHistory.length === 0}
               className="w-full"
             >
               Undo Last Change
-            </Button>
+            </Button> */}
 
             {/* Action Buttons - Desktop Only */}
             <div className="hidden lg:flex gap-4 w-full">

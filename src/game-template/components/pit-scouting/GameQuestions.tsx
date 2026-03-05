@@ -224,7 +224,7 @@ export function GameSpecificQuestions({ gameData = {}, onGameDataChange }: GameS
           <CardTitle>Physical Specifications</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <Label htmlFor="maxLength">Robot Max Length (inches, with any extension)</Label>
             <Input
               id="maxLength"
@@ -244,7 +244,7 @@ export function GameSpecificQuestions({ gameData = {}, onGameDataChange }: GameS
               value={(gameData.maxWidth as number) || ''}
               onChange={(e) => handleChange('maxWidth', parseFloat(e.target.value) || 0)}
             />
-          </div>
+          </div> */}
 
           <div className="space-y-2">
             <Label htmlFor="maxHeight">Robot Max Height (inches)</Label>
@@ -335,7 +335,7 @@ export function GameSpecificQuestions({ gameData = {}, onGameDataChange }: GameS
       </Card>
 
       {/* Strategic Preferences */}
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>Strategic Preferences</CardTitle>
         </CardHeader>
@@ -419,7 +419,7 @@ export function GameSpecificQuestions({ gameData = {}, onGameDataChange }: GameS
             </div>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
       {/* Autonomous & Endgame */}
       <Card>
@@ -477,7 +477,7 @@ export function GameSpecificQuestions({ gameData = {}, onGameDataChange }: GameS
       </Card>
 
       {/* Reported Autos by Start Position */}
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>Reported Autos by Starting Location</CardTitle>
         </CardHeader>
@@ -527,7 +527,7 @@ export function GameSpecificQuestions({ gameData = {}, onGameDataChange }: GameS
             );
           })}
         </CardContent>
-      </Card>
+      </Card> */}
 
       <Dialog open={recordingStart !== null} onOpenChange={(open) => { if (!open) closeRecorder(); }}>
         <DialogContent className="w-screen h-screen max-w-none max-h-none rounded-none border-0 p-4 sm:p-6 flex flex-col overflow-hidden">

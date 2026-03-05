@@ -12,9 +12,7 @@ import { useWorkflowNavigation } from "@/core/hooks/useWorkflowNavigation";
 import { submitMatchData } from "@/core/lib/submitMatch";
 import { useGame } from "@/core/contexts/GameContext";
 import { workflowConfig } from "@/game-template/game-schema";
-import BallsShotCounter from "@/core/components/scouting/BallsShotCounter";
-
-const TELEOP_CLIMB_START_PRESETS = [30, 25, 20, 15, 10, 5] as const;
+import BallsShotCounter from "@/core/components/GameStartComponents/plusMinusButton";
 
 const TeleopScoringPage = () => {
   const location = useLocation();
@@ -47,9 +45,6 @@ const TeleopScoringPage = () => {
   const ballsShotCount = typeof robotStatus?.ballsShotCount === 'number'
     ? Math.max(0, robotStatus.ballsShotCount)
     : 0;
-  const teleopClimbStartTimeSecRemaining = typeof robotStatus?.teleopClimbStartTimeSecRemaining === 'number'
-    ? robotStatus.teleopClimbStartTimeSecRemaining
-    : null;
 
   // Save state to localStorage whenever actions change
   useEffect(() => {
@@ -282,7 +277,7 @@ const TeleopScoringPage = () => {
           )}
 
           {/* Recent Actions */}
-          <Card className="h-64">
+          {/* <Card className="h-64">
             <CardHeader>
               <CardTitle className="text-lg">Recent Actions</CardTitle>
             </CardHeader>
@@ -314,7 +309,7 @@ const TeleopScoringPage = () => {
                 )}
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
 
           {/* Robot Status Card */}
           {workflowConfig.pages.showTeleopStatus && (
@@ -370,12 +365,13 @@ const TeleopScoringPage = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Balls Shot</CardTitle>
+              <CardTitle className="text-center text-2xl">Fuel Scored</CardTitle>
             </CardHeader>
             <CardContent>
               <BallsShotCounter
                 count={ballsShotCount}
                 onChange={(nextCount) => updateRobotStatus({ ballsShotCount: nextCount })}
+                incrementLabel="+1 Fuel"
               />
             </CardContent>
           </Card>
