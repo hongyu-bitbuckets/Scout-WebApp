@@ -210,58 +210,58 @@ export const toggles = {
     },
     endgame: {
         // Active Phase Role toggles (multi-select, group: "roleActive")
-        roleActiveCleanUp: {
-            label: "Clean Up",
-            description: "Collected fuel from the Alliance Zone and Scored",
-            group: "roleActive",
-        },
-        roleActivePasser: {
-            label: "Passer",
-            description: "Passed fuel to alliance partners",
-            group: "roleActive",
-        },
-        roleActiveDefense: {
-            label: "Defense",
-            description: "Played defensive role",
-            group: "roleActive",
-        },
-        roleActiveCycler: {
-            label: "Cycler",
-            description: "Scored fuel repeatedly, going from the Neutral Zone to the Alliance Zone",
-            group: "roleActive",
-        },
-        roleActiveThief: {
-            label: "Thief",
-            description: "Stole fuel from opponent zone",
-            group: "roleActive",
-        },
+        // roleActiveCleanUp: {
+        //     label: "Clean Up",
+        //     description: "Collected fuel from the Alliance Zone and Scored",
+        //     group: "roleActive",
+        // },
+        // roleActivePasser: {
+        //     label: "Passer",
+        //     description: "Passed fuel to alliance partners",
+        //     group: "roleActive",
+        // },
+        // roleActiveDefense: {
+        //     label: "Defense",
+        //     description: "Played defensive role",
+        //     group: "roleActive",
+        // },
+        // roleActiveCycler: {
+        //     label: "Cycler",
+        //     description: "Scored fuel repeatedly, going from the Neutral Zone to the Alliance Zone",
+        //     group: "roleActive",
+        // },
+        // roleActiveThief: {
+        //     label: "Thief",
+        //     description: "Stole fuel from opponent zone",
+        //     group: "roleActive",
+        // },
 
         // Inactive Phase Role toggles (multi-select, group: "roleInactive")
-        roleInactiveCleanUp: {
-            label: "Clean Up",
-            description: "Collected fuel from the Alliance Zone and Scored",
-            group: "roleInactive",
-        },
-        roleInactivePasser: {
-            label: "Passer",
-            description: "Passed fuel to alliance partners",
-            group: "roleInactive",
-        },
-        roleInactiveDefense: {
-            label: "Defense",
-            description: "Played defensive role",
-            group: "roleInactive",
-        },
-        roleInactiveCycler: {
-            label: "Cycler",
-            description: "Scored fuel repeatedly, going from the Neutral Zone to the Alliance Zone",
-            group: "roleInactive",
-        },
-        roleInactiveThief: {
-            label: "Thief",
-            description: "Stole fuel from opponent zone",
-            group: "roleInactive",
-        },
+        // roleInactiveCleanUp: {
+        //     label: "Clean Up",
+        //     description: "Collected fuel from the Alliance Zone and Scored",
+        //     group: "roleInactive",
+        // },
+        // roleInactivePasser: {
+        //     label: "Passer",
+        //     description: "Passed fuel to alliance partners",
+        //     group: "roleInactive",
+        // },
+        // roleInactiveDefense: {
+        //     label: "Defense",
+        //     description: "Played defensive role",
+        //     group: "roleInactive",
+        // },
+        // roleInactiveCycler: {
+        //     label: "Cycler",
+        //     description: "Scored fuel repeatedly, going from the Neutral Zone to the Alliance Zone",
+        //     group: "roleInactive",
+        // },
+        // roleInactiveThief: {
+        //     label: "Thief",
+        //     description: "Stole fuel from opponent zone",
+        //     group: "roleInactive",
+        // },
 
         // Passing zones (multi-select, group: "passingZone")
         passedToAllianceFromNeutral: {

@@ -25,6 +25,13 @@ const percent = (count: number, total: number): number =>
 
 const val = (n: number | unknown): number => (typeof n === 'number' ? n : 0);
 
+const fuelScored = (phaseData: Record<string, unknown> | undefined): number => {
+    if (!phaseData) return 0;
+    if (typeof phaseData.fuelScoredCount === 'number') return phaseData.fuelScoredCount;
+    if (typeof phaseData.ballsShotCount === 'number') return phaseData.ballsShotCount;
+    return 0;
+};
+
 const avg = (values: number[]): number => {
     if (values.length === 0) return 0;
     return values.reduce((sum, value) => sum + value, 0) / values.length;
@@ -72,7 +79,7 @@ export const calculateTeamStats = (teamMatches: ScoutingEntry[]): Omit<TeamStats
 
     // Auto fuel
     const autoFuelTotal = sum(teamMatches, m =>
-        val(m.gameData?.auto?.fuelScoredCount)
+        fuelScored(m.gameData?.auto as Record<string, unknown> | undefined)
     );
 
     const autoFuelPassedTotal = sum(teamMatches, m =>
@@ -81,7 +88,7 @@ export const calculateTeamStats = (teamMatches: ScoutingEntry[]): Omit<TeamStats
 
     // Teleop fuel
     const teleopFuelTotal = sum(teamMatches, m =>
-        val(m.gameData?.teleop?.fuelScoredCount)
+        fuelScored(m.gameData?.teleop as Record<string, unknown> | undefined)
     );
 
     const teleopFuelPassedTotal = sum(teamMatches, m =>

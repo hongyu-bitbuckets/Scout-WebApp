@@ -342,10 +342,14 @@ function buildFuelOprMap(matches: ScoutingEntry[]): Map<string, {
 
             const rawAuto = typeof entry.gameData?.auto?.fuelScoredCount === 'number'
                 ? entry.gameData.auto.fuelScoredCount
-                : 0;
+                : (typeof (entry.gameData?.auto as Record<string, unknown> | undefined)?.ballsShotCount === 'number'
+                    ? ((entry.gameData?.auto as Record<string, unknown>).ballsShotCount as number)
+                    : 0);
             const rawTeleop = typeof entry.gameData?.teleop?.fuelScoredCount === 'number'
                 ? entry.gameData.teleop.fuelScoredCount
-                : 0;
+                : (typeof (entry.gameData?.teleop as Record<string, unknown> | undefined)?.ballsShotCount === 'number'
+                    ? ((entry.gameData?.teleop as Record<string, unknown>).ballsShotCount as number)
+                    : 0);
 
             return {
                 auto: typeof scaledMetrics?.scaledAutoFuel === 'number' ? scaledMetrics.scaledAutoFuel : rawAuto,

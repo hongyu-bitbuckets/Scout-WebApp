@@ -321,7 +321,7 @@ export function GameSpecificQuestions({ gameData = {}, onGameDataChange }: GameS
             </Button>
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <Button
               type="button"
               variant={gameData.canPassToCorral ? "default" : "outline"}
@@ -330,7 +330,7 @@ export function GameSpecificQuestions({ gameData = {}, onGameDataChange }: GameS
             >
               Can pass fuel to corral
             </Button>
-          </div>
+          </div> */}
         </CardContent>
       </Card>
 

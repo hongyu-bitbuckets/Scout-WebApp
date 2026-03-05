@@ -33,6 +33,20 @@ type ScoutingEntryTemplate = ScoutingEntryBase & {
     gameData: CoreGameData;
 };
 
+const getPhaseFuelScored = (phaseData: Record<string, unknown> | undefined): number => {
+    if (!phaseData) return 0;
+
+    if (typeof phaseData.fuelScoredCount === 'number') {
+        return phaseData.fuelScoredCount;
+    }
+
+    if (typeof phaseData.ballsShotCount === 'number') {
+        return phaseData.ballsShotCount;
+    }
+
+    return 0;
+};
+
 /**
  * Team statistics for 2026 REBUILT
  */
@@ -269,8 +283,8 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                 scaledTeleopFuel?: number;
             } | undefined;
 
-            const rawAutoFuel = gameData?.auto?.fuelScoredCount || 0;
-            const rawTeleopFuel = gameData?.teleop?.fuelScoredCount || 0;
+            const rawAutoFuel = getPhaseFuelScored(gameData?.auto as Record<string, unknown> | undefined);
+            const rawTeleopFuel = getPhaseFuelScored(gameData?.teleop as Record<string, unknown> | undefined);
             const scaledAutoFuel = typeof scaledMetrics?.scaledAutoFuel === 'number'
                 ? scaledMetrics.scaledAutoFuel
                 : rawAutoFuel;
@@ -426,8 +440,8 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                 noShow: isNoShow,
                 startPosition: entry.gameData?.auto?.startPosition ?? -1,
                 comment: entry.comments || '',
-                autoFuel: entry.gameData?.auto?.fuelScoredCount || 0,
-                teleopFuel: entry.gameData?.teleop?.fuelScoredCount || 0,
+                autoFuel: getPhaseFuelScored(entry.gameData?.auto as Record<string, unknown> | undefined),
+                teleopFuel: getPhaseFuelScored(entry.gameData?.teleop as Record<string, unknown> | undefined),
                 fuelPassed: (entry.gameData?.auto?.fuelPassedCount || 0) + (entry.gameData?.teleop?.fuelPassedCount || 0),
                 autoFuelPassed: entry.gameData?.auto?.fuelPassedCount || 0,
                 teleopFuelPassed: entry.gameData?.teleop?.fuelPassedCount || 0,

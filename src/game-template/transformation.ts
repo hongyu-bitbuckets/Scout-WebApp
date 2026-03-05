@@ -332,6 +332,18 @@ export const gameDataTransformation: DataTransformation = {
     if (matchData.teleopRobotStatus) Object.assign(result.teleop, matchData.teleopRobotStatus);
     if (matchData.endgameRobotStatus) Object.assign(result.endgame, matchData.endgameRobotStatus);
 
+    // Counter UI uses ballsShotCount; map it to canonical fuelScoredCount used by analysis.
+    // If provided, treat button counters as source of truth and ignore waypoint-derived scored fuel.
+    const autoBallsShotCount = Number((matchData.autoRobotStatus as Record<string, unknown> | undefined)?.ballsShotCount);
+    if (Number.isFinite(autoBallsShotCount) && autoBallsShotCount >= 0) {
+      result.auto.fuelScoredCount = autoBallsShotCount;
+    }
+
+    const teleopBallsShotCount = Number((matchData.teleopRobotStatus as Record<string, unknown> | undefined)?.ballsShotCount);
+    if (Number.isFinite(teleopBallsShotCount) && teleopBallsShotCount >= 0) {
+      result.teleop.fuelScoredCount = teleopBallsShotCount;
+    }
+
     // Copy any additional fields
     const additionalFields = { ...matchData };
     delete additionalFields.autoActions;
