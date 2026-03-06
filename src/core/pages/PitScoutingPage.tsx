@@ -26,6 +26,10 @@ import {
   markPitAssignmentCompleted,
 } from "@/core/lib/pitAssignmentTransfer";
 import { Save, AlertCircle, CheckCircle } from "lucide-react";
+import {
+  formatTeamDisplayLabel,
+  resolveTeamNameForEventTeam,
+} from "@/core/lib/teamMetadata";
 
 interface PitScoutingPageProps {
   /**
@@ -71,6 +75,14 @@ export function PitScoutingPage({
     () => assignedTeams.filter((assignment) => assignment.completed).length,
     [assignedTeams],
   );
+  const selectedTeamDisplayLabel = useMemo(() => {
+    if (typeof formState.teamNumber !== 'number') {
+      return '';
+    }
+
+    const teamName = resolveTeamNameForEventTeam(formState.eventKey, formState.teamNumber);
+    return formatTeamDisplayLabel(formState.teamNumber, teamName);
+  }, [formState.eventKey, formState.teamNumber]);
 
   const refreshAssignedTeams = useCallback(() => {
     const fallbackScoutName = localStorage.getItem('currentScout') || '';
@@ -185,6 +197,7 @@ export function PitScoutingPage({
         {/* Universal Pit Scouting Fields */}
         <BasicInformation
           teamNumber={formState.teamNumber}
+          teamNameLabel={selectedTeamDisplayLabel}
           eventKey={formState.eventKey}
           scoutName={formState.scoutName}
           onTeamNumberChange={setTeamNumber}
@@ -223,6 +236,14 @@ export function PitScoutingPage({
                   {assignedTeams.map((assignment) => {
                     const isCurrentTeam =
                       typeof formState.teamNumber === 'number' && formState.teamNumber === assignment.teamNumber;
+                    const assignmentTeamName = resolveTeamNameForEventTeam(
+                      assignment.eventKey,
+                      assignment.teamNumber,
+                    );
+                    const assignmentTeamLabel = formatTeamDisplayLabel(
+                      assignment.teamNumber,
+                      assignmentTeamName,
+                    );
 
                     return (
                       <button
@@ -236,7 +257,7 @@ export function PitScoutingPage({
                         }}
                       >
                         <div className="flex items-center justify-between gap-2">
-                          <span className="font-medium">Team {assignment.teamNumber}</span>
+                          <span className="font-medium">{assignmentTeamLabel}</span>
                           <Badge variant={assignment.completed ? 'default' : 'outline'}>
                             {assignment.completed ? 'Completed' : 'Assigned'}
                           </Badge>

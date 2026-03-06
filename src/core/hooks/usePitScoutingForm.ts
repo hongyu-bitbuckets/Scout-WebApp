@@ -5,6 +5,7 @@ import {
   loadPitScoutingByTeamAndEvent,
 } from "@/core/db/database";
 import { toast } from "sonner";
+import { resolveTeamNameForEventTeam } from "@/core/lib/teamMetadata";
 
 interface PitScoutingFormState {
   teamNumber: number | "";
@@ -175,6 +176,10 @@ export function usePitScoutingForm(): UsePitScoutingFormReturn {
       const entry: PitScoutingEntryBase = {
         id,
         teamNumber: formState.teamNumber as number,
+        teamName: resolveTeamNameForEventTeam(
+          formState.eventKey,
+          formState.teamNumber as number,
+        ),
         eventKey: formState.eventKey,
         scoutName: formState.scoutName,
         timestamp: Date.now(),

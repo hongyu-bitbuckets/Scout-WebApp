@@ -72,6 +72,7 @@ export interface FieldHeaderProps {
     matchNumber?: string | number;
     matchType?: 'qm' | 'sf' | 'f';
     teamNumber?: string | number;
+    teamLabel?: string;
     alliance?: 'red' | 'blue';
     isFieldRotated?: boolean;
     canUndo?: boolean;
@@ -156,6 +157,7 @@ export function FieldHeader({
     matchNumber,
     matchType,
     teamNumber,
+    teamLabel,
     alliance = 'blue',
     isFieldRotated = false,
     canUndo = false,
@@ -226,7 +228,7 @@ export function FieldHeader({
                         {matchNumber && teamNumber && <div className="w-px h-3 bg-slate-300 dark:bg-slate-700" />}
                         {teamNumber && (
                             <span className="text-[10px] md:text-xs font-bold text-slate-700 dark:text-slate-400">
-                                {teamNumber}
+                                {teamLabel || teamNumber}
                             </span>
                         )}
                     </div>
@@ -464,7 +466,7 @@ export function FieldHeader({
                     <DialogHeader>
                         <DialogTitle>Confirm No Show</DialogTitle>
                         <DialogDescription>
-                            Are you sure team {teamNumber} did not show up for match {formatMatchLabel(matchNumber || '', matchType)}?
+                            Are you sure team {teamLabel || teamNumber} did not show up for match {formatMatchLabel(matchNumber || '', matchType)}?
                             <br /><br />
                             This will immediately submit the match data with a no-show flag.
                         </DialogDescription>

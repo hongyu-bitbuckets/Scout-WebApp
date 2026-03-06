@@ -8,6 +8,7 @@ import { User, Hash, Calendar, FolderOpen, ClipboardList } from "lucide-react";
 
 interface BasicInformationProps {
   teamNumber: number | "";
+  teamNameLabel?: string;
   eventKey: string;
   scoutName: string;
   onTeamNumberChange: (value: number | "") => void;
@@ -22,6 +23,7 @@ interface BasicInformationProps {
 
 export function BasicInformation({
   teamNumber,
+  teamNameLabel,
   eventKey,
   scoutName,
   onTeamNumberChange,
@@ -108,6 +110,9 @@ export function BasicInformation({
             required
             className="text-lg"
           />
+          {teamNameLabel && (
+            <p className="text-sm text-muted-foreground">Selected team: {teamNameLabel}</p>
+          )}
         </div>
 
         {/* Event Selector */}

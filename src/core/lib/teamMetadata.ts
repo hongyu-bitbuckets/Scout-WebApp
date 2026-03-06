@@ -54,3 +54,23 @@ export const formatTeamDisplayLabel = (teamNumber: number | string, teamName?: s
 
   return `${teamNumberLabel} - ${normalizedTeamName}`;
 };
+
+export const formatTeamDisplayForEvent = (
+  eventKey: string | undefined,
+  rawTeamValue: unknown,
+  inlineTeamName?: string
+): string => {
+  const parsed = parseSelectedTeamValue(rawTeamValue);
+
+  if (parsed.teamNumber <= 0) {
+    return String(rawTeamValue ?? '').trim();
+  }
+
+  const resolvedName = resolveTeamNameForEventTeam(
+    eventKey || '',
+    parsed.teamNumber,
+    inlineTeamName ?? parsed.inlineTeamName
+  );
+
+  return formatTeamDisplayLabel(parsed.teamNumber, resolvedName);
+};
