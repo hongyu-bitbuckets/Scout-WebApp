@@ -6,16 +6,24 @@ import { PLAYER_STATIONS, type PlayerStation } from '@/core/lib/matchScoutAssign
 interface MatchAssignmentTableProps {
   filteredRows: MatchScheduleTransferEntry[];
   matchNumber: string;
-  stationCellClass: (station: string, hasAssignment: boolean) => string;
+  stationCellClass: (
+    matchNum: number,
+    station: PlayerStation,
+    hasAssignment: boolean,
+    isCompleted: boolean,
+  ) => string;
   getAssignedScout: (matchNum: number, station: string) => string | undefined;
+  isStationCompleted: (matchNum: number, station: PlayerStation) => boolean;
   getScoutColorClass: (scoutName: string) => string;
   isManualMode: boolean;
+  assignmentsConfirmed: boolean;
   selectedScoutForAssignment: string | null;
   isDragAssigning: boolean;
   onStationPointerDown: (matchNum: number, station: PlayerStation) => void;
   onStationPointerEnter: (matchNum: number, station: PlayerStation) => void;
   onStationPointerUp: () => void;
   onStationClear: (matchNum: number, station: PlayerStation) => void;
+  onStationToggleCompleted: (matchNum: number, station: PlayerStation) => void;
 }
 
 export const MatchAssignmentTable: React.FC<MatchAssignmentTableProps> = ({
@@ -23,14 +31,17 @@ export const MatchAssignmentTable: React.FC<MatchAssignmentTableProps> = ({
   matchNumber,
   stationCellClass,
   getAssignedScout,
+  isStationCompleted,
   getScoutColorClass,
   isManualMode,
+  assignmentsConfirmed,
   selectedScoutForAssignment,
   isDragAssigning,
   onStationPointerDown,
   onStationPointerEnter,
   onStationPointerUp,
   onStationClear,
+  onStationToggleCompleted,
 }) => {
   return (
     <div className="min-h-[600px] rounded-md border overflow-auto max-h-[600px]">
@@ -58,17 +69,25 @@ export const MatchAssignmentTable: React.FC<MatchAssignmentTableProps> = ({
               </TableCell>
               {PLAYER_STATIONS.map((station) => {
                 const assignedScout = getAssignedScout(row.matchNum, station);
+                const isCompleted = isStationCompleted(row.matchNum, station);
                 const scoutColorClass = assignedScout ? getScoutColorClass(assignedScout) : '';
                 const canAssign = isManualMode && Boolean(selectedScoutForAssignment);
                 const canClear = isManualMode && Boolean(assignedScout);
+                const canToggleComplete =
+                  Boolean(assignedScout) && (!isManualMode || assignmentsConfirmed);
                 const isInteractive = canAssign || canClear;
 
                 return (
                   <TableCell
                     key={`${row.matchNum}-${station}`}
-                    className={`${stationCellClass(station, Boolean(assignedScout))} ${
+                    className={`${stationCellClass(row.matchNum, station, Boolean(assignedScout), isCompleted)} ${
                       isInteractive ? 'cursor-pointer select-none' : ''
                     }`}
+                    onClick={() => {
+                      if (canToggleComplete) {
+                        onStationToggleCompleted(row.matchNum, station);
+                      }
+                    }}
                     onPointerDown={() => {
                       if (canAssign) {
                         onStationPointerDown(row.matchNum, station);
@@ -88,13 +107,17 @@ export const MatchAssignmentTable: React.FC<MatchAssignmentTableProps> = ({
                     title={
                       canAssign
                         ? `${station.toUpperCase()} - Drag to assign ${selectedScoutForAssignment}`
+                        : canToggleComplete
+                          ? `${station.toUpperCase()} - Click to toggle completion`
                         : canClear
                           ? `${station.toUpperCase()} - Right click to clear`
                           : `${station.toUpperCase()} - Unassigned`
                     }
                   >
                     {assignedScout ? (
-                      <span className={`inline-block rounded border px-2 py-0.5 text-xs font-medium ${scoutColorClass}`}>
+                      <span className={`inline-block rounded border px-2 py-0.5 text-xs font-medium ${scoutColorClass} ${
+                        isCompleted ? 'line-through opacity-75' : ''
+                      }`}>
                         {assignedScout}
                       </span>
                     ) : (

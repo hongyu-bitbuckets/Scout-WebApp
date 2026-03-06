@@ -7,7 +7,7 @@ import { useWebRTC } from '@/core/contexts/WebRTCContext';
 import { getAllStoredEventTeams } from '@/core/lib/tbaUtils';
 import { getStoredNexusTeams, getStoredPitAddresses, getStoredPitData } from '@/core/lib/nexusUtils';
 import { loadPitScoutingEntry } from '@/core/lib/pitScoutingUtils';
-import { TeamDisplaySection } from '@/core/components/pit-assignments/PitTeamDisplaySection';
+import { TeamDisplaySection } from '@/core/components/pit-assignments/pit/PitTeamDisplaySection';
 import { AssignmentResults } from '@/core/components/pit-assignments/pit/PitAssignmentResults';
 import { AssignmentEventInformationCard } from '@/core/components/pit-assignments/shared/AssignmentEventInformationCard';
 import AssignmentControlsCard from '@/core/components/pit-assignments/AssignmentControlsCard';

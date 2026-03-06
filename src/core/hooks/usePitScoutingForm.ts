@@ -1,21 +1,13 @@
-import { useState, useCallback, useEffect, useRef } from "react";
-import type { PitScoutingEntryBase } from "@/types/database";
+import { useState, useCallback } from "react";
+import type { PitScoutingEntryBase, DrivetrainType, ProgrammingLanguage } from "@/types/database";
 import {
   savePitScoutingEntry,
   loadPitScoutingByTeamAndEvent,
 } from "@/core/db/database";
-import { proxyGetJson } from "@/core/lib/apiProxy";
 import { toast } from "sonner";
-
-interface TBATeamResponse {
-  team_number: number;
-  nickname?: string;
-  name?: string;
-}
 
 interface PitScoutingFormState {
   teamNumber: number | "";
-  teamName?: string;
   eventKey: string;
   scoutName: string;
   robotPhoto?: string;
@@ -32,7 +24,6 @@ interface UsePitScoutingFormReturn {
 
   // Universal field setters
   setTeamNumber: (value: number | "") => void;
-  setTeamName: (value: string | undefined) => void;
   setEventKey: (value: string) => void;
   setScoutName: (value: string) => void;
   setRobotPhoto: (value: string | undefined) => void;
@@ -53,13 +44,11 @@ interface UsePitScoutingFormReturn {
   // Loading state
   isLoading: boolean;
   existingEntryId?: string;
-  isTeamNameAutoFilled: boolean;
 }
 
 export function usePitScoutingForm(): UsePitScoutingFormReturn {
   const [formState, setFormState] = useState<PitScoutingFormState>({
     teamNumber: "",
-    teamName: undefined,
     eventKey: localStorage.getItem("eventKey") || "",
     scoutName: localStorage.getItem("currentScout") || "",
     robotPhoto: undefined,
@@ -72,13 +61,6 @@ export function usePitScoutingForm(): UsePitScoutingFormReturn {
 
   const [isLoading, setIsLoading] = useState(false);
   const [existingEntryId, setExistingEntryId] = useState<string | undefined>(undefined);
-  const [lastAutoFilledTeamName, setLastAutoFilledTeamName] = useState<string | undefined>(undefined);
-  const latestLookupRequestId = useRef(0);
-  const isTeamNameAutoFilled = Boolean(
-    formState.teamName?.trim() &&
-    lastAutoFilledTeamName?.trim() &&
-    formState.teamName.trim() === lastAutoFilledTeamName.trim()
-  );
 
   // Manual load function (opt-in instead of automatic)
   const loadExistingEntry = useCallback(async () => {
@@ -98,7 +80,6 @@ export function usePitScoutingForm(): UsePitScoutingFormReturn {
         // Pre-fill form with existing data
         setFormState((prev) => ({
           ...prev,
-          teamName: existing.teamName,
           scoutName: existing.scoutName,
           robotPhoto: existing.robotPhoto,
           // weight: existing.weight,
@@ -123,10 +104,6 @@ export function usePitScoutingForm(): UsePitScoutingFormReturn {
   // Universal field setters
   const setTeamNumber = useCallback((value: number | "") => {
     setFormState((prev) => ({ ...prev, teamNumber: value }));
-  }, []);
-
-  const setTeamName = useCallback((value: string | undefined) => {
-    setFormState((prev) => ({ ...prev, teamName: value }));
   }, []);
 
   const setEventKey = useCallback((value: string) => {
@@ -164,56 +141,6 @@ export function usePitScoutingForm(): UsePitScoutingFormReturn {
     setFormState((prev) => ({ ...prev, gameData: data }));
   }, []);
 
-  useEffect(() => {
-    if (typeof formState.teamNumber !== "number") {
-      return;
-    }
-
-    const requestId = ++latestLookupRequestId.current;
-
-    const fetchTeamName = async () => {
-      try {
-        const team = await proxyGetJson<TBATeamResponse>("tba", `/team/frc${formState.teamNumber}`);
-        if (latestLookupRequestId.current !== requestId) {
-          return;
-        }
-
-        const resolvedTeamName = (team.nickname || team.name || "").trim();
-        if (!resolvedTeamName) {
-          return;
-        }
-
-        setFormState((prev) => {
-          const currentTeamName = prev.teamName?.trim();
-          const canAutofill = !currentTeamName || currentTeamName === (lastAutoFilledTeamName || "");
-
-          if (!canAutofill) {
-            return prev;
-          }
-
-          if (currentTeamName === resolvedTeamName) {
-            return prev;
-          }
-
-          return {
-            ...prev,
-            teamName: resolvedTeamName,
-          };
-        });
-
-        setLastAutoFilledTeamName(resolvedTeamName);
-      } catch (error) {
-        if (latestLookupRequestId.current !== requestId) {
-          return;
-        }
-
-        console.warn("Unable to auto-fill team name from TBA:", error);
-      }
-    };
-
-    void fetchTeamName();
-  }, [formState.teamNumber, lastAutoFilledTeamName]);
-
   // Validation
   const validateForm = useCallback((): boolean => {
     if (formState.teamNumber === "" || typeof formState.teamNumber !== "number") {
@@ -248,7 +175,6 @@ export function usePitScoutingForm(): UsePitScoutingFormReturn {
       const entry: PitScoutingEntryBase = {
         id,
         teamNumber: formState.teamNumber as number,
-        teamName: formState.teamName?.trim() || undefined,
         eventKey: formState.eventKey,
         scoutName: formState.scoutName,
         timestamp: Date.now(),
@@ -282,7 +208,6 @@ export function usePitScoutingForm(): UsePitScoutingFormReturn {
   const resetForm = useCallback(() => {
     setFormState({
       teamNumber: "",
-      teamName: undefined,
       eventKey: localStorage.getItem("eventKey") || "",
       scoutName: localStorage.getItem("currentScout") || "",
       robotPhoto: undefined,
@@ -292,14 +217,12 @@ export function usePitScoutingForm(): UsePitScoutingFormReturn {
       notes: undefined,
       gameData: undefined,
     });
-    setLastAutoFilledTeamName(undefined);
     setExistingEntryId(undefined);
   }, []);
 
   return {
     formState,
     setTeamNumber,
-    setTeamName,
     setEventKey,
     setScoutName,
     setRobotPhoto,
@@ -314,6 +237,5 @@ export function usePitScoutingForm(): UsePitScoutingFormReturn {
     loadExistingEntry,
     isLoading,
     existingEntryId,
-    isTeamNameAutoFilled,
   };
 }
