@@ -52,6 +52,13 @@ interface LocalScheduleMatch {
   blueAlliance?: number[];
 }
 
+interface StoredEventTeamsData {
+  teamNumbers: number[];
+  teams?: TBATeam[];
+  timestamp: number;
+  eventKey: string;
+}
+
 // ============================================================================
 // Helper Functions
 // ============================================================================
@@ -101,23 +108,33 @@ export const getEventTeams = async (eventKey: string, apiKey: string): Promise<T
     }
   }
 
-  const teamKeys = await proxyGetJson<string[]>(
-    'tba',
-    `/event/${eventKey}/teams/keys`,
-    { apiKeyOverride: apiKey || undefined }
-  );
+  try {
+    const teams = await proxyGetJson<TBATeam[]>(
+      'tba',
+      `/event/${eventKey}/teams`,
+      { apiKeyOverride: apiKey || undefined }
+    );
 
-  return teamKeys
-    .map(key => {
-      const teamNumber = parseInt(key.replace('frc', ''), 10);
-      return {
-        key,
-        team_number: teamNumber,
-        nickname: `Team ${teamNumber}`,
-        name: `Team ${teamNumber}`,
-      };
-    })
-    .sort((a, b) => a.team_number - b.team_number);
+    return teams.sort((a, b) => a.team_number - b.team_number);
+  } catch {
+    const teamKeys = await proxyGetJson<string[]>(
+      'tba',
+      `/event/${eventKey}/teams/keys`,
+      { apiKeyOverride: apiKey || undefined }
+    );
+
+    return teamKeys
+      .map(key => {
+        const teamNumber = parseInt(key.replace('frc', ''), 10);
+        return {
+          key,
+          team_number: teamNumber,
+          nickname: `Team ${teamNumber}`,
+          name: `Team ${teamNumber}`,
+        };
+      })
+      .sort((a, b) => a.team_number - b.team_number);
+  }
 };
 
 function isDemoEventKey(eventKey: string): boolean {
@@ -175,10 +192,11 @@ const TEAMS_STORAGE_PREFIX = 'tba_event_teams_';
  */
 export const storeEventTeams = (eventKey: string, teams: TBATeam[]): void => {
   const storageKey = `${TEAMS_STORAGE_PREFIX}${eventKey}`;
-  // Extract just the team numbers for more efficient storage
-  const teamNumbers = teams.map(team => team.team_number).sort((a, b) => a - b);
-  const data = {
+  const normalizedTeams = [...teams].sort((a, b) => a.team_number - b.team_number);
+  const teamNumbers = normalizedTeams.map(team => team.team_number);
+  const data: StoredEventTeamsData = {
     teamNumbers,
+    teams: normalizedTeams,
     timestamp: Date.now(),
     eventKey
   };
@@ -202,7 +220,7 @@ export const getStoredEventTeams = (eventKey: string): number[] | null => {
     const stored = localStorage.getItem(storageKey);
     if (!stored) return null;
     
-    const data = JSON.parse(stored);
+    const data = JSON.parse(stored) as StoredEventTeamsData | { teams?: TBATeam[]; teamNumbers?: number[] };
     // Check for both old format (teams) and new format (teamNumbers) for backward compatibility
     if (data.teamNumbers) {
       return data.teamNumbers;
@@ -215,6 +233,53 @@ export const getStoredEventTeams = (eventKey: string): number[] | null => {
     console.error('Failed to retrieve teams from localStorage:', error);
     return null;
   }
+};
+
+/**
+ * Get stored event team metadata from localStorage.
+ */
+export const getStoredEventTeamObjects = (eventKey: string): TBATeam[] | null => {
+  const storageKey = `${TEAMS_STORAGE_PREFIX}${eventKey}`;
+
+  try {
+    const stored = localStorage.getItem(storageKey);
+    if (!stored) return null;
+
+    const data = JSON.parse(stored) as StoredEventTeamsData | { teams?: TBATeam[]; teamNumbers?: number[] };
+    if (Array.isArray(data.teams) && data.teams.length > 0) {
+      return [...data.teams].sort((a, b) => a.team_number - b.team_number);
+    }
+
+    if (Array.isArray(data.teamNumbers) && data.teamNumbers.length > 0) {
+      return data.teamNumbers
+        .slice()
+        .sort((a, b) => a - b)
+        .map((teamNumber) => ({
+          key: `frc${teamNumber}`,
+          team_number: teamNumber,
+          nickname: `Team ${teamNumber}`,
+          name: `Team ${teamNumber}`,
+        }));
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Failed to retrieve team metadata from localStorage:', error);
+    return null;
+  }
+};
+
+/**
+ * Resolve a team name by event and team number from stored team metadata.
+ */
+export const getStoredTeamNameByNumber = (eventKey: string, teamNumber: number): string | undefined => {
+  const teams = getStoredEventTeamObjects(eventKey);
+  const team = teams?.find((candidate) => candidate.team_number === teamNumber);
+  if (!team) {
+    return undefined;
+  }
+
+  return team.nickname?.trim() || team.name?.trim() || undefined;
 };
 
 /**

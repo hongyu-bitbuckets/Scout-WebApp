@@ -2,6 +2,11 @@ import { useEffect, useState, useMemo, type JSX } from "react";
 import SelectTeamButton from "./GameStartSelectTeamButton";
 import { Input } from "../ui/input";
 import { loadScoutingEntriesByMatch } from "@/core/db/database";
+import {
+  formatTeamDisplayLabel,
+  parseSelectedTeamValue,
+  resolveTeamNameForEventTeam,
+} from "@/core/lib/teamMetadata";
 /**
  * A component that renders a team selection interface.
  *
@@ -29,6 +34,8 @@ const InitialSelectTeam = ({
   selectedEventKey,
   preferredTeamPosition = 0,
 }: InitialSelectTeamProps): JSX.Element => {
+  const activeEventKey = (selectedEventKey || localStorage.getItem("eventKey") || "").toLowerCase();
+
   const baseTeams = useMemo(() => {
     try {
       const matchDataStr = localStorage.getItem("matchData");
@@ -75,7 +82,6 @@ const InitialSelectTeam = ({
       }
 
       try {
-        const activeEventKey = (selectedEventKey || localStorage.getItem("eventKey") || "").toLowerCase();
         const entries = await loadScoutingEntriesByMatch(matchNumber);
 
         const filteredEntries = entries.filter((entry) => {
@@ -114,7 +120,7 @@ const InitialSelectTeam = ({
     };
 
     void loadScoutedTeamsForMatch();
-  }, [selectedMatch, selectedAlliance, selectedEventKey]);
+  }, [selectedMatch, selectedAlliance, selectedEventKey, activeEventKey]);
 
   const effectiveTeams = useMemo(() => {
     if (!hasPreferredRolePosition) {
@@ -161,6 +167,18 @@ const InitialSelectTeam = ({
   const recentCustomTeam = useMemo(() => {
     return scoutedTeams.find((team) => !baseTeams.includes(team)) || "";
   }, [scoutedTeams, baseTeams]);
+
+  const effectiveTeamLabels = useMemo(() => {
+    return effectiveTeams.map((teamValue) => {
+      const parsedTeam = parseSelectedTeamValue(String(teamValue));
+      if (!parsedTeam.teamNumber) {
+        return String(teamValue);
+      }
+
+      const resolvedName = resolveTeamNameForEventTeam(activeEventKey, parsedTeam.teamNumber);
+      return formatTeamDisplayLabel(parsedTeam.teamNumber, resolvedName);
+    });
+  }, [effectiveTeams, activeEventKey]);
 
   // Helper function to determine if a team should be auto-selected based on position
   const getInitialTeamSelection = () => {
@@ -269,7 +287,8 @@ const InitialSelectTeam = ({
     } else if (team3Status) {
       setSelectTeam(effectiveTeams[2]);
     } else if (customTeamStatus && customTeamValue != "") {
-      setSelectTeam(customTeamValue);
+      const parsedCustomTeam = parseSelectedTeamValue(customTeamValue);
+      setSelectTeam(parsedCustomTeam.teamNumber > 0 ? String(parsedCustomTeam.teamNumber) : null);
     } else {
       setSelectTeam(null);
     }
@@ -321,7 +340,7 @@ const InitialSelectTeam = ({
               currentTeamType={"1"}
               currentTeamStatus={team1Status}
               clickTeam={clickTeam}
-              teamName={effectiveTeams[0]}
+              teamName={effectiveTeamLabels[0]}
               isPreferred={preferredTeamPosition === 1}
             />
           </div>
@@ -330,7 +349,7 @@ const InitialSelectTeam = ({
               currentTeamType={"2"}
               currentTeamStatus={team2Status}
               clickTeam={clickTeam}
-              teamName={effectiveTeams[1]}
+              teamName={effectiveTeamLabels[1]}
               isPreferred={preferredTeamPosition === 2}
             />
           </div>
@@ -339,7 +358,7 @@ const InitialSelectTeam = ({
               currentTeamType={"3"}
               currentTeamStatus={team3Status}
               clickTeam={clickTeam}
-              teamName={effectiveTeams[2]}
+              teamName={effectiveTeamLabels[2]}
               isPreferred={preferredTeamPosition === 3}
             />
           </div>
@@ -350,9 +369,9 @@ const InitialSelectTeam = ({
             </h2>
             <Input
               className="w-full h-12 text-xl rounded-lg"
-              type="number"
-              inputMode="numeric"
-              placeholder="Team #"
+              type="text"
+              inputMode="text"
+              placeholder="Team # or Team Name"
               value={customTeamValue}
               onChange={(e) => setCustomTeamValue(e.target.value)}
               onFocus={() => {
@@ -362,6 +381,9 @@ const InitialSelectTeam = ({
               onBlur={() => setTextSelected(false)}
             />
           </div>
+          <p className="text-sm text-muted-foreground text-center">
+            Enter team number, or include it with team name (example: 1678 Citrus Circuits)
+          </p>
         </div>
       </div>
     </>

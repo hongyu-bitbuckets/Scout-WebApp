@@ -121,7 +121,7 @@ export const MatchAssignmentTable: React.FC<MatchAssignmentTableProps> = ({
                         {assignedScout}
                       </span>
                     ) : (
-                      <span className="text-xs text-muted-foreground">Break / Unassigned</span>
+                      <span className="text-xs text-muted-foreground">Unassigned</span>
                     )}
                   </TableCell>
                 );

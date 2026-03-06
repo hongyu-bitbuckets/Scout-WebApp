@@ -6,6 +6,7 @@
  */
 
 import { db } from '@/core/db/database';
+import { parseSelectedTeamValue, resolveTeamNameForEventTeam } from '@/core/lib/teamMetadata';
 import { clearScoutingLocalStorage } from '@/core/lib/utils';
 import { toast } from 'sonner';
 import type { DataTransformation } from '@/types';
@@ -94,13 +95,20 @@ export async function submitMatchData({
             inputs.matchType || 'qm',
             inputs.matchNumber
         );
+        const parsedTeam = parseSelectedTeamValue(inputs.selectTeam);
+        const normalizedTeamNumber = parsedTeam.teamNumber;
+        const idTeamSegment = normalizedTeamNumber > 0 ? String(normalizedTeamNumber) : inputs.selectTeam;
+        const resolvedTeamName = normalizedTeamNumber > 0
+            ? resolveTeamNameForEventTeam(inputs.eventKey, normalizedTeamNumber, parsedTeam.inlineTeamName)
+            : undefined;
 
         // For no-show, skip data collection and submit minimal entry
         if (noShow) {
             const entry: Record<string, unknown> = {
-                id: `${inputs.eventKey}::${matchKey}::${inputs.selectTeam}::${inputs.alliance}`,
+                id: `${inputs.eventKey}::${matchKey}::${idTeamSegment}::${inputs.alliance}`,
                 scoutName: inputs.scoutName || '',
-                teamNumber: parseInt(inputs.selectTeam) || 0,
+                teamNumber: normalizedTeamNumber,
+                teamName: resolvedTeamName,
                 matchNumber: numericMatch,
                 eventKey: inputs.eventKey,
                 matchKey: matchKey,
@@ -144,9 +152,10 @@ export async function submitMatchData({
 
         // Create the scouting entry
         const scoutingEntry: Record<string, unknown> = {
-            id: `${inputs.eventKey}::${matchKey}::${inputs.selectTeam}::${inputs.alliance}`,
+            id: `${inputs.eventKey}::${matchKey}::${idTeamSegment}::${inputs.alliance}`,
             scoutName: inputs.scoutName || '',
-            teamNumber: parseInt(inputs.selectTeam) || 0,
+            teamNumber: normalizedTeamNumber,
+            teamName: resolvedTeamName,
             matchNumber: numericMatch,
             eventKey: inputs.eventKey,
             matchKey: matchKey,

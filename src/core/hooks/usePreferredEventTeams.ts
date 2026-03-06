@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { getAllStoredEventTeams } from '@/core/lib/tbaUtils';
+import { getAllStoredEventTeams } from '@/core/lib/tba';
 import { getStoredNexusTeams } from '@/core/lib/nexusUtils';
 
 export type TeamDataSource = 'nexus' | 'tba' | null;

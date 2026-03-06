@@ -24,6 +24,9 @@ export interface ScoutingEntryBase<TGameData = Record<string, unknown>> {
   /** Team number being scouted */
   teamNumber: number;
 
+  /** Team display name/nickname snapshot for this entry */
+  teamName?: string;
+
   /** Match number (numeric) */
   matchNumber: number;
 

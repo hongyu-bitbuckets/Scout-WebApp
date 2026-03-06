@@ -6,6 +6,7 @@
 export interface TeamStats {
     // Basic info
     teamNumber: number;
+    teamName?: string;
     eventKey: string;
     matchCount: number;
 

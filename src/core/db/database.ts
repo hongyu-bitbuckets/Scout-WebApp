@@ -37,6 +37,11 @@ export class MatchScoutingDB extends Dexie {
     this.version(1).stores({
       scoutingData: 'id, teamNumber, matchNumber, allianceColor, scoutName, eventKey, matchKey, timestamp, isCorrected, [teamNumber+eventKey], [scoutName+eventKey+matchNumber]'
     });
+
+    // v2 keeps identity and query indexes stable while allowing additional optional fields like teamName.
+    this.version(2).stores({
+      scoutingData: 'id, teamNumber, matchNumber, allianceColor, scoutName, eventKey, matchKey, timestamp, isCorrected, [teamNumber+eventKey], [scoutName+eventKey+matchNumber]'
+    });
   }
 }
 
@@ -50,6 +55,11 @@ export class PitScoutingDB extends Dexie {
     super('PitScoutingDB');
 
     this.version(1).stores({
+      pitScoutingData: 'id, teamNumber, eventKey, scoutName, timestamp, [teamNumber+eventKey]'
+    });
+
+    // v2 keeps numeric team indexes intact while allowing optional metadata fields such as teamName.
+    this.version(2).stores({
       pitScoutingData: 'id, teamNumber, eventKey, scoutName, timestamp, [teamNumber+eventKey]'
     });
   }

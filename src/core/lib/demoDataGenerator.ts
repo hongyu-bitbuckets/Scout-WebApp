@@ -14,6 +14,7 @@
 import { db, saveScoutingEntry, savePitScoutingEntry } from '@/core/db/database';
 import type { ScoutingEntryBase } from '@/core/types/scouting-entry';
 import type { PitScoutingEntryBase, DrivetrainType, ProgrammingLanguage } from '@/core/types/pit-scouting';
+import { storeEventTeams, type TBATeam } from '@/core/lib/tba';
 import { setCurrentEvent } from '@/core/lib/tba/eventDataUtils';
 import { cacheTBAMatches, clearEventCache, clearEventValidationResults, storeValidationResult } from '@/core/lib/tbaCache';
 import { getOrCreateScoutByName, updateScoutStats } from '@/core/lib/scoutGamificationUtils';
@@ -58,6 +59,8 @@ interface TeamSkillProfile {
     endgameSuccess: number;     // 0-1, likelihood of successful endgame
     consistency: number;        // 0-1, variance in performance (1 = very consistent)
 }
+
+const getDemoTeamName = (teamNumber: number): string => `Demo Team ${teamNumber}`;
 
 /**
  * Generate team skill profiles with realistic distribution
@@ -801,6 +804,20 @@ async function cacheAndStoreDemoSchedule(
     matches: MatchSchedule[],
     matchStatsMap?: Map<string, DemoMatchStats>
 ): Promise<void> {
+    const uniqueTeamNumbers = Array.from(
+        new Set(matches.flatMap((match) => [...match.redTeams, ...match.blueTeams]))
+    ).sort((a, b) => a - b);
+
+    const demoTeams: TBATeam[] = uniqueTeamNumbers.map((teamNumber) => ({
+        key: `frc${teamNumber}`,
+        team_number: teamNumber,
+        nickname: getDemoTeamName(teamNumber),
+        name: getDemoTeamName(teamNumber),
+    }));
+
+    storeEventTeams(eventKey, demoTeams);
+    console.log(`  ✓ Stored ${demoTeams.length} demo teams in localStorage metadata`);
+
     const tbaMatches = matches.map((match, index) => {
         const matchStats = matchStatsMap?.get(match.matchKey);
         const scoreBreakdown = matchStats ? buildDemoScoreBreakdown(matchStats) : null;
@@ -977,6 +994,7 @@ export async function generateDemoEvent(options: DemoDataOptions = {}): Promise<
                 const entry: ScoutingEntryBase<Record<string, unknown>> = {
                     id: `${eventKey}::${normalizedMatchKey}::${teamNumber}::red`,
                     teamNumber,
+                    teamName: getDemoTeamName(teamNumber),
                     matchNumber: match.matchNumber,
                     allianceColor: 'red',
                     scoutName,
@@ -1021,6 +1039,7 @@ export async function generateDemoEvent(options: DemoDataOptions = {}): Promise<
                 const entry: ScoutingEntryBase<Record<string, unknown>> = {
                     id: `${eventKey}::${normalizedMatchKey}::${teamNumber}::blue`,
                     teamNumber,
+                    teamName: getDemoTeamName(teamNumber),
                     matchNumber: match.matchNumber,
                     allianceColor: 'blue',
                     scoutName,
@@ -1113,6 +1132,7 @@ export async function generateDemoEvent(options: DemoDataOptions = {}): Promise<
             const pitEntry: PitScoutingEntryBase = {
                 id: `pit-${team.teamNumber}-${eventKey}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                 teamNumber: team.teamNumber,
+                teamName: getDemoTeamName(team.teamNumber),
                 eventKey,
                 scoutName: pitScout,
                 timestamp: Date.now() - Math.random() * 86400000, // Random time in last 24 hours

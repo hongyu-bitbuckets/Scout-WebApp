@@ -7,6 +7,7 @@ import {
   getEventTeams,
   storeEventTeams,
   getStoredEventTeams,
+  getStoredEventTeamObjects,
   clearStoredEventTeams,
   setCurrentEvent
 } from '@/core/lib/tba';
@@ -181,13 +182,13 @@ export const useTBAData = () => {
       // First check if teams are already stored
       const storedTeamNumbers = getStoredEventTeams(tbaEventKey);
       if (storedTeamNumbers && storedTeamNumbers.length > 0) {
-        // Convert stored team numbers back to minimal team objects for display
-        const storedTeamObjects: TBATeam[] = storedTeamNumbers.map(teamNumber => ({
-          key: `frc${teamNumber}`,
-          team_number: teamNumber,
-          nickname: `Team ${teamNumber}`,
-          name: `Team ${teamNumber}`,
-        }));
+        const storedTeamObjects = getStoredEventTeamObjects(tbaEventKey)
+          ?? storedTeamNumbers.map(teamNumber => ({
+            key: `frc${teamNumber}`,
+            team_number: teamNumber,
+            nickname: `Team ${teamNumber}`,
+            name: `Team ${teamNumber}`,
+          }));
         setTeams(storedTeamObjects);
         setIsStored(true);
         toast.success(`Loaded ${storedTeamNumbers.length} teams from local storage`);

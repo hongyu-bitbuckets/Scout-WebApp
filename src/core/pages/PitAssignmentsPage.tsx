@@ -4,7 +4,7 @@ import { AlertCircle, Users, BarChart3 } from 'lucide-react';
 import { Alert, AlertDescription } from "@/core/components/ui/alert";
 import { useScoutManagement } from '@/core/hooks/useScoutManagement';
 import { useWebRTC } from '@/core/contexts/WebRTCContext';
-import { getAllStoredEventTeams } from '@/core/lib/tbaUtils';
+import { getAllStoredEventTeams } from '@/core/lib/tba';
 import { getStoredNexusTeams, getStoredPitAddresses, getStoredPitData } from '@/core/lib/nexusUtils';
 import { loadPitScoutingEntry } from '@/core/lib/pitScoutingUtils';
 import { TeamDisplaySection } from '@/core/components/pit-assignments/pit/PitTeamDisplaySection';
