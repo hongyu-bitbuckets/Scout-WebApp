@@ -299,7 +299,7 @@ function createDefaultPitEntryForTeam(teamNumber: number): PitScoutingEntryBase 
         scoutName,
         timestamp: now,
         gameData: {
-            reportedAutosByStart: createEmptyReportedAutos(),
+            // reportedAutosByStart: createEmptyReportedAutos(),
         },
     };
 }
@@ -597,17 +597,18 @@ export const useMatchStrategy = () => {
                 const latestPitByTeam = getMostRecentPitEntriesByTeam(pitEntries);
                 setLatestPitEntryByTeam(latestPitByTeam);
 
-                Object.entries(latestPitByTeam).forEach(([teamKey, pitEntry]) => {
-                    const teamNumber = Number(teamKey);
-                    if (!teamNumber || !isRecord(pitEntry.gameData)) return;
+                // Reported auto path loading from pit gameData is currently disabled.
+                // Object.entries(latestPitByTeam).forEach(([teamKey, pitEntry]) => {
+                //     const teamNumber = Number(teamKey);
+                //     if (!teamNumber || !isRecord(pitEntry.gameData)) return;
 
-                    if (!routinesByTeam[teamNumber]) {
-                        routinesByTeam[teamNumber] = { scouted: [], reported: [] };
-                    }
+                //     if (!routinesByTeam[teamNumber]) {
+                //         routinesByTeam[teamNumber] = { scouted: [], reported: [] };
+                //     }
 
-                    const reportedAutosByStart = coerceReportedAutosByStart(pitEntry.gameData.reportedAutosByStart);
-                    routinesByTeam[teamNumber].reported = buildReportedRoutinesFromReportedAutos(teamNumber, reportedAutosByStart);
-                });
+                //     const reportedAutosByStart = coerceReportedAutosByStart(pitEntry.gameData.reportedAutosByStart);
+                //     routinesByTeam[teamNumber].reported = buildReportedRoutinesFromReportedAutos(teamNumber, reportedAutosByStart);
+                // });
 
                 Object.values(routinesByTeam).forEach((teamRoutines) => {
                     teamRoutines.scouted.sort((a, b) => a.label.localeCompare(b.label));
@@ -761,6 +762,10 @@ export const useMatchStrategy = () => {
         actions: AutoRoutineWaypoint[]
     ): Promise<AutoRoutineSelection | null> => {
         if (!teamNumber || actions.length === 0) return null;
+        // Reported auto path database writes are currently disabled.
+        return null;
+
+        /*
 
         let latestEntry = latestPitEntryByTeam[teamNumber];
         if (!latestEntry) {
@@ -819,6 +824,7 @@ export const useMatchStrategy = () => {
         });
 
         return { source: 'reported', routineId: `reported-${rawId}` };
+        */
     }, [latestPitEntryByTeam]);
 
     const updateReportedAutoForTeam = useCallback(async (
@@ -828,6 +834,10 @@ export const useMatchStrategy = () => {
         actions: AutoRoutineWaypoint[]
     ): Promise<boolean> => {
         if (!teamNumber || actions.length === 0) return false;
+        // Reported auto path database writes are currently disabled.
+        return false;
+
+        /*
 
         let latestEntry = latestPitEntryByTeam[teamNumber];
         if (!latestEntry) {
@@ -886,6 +896,7 @@ export const useMatchStrategy = () => {
         });
 
         return true;
+        */
     }, [latestPitEntryByTeam]);
 
     const deleteReportedAutoForTeam = useCallback(async (
@@ -893,6 +904,10 @@ export const useMatchStrategy = () => {
         routineId: string
     ): Promise<boolean> => {
         if (!teamNumber) return false;
+        // Reported auto path database writes are currently disabled.
+        return false;
+
+        /*
 
         let latestEntry = latestPitEntryByTeam[teamNumber];
         if (!latestEntry) {
@@ -950,6 +965,7 @@ export const useMatchStrategy = () => {
         );
 
         return true;
+        */
     }, [latestPitEntryByTeam]);
 
     const applyAllianceToRed = (allianceId: string) => {

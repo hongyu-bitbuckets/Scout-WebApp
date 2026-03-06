@@ -34,7 +34,7 @@ interface GameSpecificQuestionsProps {
 }
 
 // const START_POSITIONS = ['Left Trench', 'Left Bump', 'Hub', 'Right Bump', 'Right Trench'];
- const ROLES = ['Cycler', 'Clean Up', 'Passer', 'Thief', 'Defense'];
+// const ROLES = ['Cycler', 'Clean Up', 'Passer', 'Thief', 'Defense'];
 
 // type PitAutoStartPosition = typeof START_POSITIONS[number];
 
