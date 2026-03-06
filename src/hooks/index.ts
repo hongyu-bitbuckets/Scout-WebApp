@@ -20,6 +20,8 @@ export { useFullscreen } from '../core/hooks/useFullscreen';
 export { useScoutManagement } from '../core/hooks/useScoutManagement';
 export { useCurrentScout } from '../core/hooks/useCurrentScout';
 export { useScoutDashboard } from '../core/hooks/useScoutDashboard';
+export { useScoutAvailability } from '../core/hooks/useScoutAvailability';
+export { usePreferredEventTeams } from '../core/hooks/usePreferredEventTeams';
 export { useConflictResolution } from '../core/hooks/useConflictResolution';
 
 // Match & strategy hooks

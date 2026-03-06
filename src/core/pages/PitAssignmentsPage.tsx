@@ -4,13 +4,14 @@ import { AlertCircle, Users, BarChart3 } from 'lucide-react';
 import { Alert, AlertDescription } from "@/core/components/ui/alert";
 import { useScoutManagement } from '@/core/hooks/useScoutManagement';
 import { useWebRTC } from '@/core/contexts/WebRTCContext';
-import { getAllStoredEventTeams } from '@/core/lib/tbaUtils';
-import { getStoredNexusTeams, getStoredPitAddresses, getStoredPitData } from '@/core/lib/nexusUtils';
+import { usePreferredEventTeams } from '@/core/hooks/usePreferredEventTeams';
+import { useScoutAvailability } from '@/core/hooks/useScoutAvailability';
+import { getStoredPitAddresses, getStoredPitData } from '@/core/lib/nexusUtils';
 import { loadPitScoutingEntry } from '@/core/lib/pitScoutingUtils';
 // import { ScoutManagementSection } from '@/core/components/pit-assignments/ScoutManagementSection';
 import { TeamDisplaySection } from '@/core/components/pit-assignments/TeamDisplaySection';
 import { AssignmentResults } from '@/core/components/pit-assignments/AssignmentResults';
-import EventInformationCard from '@/core/components/pit-assignments/EventInformationCard';
+import { AssignmentEventInformationCard } from '@/core/components/pit-assignments/AssignmentEventInformationCard';
 import AssignmentControlsCard from '@/core/components/pit-assignments/AssignmentControlsCard';
 import { DataAttribution } from '@/core/components/DataAttribution';
 import type { PitAssignment } from '@/core/lib/pitAssignmentTypes';
@@ -21,9 +22,8 @@ import { toast } from 'sonner';
 const PitAssignmentsPage: React.FC = () => {
   const { scoutsList } = useScoutManagement();
   const { connectedScouts, pushDataToAll } = useWebRTC();
-  const [selectedEvent, setSelectedEvent] = useState<string>('');
-  const [currentTeams, setCurrentTeams] = useState<number[]>([]);
-  const [teamDataSource, setTeamDataSource] = useState<'nexus' | 'tba' | null>(null);
+  const { selectedEvent, currentTeams, teamDataSource } = usePreferredEventTeams();
+  const { availableScouts, readyConnectedScoutsCount } = useScoutAvailability(scoutsList, connectedScouts);
   const [pitAddresses, setPitAddresses] = useState<{ [teamNumber: string]: string } | null>(null);
   const [pitMapData, setPitMapData] = useState<NexusPitMap | null>(null);
   const [assignments, setAssignments] = useState<PitAssignment[]>([]);
@@ -31,24 +31,6 @@ const PitAssignmentsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('teams');
   const [selectedScoutForAssignment, setSelectedScoutForAssignment] = useState<string | null>(null);
   const [assignmentsConfirmed, setAssignmentsConfirmed] = useState<boolean>(false);
-
-  const readyConnectedScoutsCount = useMemo(() => {
-    return connectedScouts.filter((scout) => {
-      const channelState = scout.channel?.readyState || scout.dataChannel?.readyState;
-      return scout.status === 'connected' && channelState === 'open';
-    }).length;
-  }, [connectedScouts]);
-
-  const availableScouts = useMemo(() => {
-    const activeConnectedScoutNames = connectedScouts
-      .filter((scout) => scout.status !== 'disconnected')
-      .map((scout) => scout.name.trim())
-      .filter((name) => name.length > 0);
-
-    return Array.from(new Set([...scoutsList, ...activeConnectedScoutNames])).sort((a, b) =>
-      a.localeCompare(b)
-    );
-  }, [scoutsList, connectedScouts]);
 
   // Save assignments to localStorage whenever they change
   useEffect(() => {
@@ -73,70 +55,6 @@ const PitAssignmentsPage: React.FC = () => {
       }
     }
   }, [selectedEvent]);
-
-  // Load the single available event (prioritizing Nexus over TBA)
-  useEffect(() => {
-    const loadEventData = () => {
-      const tbaTeams = getAllStoredEventTeams();
-      let foundEvent = '';
-      let foundTeams: number[] = [];
-      let foundSource: 'nexus' | 'tba' = 'tba';
-
-      // Check for Nexus teams first (priority) by scanning localStorage
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith('nexus_event_teams_')) {
-          const eventKey = key.replace('nexus_event_teams_', '');
-          const nexusTeams = getStoredNexusTeams(eventKey);
-
-          if (nexusTeams && nexusTeams.length > 0) {
-            // Convert from frc format to numbers (frc123 -> 123)
-            const teamNumbers = nexusTeams
-              .map(teamKey => teamKey.startsWith('frc') ? parseInt(teamKey.substring(3)) : parseInt(teamKey))
-              .filter(num => !isNaN(num))
-              .sort((a, b) => a - b);
-
-            if (teamNumbers.length > 0) {
-              foundEvent = eventKey;
-              foundTeams = teamNumbers;
-              foundSource = 'nexus';
-              break; // Use first Nexus event found
-            }
-          }
-        }
-      }
-
-      // Fallback to TBA teams if no Nexus teams found
-      if (!foundEvent) {
-        const tbaEventKeys = Object.keys(tbaTeams);
-        if (tbaEventKeys.length > 0) {
-          const firstEventKey = tbaEventKeys[0];
-          if (firstEventKey) {
-            const tbaTeamsForEvent = tbaTeams[firstEventKey];
-            if (tbaTeamsForEvent && tbaTeamsForEvent.length > 0) {
-              foundEvent = firstEventKey;
-              foundTeams = tbaTeamsForEvent;
-              foundSource = 'tba';
-            }
-          }
-        }
-      }
-
-      setSelectedEvent(foundEvent);
-      setCurrentTeams(foundTeams);
-      setTeamDataSource(foundSource);
-    };
-
-    loadEventData(); // Initial load
-
-    // Add event listener for when the window regains focus
-    window.addEventListener('focus', loadEventData);
-
-    // Cleanup the event listener when the component unmounts
-    return () => {
-      window.removeEventListener('focus', loadEventData);
-    };
-  }, []);
 
   // Load pit addresses and map data when event changes and uses Nexus data
   useEffect(() => {
@@ -435,12 +353,13 @@ const PitAssignmentsPage: React.FC = () => {
       {/* Event Information and Assignment Controls - Side by side */}
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Event Information */}
-        <EventInformationCard
+        <AssignmentEventInformationCard
+          variant="pit"
           selectedEvent={selectedEvent}
           teamDataSource={teamDataSource}
-          currentTeams={currentTeams}
-          pitAddresses={pitAddresses}
-          hasTeamData={currentTeams.length > 0}
+          teamCount={currentTeams.length}
+          pitLocationCount={pitAddresses ? Object.keys(pitAddresses).length : undefined}
+          hasData={currentTeams.length > 0}
         />
 
         {/* Assignment Controls */}

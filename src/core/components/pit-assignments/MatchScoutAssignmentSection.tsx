@@ -220,14 +220,10 @@ export const MatchScoutAssignmentSection: React.FC<Props> = ({
                     <TableRow key={row.matchNum} data-state={String(row.matchNum) === matchNumber ? 'selected' : undefined}>
                       <TableCell className="font-medium">{row.matchNum}</TableCell>
                       <TableCell className="text-[11px] leading-4 text-red-700 dark:text-red-300">
-                        {row.redAlliance.map((team) => (
-                          <div key={`${row.matchNum}-r-${team}`}>{team}</div>
-                        ))}
+                        {row.redAlliance.join(' ')}
                       </TableCell>
                       <TableCell className="text-[11px] leading-4 text-blue-700 dark:text-blue-300">
-                        {row.blueAlliance.map((team) => (
-                          <div key={`${row.matchNum}-b-${team}`}>{team}</div>
-                        ))}
+                        {row.blueAlliance.join(' ')}
                       </TableCell>
                       {PLAYER_STATIONS.map((station) => {
                         const assignedScout = stationAssignments[station];
