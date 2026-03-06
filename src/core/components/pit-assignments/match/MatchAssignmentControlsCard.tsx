@@ -1,32 +1,37 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/core/components/ui/card';
 import { Button } from '@/core/components/ui/button';
+import { Input } from '@/core/components/ui/input';
 import { Shuffle, Upload } from 'lucide-react';
 
 type MatchAssignmentMode = 'sequential' | 'manual';
 
 interface MatchAssignmentControlsCardProps {
   assignmentMode: MatchAssignmentMode;
+  chunkSize: number;
   hasAssignments: boolean;
   hasSchedule: boolean;
   readyConnectedScoutsCount: number;
   onAssignmentModeChange: (mode: MatchAssignmentMode) => void;
+  onChunkSizeChange: (value: number) => void;
   onGenerateAssignments: () => void;
   onPushAssignments: () => void;
 }
 
 export const MatchAssignmentControlsCard: React.FC<MatchAssignmentControlsCardProps> = ({
   assignmentMode,
+  chunkSize,
   hasAssignments,
   hasSchedule,
   readyConnectedScoutsCount,
   onAssignmentModeChange,
+  onChunkSizeChange,
   onGenerateAssignments,
   onPushAssignments,
 }) => {
   const modeDescription =
     assignmentMode === 'sequential'
-      ? 'Auto Rotation: scout names are assigned across all station cells in match order for balanced coverage.'
+      ? 'Auto Rotation: assign scouts in fixed match chunks, then rotate station ownership between chunks for balanced coverage.'
       : 'Manual Assignment: select a scout, then click-and-drag across station cells to assign quickly.';
 
   return (
@@ -59,6 +64,26 @@ export const MatchAssignmentControlsCard: React.FC<MatchAssignmentControlsCardPr
             </div>
             <p className="text-xs text-muted-foreground mt-1">{modeDescription}</p>
           </div>
+
+          {assignmentMode === 'sequential' && (
+            <div>
+              <label className="text-sm font-medium mb-2 block" htmlFor="chunk-size-input">
+                Matches Per Chunk:
+              </label>
+              <Input
+                id="chunk-size-input"
+                type="number"
+                min={1}
+                step={1}
+                value={chunkSize}
+                onChange={(event) => onChunkSizeChange(Number.parseInt(event.target.value, 10) || 1)}
+                className="max-w-40"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Scouts keep station assignments inside each chunk and rotate when the next chunk starts.
+              </p>
+            </div>
+          )}
 
           <div className="flex gap-2">
             <Button

@@ -45,6 +45,7 @@ export const MatchScoutAssignmentSection: React.FC<MatchScoutAssignmentSectionPr
 }) => {
   const { pushDataToAll } = useWebRTC();
   const [assignmentMode, setAssignmentMode] = useState<MatchAssignmentMode>('sequential');
+  const [chunkSize, setChunkSize] = useState<number>(3);
   const [selectedScoutForAssignment, setSelectedScoutForAssignment] = useState<string | null>(null);
   const [assignmentsConfirmed, setAssignmentsConfirmed] = useState<boolean>(true);
   const [assignmentBlocks, setAssignmentBlocks] = useState<MatchScoutAssignmentBlock[]>([]);
@@ -165,6 +166,11 @@ export const MatchScoutAssignmentSection: React.FC<MatchScoutAssignmentSectionPr
     }
   };
 
+  const handleChunkSizeChange = (value: number) => {
+    const normalizedChunkSize = Number.isFinite(value) ? Math.max(1, Math.floor(value)) : 1;
+    setChunkSize(normalizedChunkSize);
+  };
+
   const handleGenerateAssignments = () => {
     if (!eventKey) {
       toast.error('No active event selected');
@@ -189,9 +195,11 @@ export const MatchScoutAssignmentSection: React.FC<MatchScoutAssignmentSectionPr
     }
 
     const nextBlocks = schedule.map((row, rowIndex) => {
+      const chunkIndex = Math.floor(rowIndex / chunkSize);
       const assignments: Partial<Record<PlayerStation, string>> = {};
+
       PLAYER_STATIONS.forEach((station, stationIndex) => {
-        const scoutIndex = (rowIndex * PLAYER_STATIONS.length + stationIndex) % availableScouts.length;
+        const scoutIndex = (chunkIndex * PLAYER_STATIONS.length + stationIndex) % availableScouts.length;
         const scoutName = availableScouts[scoutIndex];
         if (scoutName) {
           assignments[station] = scoutName;
@@ -272,10 +280,12 @@ export const MatchScoutAssignmentSection: React.FC<MatchScoutAssignmentSectionPr
       <div className="flex flex-col lg:flex-row gap-6">
         <MatchAssignmentControlsCard
           assignmentMode={assignmentMode}
+          chunkSize={chunkSize}
           hasAssignments={hasAssignments}
           hasSchedule={schedule.length > 0}
           readyConnectedScoutsCount={readyConnectedScoutsCount}
           onAssignmentModeChange={handleAssignmentModeChange}
+          onChunkSizeChange={handleChunkSizeChange}
           onGenerateAssignments={handleGenerateAssignments}
           onPushAssignments={handlePushAssignments}
         />
