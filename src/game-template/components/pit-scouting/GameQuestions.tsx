@@ -303,7 +303,7 @@ export function GameSpecificQuestions({ gameData = {}, onGameDataChange }: GameS
               value={(gameData.shootingAccuracy as number) || ''}
               onChange={(e) => handleChange('shootingAccuracy', parseInt(e.target.value) || 0)}
             />
-          </div>
+          </div> */}
 
           <div className="flex items-center gap-2">
             <Button
@@ -313,6 +313,28 @@ export function GameSpecificQuestions({ gameData = {}, onGameDataChange }: GameS
               className="flex-1"
             >
               Can pickup from outpost chute
+            </Button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant={gameData.canMoveWhileShooting ? "default" : "outline"}
+              onClick={() => handleChange('canMoveWhileShooting', !gameData.canMoveWhileShooting)}
+              className="flex-1"
+            >
+              Robot Move While Shooting?
+            </Button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant={gameData.canShootAnywhere ? "default" : "outline"}
+              onClick={() => handleChange('canShootAnywhere', !gameData.canShootAnywhere)}
+              className="flex-1"
+            >
+              Robot Dynamic/Can shoot anywhere?
             </Button>
           </div>
 

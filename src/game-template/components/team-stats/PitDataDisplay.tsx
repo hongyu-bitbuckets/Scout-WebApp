@@ -14,6 +14,11 @@ interface PitDataDisplayProps {
     selectedEvent?: string;
 }
 
+const PIT_GAME_DATA_LABELS: Record<string, string> = {
+    canMoveWhileShooting: 'Robot Move While Shooting?',
+    canShootAnywhere: 'Robot Dynamic/Can shoot anywhere?',
+};
+
 export function PitDataDisplay({ teamNumber, selectedEvent }: PitDataDisplayProps) {
     const [entry, setEntry] = useState<PitScoutingEntryBase | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -213,7 +218,9 @@ export function PitDataDisplay({ teamNumber, selectedEvent }: PitDataDisplayProp
                                                 .filter(([key]) => key !== 'reportedAutosByStart')
                                                 .map(([key, value]) => (
                                                     <div key={key} className="flex justify-between items-center py-1 border-b border-border/50 last:border-0">
-                                                        <span className="text-sm font-medium capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                                                        <span className="text-sm font-medium capitalize">
+                                                            {PIT_GAME_DATA_LABELS[key] || key.replace(/([A-Z])/g, ' $1').trim()}
+                                                        </span>
                                                         <Badge variant="secondary" className="font-mono">
                                                             {typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value)}
                                                         </Badge>

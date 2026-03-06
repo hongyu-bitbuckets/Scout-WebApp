@@ -1129,6 +1129,18 @@ export async function generateDemoEvent(options: DemoDataOptions = {}): Promise<
                                    profile.tier === 'average' ? (Math.random() > 0.3 ? 'level2' : 'level1') :
                                    Math.random() > 0.5 ? 'level1' : 'none';
 
+            const canMoveWhileShooting =
+                profile.tier === 'elite' ? Math.random() > 0.15 :
+                profile.tier === 'strong' ? Math.random() > 0.35 :
+                profile.tier === 'average' ? Math.random() > 0.55 :
+                Math.random() > 0.8;
+
+            const canShootAnywhere =
+                profile.tier === 'elite' ? Math.random() > 0.2 :
+                profile.tier === 'strong' ? Math.random() > 0.45 :
+                profile.tier === 'average' ? Math.random() > 0.7 :
+                Math.random() > 0.9;
+
             const pitEntry: PitScoutingEntryBase = {
                 id: `pit-${team.teamNumber}-${eventKey}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                 teamNumber: team.teamNumber,
@@ -1140,7 +1152,14 @@ export async function generateDemoEvent(options: DemoDataOptions = {}): Promise<
                 weight: Math.round(weight * 10) / 10, // Round to 1 decimal
                 drivetrain,
                 programmingLanguage,
-                notes: generatePitNotes(profile, { canAutoClimbL1, targetClimbLevel, fuelCapacity, canGoUnderTrench }),
+                notes: generatePitNotes(profile, {
+                    canAutoClimbL1,
+                    targetClimbLevel,
+                    fuelCapacity,
+                    canGoUnderTrench,
+                    canMoveWhileShooting,
+                    canShootAnywhere,
+                }),
                 gameData: {
                     // Physical Specifications
                     maxLength: Math.round(28 + Math.random() * 4), // 28-32"
@@ -1151,6 +1170,8 @@ export async function generateDemoEvent(options: DemoDataOptions = {}): Promise<
                     // Fuel Handling
                     fuelCapacity,
                     canOutpostPickup: Math.random() > 0.2, // 80% can pickup from outpost
+                    canMoveWhileShooting,
+                    canShootAnywhere,
                     canPassToCorral: Math.random() > 0.3, // 70% can pass to corral
                     
                     // Strategic Preferences disabled
@@ -1389,7 +1410,14 @@ function generateRandomComment(profile: TeamSkillProfile): string {
  */
 function generatePitNotes(
     profile: TeamSkillProfile, 
-    capabilities: { canAutoClimbL1: boolean; targetClimbLevel: string; fuelCapacity: number; canGoUnderTrench: boolean }
+    capabilities: {
+        canAutoClimbL1: boolean;
+        targetClimbLevel: string;
+        fuelCapacity: number;
+        canGoUnderTrench: boolean;
+        canMoveWhileShooting: boolean;
+        canShootAnywhere: boolean;
+    }
 ): string {
     const notes: string[] = [];
     
@@ -1420,6 +1448,12 @@ function generatePitNotes(
         notes.push('Targets Level 3 climb (30pts).');
     } else if (capabilities.targetClimbLevel === 'level2') {
         notes.push('Targets Level 2 climb (20pts).');
+    }
+    if (capabilities.canMoveWhileShooting) {
+        notes.push('Can score while moving.');
+    }
+    if (capabilities.canShootAnywhere) {
+        notes.push('Can shoot effectively from most field locations.');
     }
     
     return notes.join(' ');

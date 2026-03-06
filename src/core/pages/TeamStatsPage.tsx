@@ -76,7 +76,7 @@ interface TeamStatsPageProps {
 
 import { StatOverview } from "@/game-template/components/team-stats/StatOverview";
 import { ScoringAnalysis } from "@/game-template/components/team-stats/ScoringAnalysis";
-import { AutoAnalysis } from "@/game-template/components/team-stats/AutoAnalysis";
+// import { AutoAnalysis } from "@/game-template/components/team-stats/AutoAnalysis";
 import { PerformanceAnalysis } from "@/game-template/components/team-stats/PerformanceAnalysis";
 import PitDataDisplay from "@/game-template/components/team-stats/PitDataDisplay";
 
@@ -519,13 +519,13 @@ export function TeamStatsPage(props: TeamStatsPageProps) {
                             </TabsContent>
 
                             {/* Auto Start Tab */}
-                            <TabsContent value="auto">
+                            {/* <TabsContent value="auto">
                                 <AutoAnalysis
                                     teamStats={teamStats}
                                     compareStats={compareStats}
                                     startPositionConfig={startPositionConfig}
                                 />
-                            </TabsContent>
+                            </TabsContent> */}
 
                             {/* Performance Tab */}
                             <TabsContent value="performance">
