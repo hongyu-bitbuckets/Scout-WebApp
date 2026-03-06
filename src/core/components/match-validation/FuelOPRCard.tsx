@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/core/components/ui/table';
+import { formatTeamDisplayForEvent } from '@/core/lib/teamMetadata';
 
 export interface FuelOPRDisplayRow {
   teamNumber: number;
@@ -31,6 +32,7 @@ export interface FuelOPRDisplayRow {
 export type FuelOPRDisplayMode = 'impact' | 'production';
 
 interface FuelOPRCardProps {
+  eventKey?: string;
   impactRows: FuelOPRDisplayRow[];
   productionRows: FuelOPRDisplayRow[];
   impactLambda: number | null;
@@ -48,6 +50,7 @@ const toCsvValue = (value: string | number): string => {
 };
 
 export const FuelOPRCard: React.FC<FuelOPRCardProps> = ({
+  eventKey,
   impactRows,
   productionRows,
   impactLambda,
@@ -188,7 +191,7 @@ export const FuelOPRCard: React.FC<FuelOPRCardProps> = ({
               <TableBody>
                 {rows.map(row => (
                   <TableRow key={row.teamNumber}>
-                    <TableCell className="font-medium">{row.teamNumber}</TableCell>
+                    <TableCell className="font-medium">{formatTeamDisplayForEvent(eventKey, row.teamNumber)}</TableCell>
                     <TableCell>{row.matchesPlayed}</TableCell>
                     <TableCell>{formatValue(row.autoFuelOPR)}</TableCell>
                     <TableCell>{formatValue(row.teleopFuelOPR)}</TableCell>

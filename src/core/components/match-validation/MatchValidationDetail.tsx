@@ -16,6 +16,7 @@ import { DiscrepancyList } from './DiscrepancyList';
 import { TeamBreakdown } from './TeamBreakdown';
 import { RefreshCw, Users, ExternalLink, AlertTriangle, Info } from 'lucide-react';
 import type { MatchListItem, Discrepancy } from '@/core/lib/matchValidationTypes';
+import { formatTeamDisplayForEvent } from '@/core/lib/teamMetadata';
 
 interface MatchValidationDetailProps {
   match: MatchListItem;
@@ -37,6 +38,7 @@ export const MatchValidationDetail: React.FC<MatchValidationDetailProps> = ({
   const matchLabel = formatMatchLabel
     ? formatMatchLabel({ ...match, matchNumber: match.matchNumber.toString() })
     : match.displayName;
+  const eventKey = match.matchKey.split('_')[0] || '';
 
   // Generate TBA match URL
   const getTBAMatchUrl = () => {
@@ -180,6 +182,7 @@ export const MatchValidationDetail: React.FC<MatchValidationDetailProps> = ({
               {/* Team Breakdown */}
               <TeamBreakdown
                 teams={validationResult.teams || []}
+                eventKey={eventKey}
                 onRescoutTeam={handleRescoutTeam}
               />
 
@@ -216,7 +219,7 @@ export const MatchValidationDetail: React.FC<MatchValidationDetailProps> = ({
                           <div className="text-3xl font-bold text-red-900 dark:text-red-100 mb-2">{match.redScore}</div>
                           <div className="text-xs text-muted-foreground space-y-1">
                             {match.redTeams.map(team => (
-                              <div key={team}>{team}</div>
+                              <div key={team}>{formatTeamDisplayForEvent(eventKey, team)}</div>
                             ))}
                           </div>
                           {match.redAutoScore !== undefined && match.redTeleopScore !== undefined && (
@@ -239,7 +242,7 @@ export const MatchValidationDetail: React.FC<MatchValidationDetailProps> = ({
                           <div className="text-3xl font-bold text-blue-900 dark:text-blue-100 mb-2">{match.blueScore}</div>
                           <div className="text-xs text-muted-foreground space-y-1">
                             {match.blueTeams.map(team => (
-                              <div key={team}>{team}</div>
+                              <div key={team}>{formatTeamDisplayForEvent(eventKey, team)}</div>
                             ))}
                           </div>
                           {match.blueAutoScore !== undefined && match.blueTeleopScore !== undefined && (
@@ -293,11 +296,11 @@ export const MatchValidationDetail: React.FC<MatchValidationDetailProps> = ({
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-muted-foreground">Red Alliance:</span>
-                        <span className="font-medium">{match.redTeams.join(', ')}</span>
+                        <span className="font-medium">{match.redTeams.map(team => formatTeamDisplayForEvent(eventKey, team)).join(', ')}</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-muted-foreground">Blue Alliance:</span>
-                        <span className="font-medium">{match.blueTeams.join(', ')}</span>
+                        <span className="font-medium">{match.blueTeams.map(team => formatTeamDisplayForEvent(eventKey, team)).join(', ')}</span>
                       </div>
                     </div>
                   </CardContent>

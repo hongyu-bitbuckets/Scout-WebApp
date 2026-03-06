@@ -20,7 +20,7 @@ export const PAGE_HELP_CONFIG: Record<string, PageHelpConfig> = {
     ]
   },
   "/game-start": {
-    title: "Game Start Setup",
+    title: "Game Start",
     useDialog: true,
     content: [
       "![Game Start Demo](./assets/tutorials/game-start-demo.gif)",

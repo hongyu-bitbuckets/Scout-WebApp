@@ -4,14 +4,17 @@ import { Badge } from '@/core/components/ui/badge';
 import { Button } from '@/core/components/ui/button';
 import { RefreshCw } from 'lucide-react';
 import type { MatchValidationResult } from '@/core/lib/matchValidationTypes';
+import { formatTeamDisplayForEvent } from '@/core/lib/teamMetadata';
 
 interface TeamBreakdownProps {
   teams: NonNullable<MatchValidationResult['teams']>;
+  eventKey?: string;
   onRescoutTeam: (teamNumber: string, alliance: 'red' | 'blue') => void;
 }
 
 export const TeamBreakdown: React.FC<TeamBreakdownProps> = ({
   teams,
+  eventKey,
   onRescoutTeam,
 }) => {
   if (!teams || teams.length === 0) {
@@ -38,7 +41,7 @@ export const TeamBreakdown: React.FC<TeamBreakdownProps> = ({
                     variant="outline"
                     className={`shrink-0 ${team.alliance === 'red' ? 'bg-red-100 dark:bg-red-950' : 'bg-blue-100 dark:bg-blue-950'}`}
                   >
-                    {team.teamNumber}
+                    {formatTeamDisplayForEvent(eventKey, team.teamNumber)}
                   </Badge>
                   <div className="min-w-0">
                     <div className="text-sm font-medium flex items-center gap-2 flex-wrap">

@@ -4,6 +4,7 @@ import { Button } from "@/core/components/ui/button";
 import { Badge } from "@/core/components/ui/badge";
 import { ColumnFilterPopover } from "./ColumnFilterPopover";
 import { StrategyColumnConfig, ColumnFilter, FilterOperator, TeamData } from "@/core/types/strategy";
+import { formatTeamDisplayLabel } from "@/core/lib/teamMetadata";
 
 export const createColumns = (
     columnConfig: StrategyColumnConfig[],
@@ -38,13 +39,16 @@ export const createColumns = (
                     </div>
                 );
             },
-            cell: ({ getValue }) => {
+            cell: ({ getValue, row }) => {
                 const value = getValue();
 
                 if (col.key === "teamNumber") {
+                    const rowData = row.original as TeamData | undefined;
+                    const teamNumber = typeof value === 'number' ? value : Number(value) || 0;
+                    const teamName = typeof rowData?.teamName === 'string' ? rowData.teamName : undefined;
                     return (
                         <span className="font-medium">
-                            {typeof value === 'number' ? value : Number(value) || 0}
+                            {formatTeamDisplayLabel(teamNumber, teamName)}
                         </span>
                     );
                 }
@@ -72,8 +76,9 @@ export const createColumns = (
                 ? (row, _columnId, filterValue) => {
                     const value = row.getValue(_columnId);
                     const teamNumber = String(value);
+                    const teamName = String(row.original.teamName ?? '');
                     const searchValue = String(filterValue).toLowerCase();
-                    return teamNumber.includes(searchValue);
+                    return teamNumber.includes(searchValue) || teamName.toLowerCase().includes(searchValue);
                 }
                 : undefined,
             enableSorting: true,

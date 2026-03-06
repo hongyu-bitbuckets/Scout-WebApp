@@ -14,6 +14,7 @@ import { TeamStatsDialog } from "@/game-template/pick-list-config";
 import { Trash2 } from "lucide-react";
 import type { BackupTeam } from "@/core/lib/allianceTypes";
 import type { TeamStats } from "@/core/types/team-stats";
+import { formatTeamDisplayLabel } from "@/core/lib/teamMetadata";
 
 interface BackupTeamsSectionProps {
     backups: BackupTeam[];
@@ -66,7 +67,8 @@ export const BackupTeamsSection = ({
 
     const getBackupTeamDisplayFormat = (value: string) => {
         if (value === "placeholder") return "Select a team...";
-        return value;
+        const team = availableTeams.find((candidate) => candidate.teamNumber === Number(value));
+        return formatTeamDisplayLabel(value, team?.teamName);
     };
 
     const availableForSelection = getAvailableTeamsForSelection();
@@ -108,7 +110,7 @@ export const BackupTeamsSection = ({
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2">
                                                     <Badge variant="secondary">{backup.rank}</Badge>
-                                                    <span className="font-medium">Team {backup.teamNumber}</span>
+                                                    <span className="font-medium">{formatTeamDisplayLabel(backup.teamNumber, teamStats?.teamName)}</span>
                                                 </div>
                                             </div>
                                             <div className="flex gap-1">

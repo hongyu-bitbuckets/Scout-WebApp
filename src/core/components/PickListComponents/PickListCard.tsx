@@ -15,6 +15,7 @@ import { Trash2 } from "lucide-react";
 import type { PickList, PickListItem } from "@/core/types/pickListTypes";
 import type { TeamStats } from "@/core/types/team-stats";
 import type { Alliance } from "@/core/lib/allianceTypes";
+import { formatTeamDisplayLabel } from "@/core/lib/teamMetadata";
 
 interface PickListCardProps {
     pickList: PickList;
@@ -91,7 +92,10 @@ export const PickListCard = ({
                             return (
                                 <SortableListItem
                                     key={item.id}
-                                    item={item}
+                                    item={{
+                                        ...item,
+                                        text: formatTeamDisplayLabel(teamNumber, teamStats?.teamName),
+                                    }}
                                     order={order}
                                     onCompleteItem={onCompleteItem}
                                     onRemoveItem={onRemoveItem}

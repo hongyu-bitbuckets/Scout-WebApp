@@ -13,8 +13,11 @@ import type { TeamStats } from '@/core/types/team-stats';
  */
 export const filterTeams = (teams: TeamStats[], searchFilter: string): TeamStats[] => {
     if (!searchFilter.trim()) return teams;
+    const normalizedQuery = searchFilter.toLowerCase();
+
     return teams.filter(team =>
-        String(team.teamNumber).toLowerCase().includes(searchFilter.toLowerCase())
+        String(team.teamNumber).toLowerCase().includes(normalizedQuery)
+        || String(team.teamName ?? '').toLowerCase().includes(normalizedQuery)
     );
 };
 

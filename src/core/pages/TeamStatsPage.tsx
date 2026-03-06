@@ -14,6 +14,7 @@ import { DataAttribution } from "@/core/components/DataAttribution";
 import { TeamStatsFieldSettingsSheet, type TeamStatsFieldOption } from "@/core/components/team-stats/TeamStatsFieldSettingsSheet";
 // PitDataDisplay import removed (will use one from game-template)
 import { useTeamStats } from "@/core/hooks/useTeamStats";
+import { formatTeamDisplayForEvent } from "@/core/lib/teamMetadata";
 import type { TeamStats } from "@/types/game-interfaces";
 import type {
     StatSectionDefinition,
@@ -106,6 +107,15 @@ export function TeamStatsPage(props: TeamStatsPageProps) {
     const [isFieldSettingsOpen, setIsFieldSettingsOpen] = useState(false);
     const [hiddenStatKeys, setHiddenStatKeys] = useState<Set<string>>(new Set());
     const [autoHideUncollected, setAutoHideUncollected] = useState(true);
+    const activeEventKeyForDisplay = selectedEvent !== 'all'
+        ? selectedEvent
+        : (localStorage.getItem('eventKey') || '');
+    const selectedTeamLabel = selectedTeam
+        ? formatTeamDisplayForEvent(activeEventKeyForDisplay, selectedTeam)
+        : '';
+    const compareTeamLabel = compareTeam && compareTeam !== 'none'
+        ? formatTeamDisplayForEvent(activeEventKeyForDisplay, compareTeam)
+        : '';
 
     const getTabCategoryLabel = (tab: 'overview' | 'scoring' | 'performance') => {
         if (tab === 'overview') return 'Overview';
@@ -358,6 +368,7 @@ export function TeamStatsPage(props: TeamStatsPageProps) {
                                 availableOptions={availableTeams}
                                 onValueChange={setSelectedTeam}
                                 placeholder="Select Team"
+                                displayFormat={(team) => formatTeamDisplayForEvent(activeEventKeyForDisplay, team)}
                                 className="bg-background border-muted-foreground/20"
                             />
                         </div>
@@ -372,6 +383,7 @@ export function TeamStatsPage(props: TeamStatsPageProps) {
                                 availableOptions={["none", ...availableTeams.filter(t => t !== selectedTeam)]}
                                 onValueChange={setCompareTeam}
                                 placeholder="No team"
+                                displayFormat={(team) => team === 'none' ? 'No team' : formatTeamDisplayForEvent(activeEventKeyForDisplay, team)}
                                 className="bg-background border-muted-foreground/20"
                             />
                         </div>
@@ -429,11 +441,11 @@ export function TeamStatsPage(props: TeamStatsPageProps) {
                             <CardHeader className="py-4">
                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                     <div className="flex items-center gap-4">
-                                        <CardTitle className="text-2xl">Team {selectedTeam}</CardTitle>
+                                        <CardTitle className="text-2xl">{selectedTeamLabel}</CardTitle>
                                         {compareTeam && compareTeam !== "none" && compareStats && (
                                             <div className="flex items-center gap-2">
                                                 <span className="text-lg text-muted-foreground italic">vs</span>
-                                                <CardTitle className="text-2xl text-purple-600">Team {compareTeam}</CardTitle>
+                                                <CardTitle className="text-2xl text-purple-600">{compareTeamLabel}</CardTitle>
                                             </div>
                                         )}
                                     </div>

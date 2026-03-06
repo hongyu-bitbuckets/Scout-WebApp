@@ -789,6 +789,7 @@ export const MatchValidationPage: React.FC = () => {
             </label>
           </div>
           <FuelOPRCard
+            eventKey={eventKey}
             impactRows={impactFuelOprRows}
             productionRows={productionFuelOprRows}
             impactLambda={impactFuelOprLambda}

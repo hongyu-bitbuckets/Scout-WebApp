@@ -18,6 +18,7 @@ import { calculateFuelOPRHybrid } from "@/game-template/fuelOpr";
 import { getCachedCOPREventKeys, getCachedEventCOPRs } from "@/core/lib/tba/coprUtils";
 import { getCachedEventStatboticsEPA, getCachedStatboticsEventKeys } from "@/core/lib/statbotics/epaUtils";
 import { getCachedTBAEventKeys, getCachedTBAEventMatches } from "@/core/lib/tbaCache";
+import { resolveTeamNameForEventTeam } from "@/core/lib/teamMetadata";
 import type { TeamStats } from "@/core/types/team-stats";
 import type { ScoutingEntry } from "@/game-template/scoring";
 import type { TBAMatchData } from "@/core/lib/tbaMatchData";
@@ -86,9 +87,16 @@ export const useAllTeamStats = (eventKey?: string): UseAllTeamStatsResult => {
             const fuelOpr = fuelOprByEventTeam.get(`${eventKey}::${teamNumber}`);
             const copr = coprByEvent.get(eventKey)?.get(teamNumber);
             const statbotics = statboticsByEvent.get(eventKey)?.get(teamNumber);
+            const inlineTeamName = teamMatches
+                .slice()
+                .sort((a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0))
+                .map((entry) => entry.teamName)
+                .find((name): name is string => typeof name === 'string' && name.trim().length > 0);
+            const resolvedTeamName = resolveTeamNameForEventTeam(eventKey, teamNumber, inlineTeamName);
 
             const baseStats = {
                 teamNumber,
+                teamName: resolvedTeamName,
                 eventKey,
                 ...calculated,
             } as TeamStats;
@@ -261,6 +269,7 @@ export const useAllTeamStats = (eventKey?: string): UseAllTeamStatsResult => {
 function createEmptyTeamStats(teamNumber: number, eventKey: string): TeamStats {
     return {
         teamNumber,
+        teamName: resolveTeamNameForEventTeam(eventKey, teamNumber),
         eventKey,
         matchCount: 0,
         totalPoints: 0,

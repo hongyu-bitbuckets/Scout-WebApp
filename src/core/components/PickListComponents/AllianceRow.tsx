@@ -10,6 +10,7 @@ import { GenericSelector } from "@/core/components/ui/generic-selector";
 import { Trash2, X } from "lucide-react";
 import type { Alliance } from "@/core/lib/allianceTypes";
 import type { TeamStats } from "@/core/types/team-stats";
+import { formatTeamDisplayLabel } from "@/core/lib/teamMetadata";
 
 interface AllianceRowProps {
     alliance: Alliance;
@@ -47,7 +48,12 @@ export const AllianceRow = ({
                                 availableOptions={["none", ...availableTeams.filter(t => !selectedTeams.includes(t.teamNumber) || t.teamNumber === teamNumber).map(t => String(t.teamNumber))]}
                                 onValueChange={(val) => onUpdateTeam(alliance.id, position, val === "none" ? null : Number(val))}
                                 placeholder="Team"
-                                displayFormat={(v) => v === "none" ? "None" : v}
+                                displayFormat={(v) => {
+                                    if (v === "none") return "None";
+                                    const numericTeam = Number(v);
+                                    const team = availableTeams.find((candidate) => candidate.teamNumber === numericTeam);
+                                    return formatTeamDisplayLabel(v, team?.teamName);
+                                }}
                                 className="w-28"
                             />
 

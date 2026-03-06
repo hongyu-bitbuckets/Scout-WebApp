@@ -11,6 +11,7 @@
 import { useMemo } from "react";
 import { useAllTeamStats } from "./useAllTeamStats";
 import { StrategyConfig, ColumnFilter, TeamData, AggregationType } from "@/core/types/strategy";
+import { resolveTeamNameForEventTeam } from "@/core/lib/teamMetadata";
 
 export interface UseTeamStatisticsResult {
     teamStats: TeamData[];
@@ -33,6 +34,7 @@ export const useTeamStatistics = (
         return allTeamStats.map(stats => {
             const teamData: TeamData = {
                 teamNumber: stats.teamNumber,
+                teamName: resolveTeamNameForEventTeam(stats.eventKey, stats.teamNumber, stats.teamName),
                 eventKey: stats.eventKey,
                 matchCount: stats.matchCount,
             };

@@ -12,6 +12,7 @@ import { TeamCardStats, TeamStatsDialog } from "@/game-template/pick-list-config
 import type { TeamStats } from "@/core/types/team-stats";
 import type { PickList } from "@/core/types/pickListTypes";
 import type { Alliance } from "@/core/lib/allianceTypes";
+import { formatTeamDisplayLabel } from "@/core/lib/teamMetadata";
 
 interface TeamCardProps {
     team: TeamStats;
@@ -111,7 +112,7 @@ export const TeamCard = ({ team, pickLists, alliances, onAddTeamToList, onAddTea
         <Card className="p-3">
             <div className="flex flex-col gap-2">
                 <div className="flex-1">
-                    <div className="font-medium">Team {team.teamNumber}</div>
+                    <div className="font-medium">{formatTeamDisplayLabel(team.teamNumber, team.teamName)}</div>
                     <TeamCardStats team={team} />
                     {getTeamLists().length > 0 && (
                         <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">

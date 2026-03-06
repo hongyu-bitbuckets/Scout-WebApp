@@ -22,6 +22,7 @@ import { createMatchPrediction, getPredictionForMatch } from "@/core/lib/scoutGa
 import { AlertTriangle, RefreshCw } from "lucide-react";
 import { useWorkflowNavigation } from "@/core/hooks/useWorkflowNavigation";
 import { useScout } from "@/core/contexts/ScoutContext";
+import { formatTeamDisplayForEvent } from "@/core/lib/teamMetadata";
 
 const AUTO_SWITCH_ONCE_STORAGE_PREFIX = 'autoSwitchToTeleopDone';
 
@@ -119,6 +120,13 @@ const GameStartPage = () => {
     states?.inputs?.eventKey || localStorage.getItem("eventKey") || ""
   );
   const [predictedWinner, setPredictedWinner] = useState<"red" | "blue" | "none">("none");
+  const selectedTeamDisplayLabel = useMemo(() => {
+    if (isCommentScouter) {
+      return "Alliance 3-team";
+    }
+
+    return formatTeamDisplayForEvent(eventKey, selectTeam);
+  }, [eventKey, isCommentScouter, selectTeam]);
 
   // Debounce matchNumber for team selection
   useEffect(() => {
@@ -337,7 +345,7 @@ const GameStartPage = () => {
             <div className="flex items-center gap-3 w-full">
               <RefreshCw className="h-4 w-4 text-amber-600 shrink-0" />
               <div className="text-sm text-amber-800 dark:text-amber-200">
-                <span className="font-semibold">Re-scouting:</span> <strong>{rescoutEventKey && `${rescoutEventKey} `}</strong> Match <strong>{rescoutMatch}</strong> for Team <strong>{rescoutTeams.length > 0 ? rescoutTeams[currentTeamIndex] : rescoutTeam}</strong>
+                <span className="font-semibold">Re-scouting:</span> <strong>{rescoutEventKey && `${rescoutEventKey} `}</strong> Match <strong>{rescoutMatch}</strong> for Team <strong>{formatTeamDisplayForEvent(rescoutEventKey, rescoutTeams.length > 0 ? rescoutTeams[currentTeamIndex] : rescoutTeam)}</strong>
                 {rescoutTeams.length > 0 && (
                   <span className="ml-2 opacity-75">
                     ({currentTeamIndex + 1}/{rescoutTeams.length})
@@ -588,7 +596,7 @@ const GameStartPage = () => {
                 <span className="text-sm text-green-700 dark:text-green-300">
                   {eventKey} • Match {matchNumber} •{" "}
                   {alliance.charAt(0).toUpperCase() + alliance.slice(1)} Alliance
-                  • Team {isCommentScouter ? "Alliance 3-team" : selectTeam} • {currentScout}
+                  • Team {selectedTeamDisplayLabel} • {currentScout}
                 </span>
               </div>
             </CardContent>
