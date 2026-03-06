@@ -320,25 +320,24 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             acc.accuracyFew += gameData?.endgame?.accuracyFew ? 1 : 0;
             acc.accuracyLittle += gameData?.endgame?.accuracyLittle ? 1 : 0;
 
-            // Active shift roles (stored in endgame section)
-            acc.roleActiveCleanUp += gameData?.endgame?.roleActiveCleanUp ? 1 : 0;
-            acc.roleActivePasser += gameData?.endgame?.roleActivePasser ? 1 : 0;
-            acc.roleActiveDefense += gameData?.endgame?.roleActiveDefense ? 1 : 0;
-            acc.roleActiveCycler += gameData?.endgame?.roleActiveCycler ? 1 : 0;
-            acc.roleActiveThief += gameData?.endgame?.roleActiveThief ? 1 : 0;
+            // Active/inactive role tracking is currently disabled.
+            // acc.roleActiveCleanUp += gameData?.endgame?.roleActiveCleanUp ? 1 : 0;
+            // acc.roleActivePasser += gameData?.endgame?.roleActivePasser ? 1 : 0;
+            // acc.roleActiveDefense += gameData?.endgame?.roleActiveDefense ? 1 : 0;
+            // acc.roleActiveCycler += gameData?.endgame?.roleActiveCycler ? 1 : 0;
+            // acc.roleActiveThief += gameData?.endgame?.roleActiveThief ? 1 : 0;
 
-            // Inactive shift roles (stored in endgame section)
-            acc.roleInactiveCleanUp += gameData?.endgame?.roleInactiveCleanUp ? 1 : 0;
-            acc.roleInactivePasser += gameData?.endgame?.roleInactivePasser ? 1 : 0;
-            acc.roleInactiveDefense += gameData?.endgame?.roleInactiveDefense ? 1 : 0;
-            acc.roleInactiveCycler += gameData?.endgame?.roleInactiveCycler ? 1 : 0;
-            acc.roleInactiveThief += gameData?.endgame?.roleInactiveThief ? 1 : 0;
+            // acc.roleInactiveCleanUp += gameData?.endgame?.roleInactiveCleanUp ? 1 : 0;
+            // acc.roleInactivePasser += gameData?.endgame?.roleInactivePasser ? 1 : 0;
+            // acc.roleInactiveDefense += gameData?.endgame?.roleInactiveDefense ? 1 : 0;
+            // acc.roleInactiveCycler += gameData?.endgame?.roleInactiveCycler ? 1 : 0;
+            // acc.roleInactiveThief += gameData?.endgame?.roleInactiveThief ? 1 : 0;
 
-            // Track start positions
-            const pos = gameData?.auto?.startPosition;
-            if (pos !== null && pos !== undefined && pos >= 0) {
-                acc.startPositionCounts[pos] = (acc.startPositionCounts[pos] || 0) + 1;
-            }
+            // Track start positions (disabled)
+            // const pos = gameData?.auto?.startPosition;
+            // if (pos !== null && pos !== undefined && pos >= 0) {
+            //     acc.startPositionCounts[pos] = (acc.startPositionCounts[pos] || 0) + 1;
+            // }
 
             return acc;
         }, {
@@ -424,7 +423,7 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                 brokeDown: (entry.gameData?.auto?.brokenDownCount || 0) > 0
                     || (entry.gameData?.teleop?.brokenDownCount || 0) > 0,
                 noShow: isNoShow,
-                startPosition: entry.gameData?.auto?.startPosition ?? -1,
+                // startPosition: entry.gameData?.auto?.startPosition ?? -1,
                 comment: entry.comments || '',
                 autoFuel: entry.gameData?.auto?.fuelScoredCount || 0,
                 teleopFuel: entry.gameData?.teleop?.fuelScoredCount || 0,
@@ -441,11 +440,11 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             };
         });
 
-        // Calculate start position percentages
-        const startPositions: Record<string, number> = {};
-        Object.entries(totals.startPositionCounts).forEach(([pos, count]) => {
-            startPositions[`position${pos}`] = Math.round((count / matchCount) * 100);
-        });
+        // Calculate start position percentages (disabled)
+        // const startPositions: Record<string, number> = {};
+        // Object.entries(totals.startPositionCounts).forEach(([pos, count]) => {
+        //     startPositions[`position${pos}`] = Math.round((count / matchCount) * 100);
+        // });
 
         const avgAutoPoints = matchResults.reduce((sum, m) => sum + m.autoPoints, 0) / matchCount;
         const avgTeleopPoints = matchResults.reduce((sum, m) => sum + m.teleopPoints, 0) / matchCount;
@@ -575,28 +574,28 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             ? Math.round((((veryEffectiveCount * 2) + somewhatEffectiveCount) / (totalDefenseEvents * 2)) * 100)
             : 0;
 
-        // Calculate primary roles (most frequently played, supporting ties)
-        const activeRoles = [
-            { name: 'Cycler', count: totals.roleActiveCycler },
-            { name: 'Clean Up', count: totals.roleActiveCleanUp },
-            { name: 'Passer', count: totals.roleActivePasser },
-            { name: 'Thief', count: totals.roleActiveThief },
-            { name: 'Defense', count: totals.roleActiveDefense },
-        ];
-        const maxActiveCount = Math.max(...activeRoles.map(r => r.count));
-        const topActiveRoles = activeRoles.filter(r => r.count === maxActiveCount && r.count > 0);
-        const primaryActiveRole = topActiveRoles.length > 0 ? topActiveRoles.map(r => r.name).join(' / ') : 'None';
+        
+// const activeRoles = [
+//             { name: 'Cycler', count: totals.roleActiveCycler },
+//             { name: 'Clean Up', count: totals.roleActiveCleanUp },
+//             { name: 'Passer', count: totals.roleActivePasser },
+//             { name: 'Thief', count: totals.roleActiveThief },
+//             { name: 'Defense', count: totals.roleActiveDefense },
+//         ];
+//         const maxActiveCount = Math.max(...activeRoles.map(r => r.count));
+//         const topActiveRoles = activeRoles.filter(r => r.count === maxActiveCount && r.count > 0);
+//         const primaryActiveRole = topActiveRoles.length > 0 ? topActiveRoles.map(r => r.name).join(' / ') : 'None';
 
-        const inactiveRoles = [
-            { name: 'Cycler', count: totals.roleInactiveCycler },
-            { name: 'Clean Up', count: totals.roleInactiveCleanUp },
-            { name: 'Passer', count: totals.roleInactivePasser },
-            { name: 'Thief', count: totals.roleInactiveThief },
-            { name: 'Defense', count: totals.roleInactiveDefense },
-        ];
-        const maxInactiveCount = Math.max(...inactiveRoles.map(r => r.count));
-        const topInactiveRoles = inactiveRoles.filter(r => r.count === maxInactiveCount && r.count > 0);
-        const primaryInactiveRole = topInactiveRoles.length > 0 ? topInactiveRoles.map(r => r.name).join(' / ') : 'None';
+//         const inactiveRoles = [
+//             { name: 'Cycler', count: totals.roleInactiveCycler },
+//             { name: 'Clean Up', count: totals.roleInactiveCleanUp },
+//             { name: 'Passer', count: totals.roleInactivePasser },
+//             { name: 'Thief', count: totals.roleInactiveThief },
+//             { name: 'Defense', count: totals.roleInactiveDefense },
+//         ];
+//         const maxInactiveCount = Math.max(...inactiveRoles.map(r => r.count));
+//         const topInactiveRoles = inactiveRoles.filter(r => r.count === maxInactiveCount && r.count > 0);
+//         const primaryInactiveRole = topInactiveRoles.length > 0 ? topInactiveRoles.map(r => r.name).join(' / ') : 'None';
 
         return {
             // Base TeamStats required fields
@@ -786,16 +785,16 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                     { key: 'coprHubTotalPoints', label: 'TBA COPR', type: 'number', color: 'green', subtitle: 'Hub Total Points' },
                 ],
             },
-            {
-                id: 'primary-roles',
-                title: 'Primary Roles',
-                tab: 'overview',
-                columns: 2,
-                stats: [
-                    { key: 'primaryActiveRole', label: 'Active Shift Role', type: 'text', color: 'green' },
-                    { key: 'primaryInactiveRole', label: 'Inactive Shift Role', type: 'text', color: 'purple' },
-                ],
-            },
+            // {
+            //     id: 'primary-roles',
+            //     title: 'Primary Roles',
+            //     tab: 'overview',
+            //     columns: 2,
+            //     stats: [
+            //         { key: 'primaryActiveRole', label: 'Active Shift Role', type: 'text', color: 'green' },
+            //         { key: 'primaryInactiveRole', label: 'Inactive Shift Role', type: 'text', color: 'purple' },
+            //     ],
+            // },
             {
                 id: 'defense-intel',
                 title: 'Defense Intel',
@@ -906,30 +905,30 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                     { key: 'climbL3Rate', label: 'Level 3 (30 pts)' },
                 ],
             },
-            {
-                id: 'active-shift-roles',
-                title: 'Active Shift Roles',
-                tab: 'performance',
-                rates: [
-                    { key: 'roleActiveCyclerRate', label: 'Cycler' },
-                    { key: 'roleActiveCleanUpRate', label: 'Clean Up' },
-                    { key: 'roleActivePasserRate', label: 'Passer' },
-                    { key: 'roleActiveThiefRate', label: 'Thief' },
-                    { key: 'roleActiveDefenseRate', label: 'Defense' },
-                ],
-            },
-            {
-                id: 'inactive-shift-roles',
-                title: 'Inactive Shift Roles',
-                tab: 'performance',
-                rates: [
-                    { key: 'roleInactiveCyclerRate', label: 'Cycler' },
-                    { key: 'roleInactiveCleanUpRate', label: 'Clean Up' },
-                    { key: 'roleInactivePasserRate', label: 'Passer' },
-                    { key: 'roleInactiveThiefRate', label: 'Thief' },
-                    { key: 'roleInactiveDefenseRate', label: 'Defense' },
-                ],
-            },
+            // {
+            //     id: 'active-shift-roles',
+            //     title: 'Active Shift Roles',
+            //     tab: 'performance',
+            //     rates: [
+            //         { key: 'roleActiveCyclerRate', label: 'Cycler' },
+            //         { key: 'roleActiveCleanUpRate', label: 'Clean Up' },
+            //         { key: 'roleActivePasserRate', label: 'Passer' },
+            //         { key: 'roleActiveThiefRate', label: 'Thief' },
+            //         { key: 'roleActiveDefenseRate', label: 'Defense' },
+            //     ],
+            // },
+            // {
+            //     id: 'inactive-shift-roles',
+            //     title: 'Inactive Shift Roles',
+            //     tab: 'performance',
+            //     rates: [
+            //         { key: 'roleInactiveCyclerRate', label: 'Cycler' },
+            //         { key: 'roleInactiveCleanUpRate', label: 'Clean Up' },
+            //         { key: 'roleInactivePasserRate', label: 'Passer' },
+            //         { key: 'roleInactiveThiefRate', label: 'Thief' },
+            //         { key: 'roleInactiveDefenseRate', label: 'Defense' },
+            //     ],
+            // },
             {
                 id: 'other-metrics',
                 title: 'Other Metrics',
