@@ -1,9 +1,9 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/core/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/core/components/ui/table';
 import type { MatchScheduleTransferEntry } from '@/core/lib/matchScheduleTransfer';
 import { PLAYER_STATIONS, type PlayerStation } from '@/core/lib/matchScoutAssignments';
 
-interface MatchTeamDisplaySectionProps {
+interface MatchAssignmentTableProps {
   filteredRows: MatchScheduleTransferEntry[];
   matchNumber: string;
   stationCellClass: (station: string, hasAssignment: boolean) => string;
@@ -18,7 +18,7 @@ interface MatchTeamDisplaySectionProps {
   onStationClear: (matchNum: number, station: PlayerStation) => void;
 }
 
-export const MatchTeamDisplaySection: React.FC<MatchTeamDisplaySectionProps> = ({
+export const MatchAssignmentTable: React.FC<MatchAssignmentTableProps> = ({
   filteredRows,
   matchNumber,
   stationCellClass,
@@ -33,19 +33,29 @@ export const MatchTeamDisplaySection: React.FC<MatchTeamDisplaySectionProps> = (
   onStationClear,
 }) => {
   return (
-    <div className="min-h-[600px] grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[600px] overflow-y-auto p-1">
-      {filteredRows.map((row) => (
-        <Card key={`match-card-${row.matchNum}`} data-state={String(row.matchNum) === matchNumber ? 'selected' : undefined}>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Match {row.matchNum}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="text-xs space-y-1">
-              <p className="text-red-700 dark:text-red-300">Red: {row.redAlliance.join(' ')}</p>
-              <p className="text-blue-700 dark:text-blue-300">Blue: {row.blueAlliance.join(' ')}</p>
-            </div>
+    <div className="min-h-[600px] rounded-md border overflow-auto max-h-[600px]">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Match</TableHead>
+            <TableHead className="w-24">Red Alliance</TableHead>
+            <TableHead className="w-24">Blue Alliance</TableHead>
+            {PLAYER_STATIONS.map((station) => (
+              <TableHead key={station}>{station.toUpperCase()}</TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
 
-            <div className="grid grid-cols-2 gap-2">
+        <TableBody>
+          {filteredRows.map((row) => (
+            <TableRow key={row.matchNum} data-state={String(row.matchNum) === matchNumber ? 'selected' : undefined}>
+              <TableCell className="font-medium">{row.matchNum}</TableCell>
+              <TableCell className="text-[14px] leading-4 text-red-700 dark:text-red-300">
+                {row.redAlliance.join(' ')}
+              </TableCell>
+              <TableCell className="text-[14px] leading-4 text-blue-700 dark:text-blue-300">
+                {row.blueAlliance.join(' ')}
+              </TableCell>
               {PLAYER_STATIONS.map((station) => {
                 const assignedScout = getAssignedScout(row.matchNum, station);
                 const scoutColorClass = assignedScout ? getScoutColorClass(assignedScout) : '';
@@ -54,11 +64,11 @@ export const MatchTeamDisplaySection: React.FC<MatchTeamDisplaySectionProps> = (
                 const isInteractive = canAssign || canClear;
 
                 return (
-                  <div
-                    key={`card-${row.matchNum}-${station}`}
-                    className={`rounded border p-2 transition-all ${stationCellClass(station, Boolean(assignedScout))} ${
-                      isInteractive ? 'cursor-pointer hover:ring-2 hover:ring-blue-500/20' : ''
-                    } ${canAssign ? 'select-none' : ''}`}
+                  <TableCell
+                    key={`${row.matchNum}-${station}`}
+                    className={`${stationCellClass(station, Boolean(assignedScout))} ${
+                      isInteractive ? 'cursor-pointer select-none' : ''
+                    }`}
                     onPointerDown={() => {
                       if (canAssign) {
                         onStationPointerDown(row.matchNum, station);
@@ -83,21 +93,20 @@ export const MatchTeamDisplaySection: React.FC<MatchTeamDisplaySectionProps> = (
                           : `${station.toUpperCase()} - Unassigned`
                     }
                   >
-                    <p className="text-[11px] font-semibold uppercase">{station}</p>
                     {assignedScout ? (
-                      <span className={`inline-block mt-1 rounded border px-2 py-0.5 text-xs font-medium ${scoutColorClass}`}>
+                      <span className={`inline-block rounded border px-2 py-0.5 text-xs font-medium ${scoutColorClass}`}>
                         {assignedScout}
                       </span>
                     ) : (
                       <span className="text-xs text-muted-foreground">Break / Unassigned</span>
                     )}
-                  </div>
+                  </TableCell>
                 );
               })}
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 };

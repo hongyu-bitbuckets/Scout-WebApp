@@ -1,8 +1,6 @@
 import React from 'react';
-import { Button } from "@/core/components/ui/button";
-import { Plus } from 'lucide-react';
 import type { PitAssignment } from '@/core/lib/pitAssignmentTypes';
-import { getScoutColor } from '../shared/scoutUtils';
+import { ScoutSelectionBar } from '../shared/ScoutSelectionBar';
 
 interface PitScoutSelectionBarProps {
   scoutsList: string[];
@@ -21,55 +19,26 @@ export const PitScoutSelectionBar: React.FC<PitScoutSelectionBarProps> = ({
   assignmentsConfirmed,
   selectedScoutForAssignment,
   onScoutSelectionChange,
-  hasAssignments
+  hasAssignments: _hasAssignments
 }) => {
-  const handleScoutSelect = (scoutName: string) => {
-    if (selectedScoutForAssignment === scoutName) {
-      onScoutSelectionChange?.(null);
-    } else {
-      onScoutSelectionChange?.(scoutName);
-    }
-  };
-
   const isInteractive = assignmentMode === 'manual' && !assignmentsConfirmed;
+  const scouts = scoutsList.map((scout) => {
+    const scoutAssignments = assignments.filter((assignment) => assignment.scoutName === scout);
+    const completedCount = scoutAssignments.filter((assignment) => assignment.completed).length;
+
+    return {
+      scoutName: scout,
+      totalAssignments: scoutAssignments.length,
+      completedAssignments: completedCount,
+    };
+  });
 
   return (
-    <div className="flex flex-wrap gap-2">
-      {scoutsList.map((scout, index) => {
-        const scoutAssignments = assignments.filter(a => a.scoutName === scout);
-        const completedCount = scoutAssignments.filter(a => a.completed).length;
-        const totalCount = scoutAssignments.length;
-        const isSelected = isInteractive && selectedScoutForAssignment === scout;
-        
-        return (
-          <Button
-            key={scout}
-            variant={isSelected ? "default" : "outline"}
-            size="default"
-            className={`${getScoutColor(index)} px-2 ${
-              isInteractive
-                ? `transition-all hover:scale-105 active:scale-95 ${
-                    isSelected ? 'ring-2 ring-blue-500 shadow-md' : 'hover:shadow-sm'
-                  }` 
-                : 'cursor-default'
-            }`}
-            title={
-              isInteractive
-                ? `${scout} - ${totalCount} teams assigned - Click to select for assignment`
-                : `${completedCount}/${totalCount} teams completed`
-            }
-            onClick={isInteractive ? () => handleScoutSelect(scout) : undefined}
-            disabled={false}
-          >
-            <div className="flex items-center gap-1">
-              {isInteractive && (
-                <Plus className="h-3 w-3" />
-              )}
-              <span>{scout} ({hasAssignments ? totalCount : 0})</span>
-            </div>
-          </Button>
-        );
-      })}
-    </div>
+    <ScoutSelectionBar
+      scouts={scouts}
+      isInteractive={isInteractive}
+      selectedScoutForAssignment={selectedScoutForAssignment}
+      onScoutSelectionChange={onScoutSelectionChange}
+    />
   );
 };

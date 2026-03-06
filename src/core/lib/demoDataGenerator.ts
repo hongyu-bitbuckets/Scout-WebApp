@@ -1089,19 +1089,19 @@ export async function generateDemoEvent(options: DemoDataOptions = {}): Promise<
                                 robotHeight >= 22 ? 50 + Math.floor(Math.random() * 31) : // 50-80
                                 20 + Math.floor(Math.random() * 31); // 20-50
             
-            // Strategic preferences
-            const startPositions = START_POSITIONS;
-            const preferredStartPositions = startPositions.slice(0, 1 + Math.floor(Math.random() * 3)); // 1-3 positions
-            
-            const activeRoles = profile.tier === 'elite' ? ['Cycler', 'Thief'] :
-                               profile.tier === 'strong' ? ['Cycler', 'Clean Up'] :
-                               profile.tier === 'average' ? ['Clean Up', 'Passer'] :
-                               ['Defense', 'Passer'];
-            
-            const inactiveRoles = profile.tier === 'elite' ? ['Passer', 'Defense'] :
-                                 profile.tier === 'strong' ? ['Passer', 'Thief'] :
-                                 profile.tier === 'average' ? ['Passer', 'Defense'] :
-                                 ['Clean Up'];
+            // Strategic preferences are currently disabled.
+            // const startPositions = START_POSITIONS;
+            // const preferredStartPositions = startPositions.slice(0, 1 + Math.floor(Math.random() * 3)); // 1-3 positions
+
+            // const activeRoles = profile.tier === 'elite' ? ['Cycler', 'Thief'] :
+            //                    profile.tier === 'strong' ? ['Cycler', 'Clean Up'] :
+            //                    profile.tier === 'average' ? ['Clean Up', 'Passer'] :
+            //                    ['Defense', 'Passer'];
+
+            // const inactiveRoles = profile.tier === 'elite' ? ['Passer', 'Defense'] :
+            //                      profile.tier === 'strong' ? ['Passer', 'Thief'] :
+            //                      profile.tier === 'average' ? ['Passer', 'Defense'] :
+            //                      ['Clean Up'];
             
             // Climbing capabilities
             const canAutoClimbL1 = profile.tier === 'elite' && Math.random() > 0.5;
@@ -1133,10 +1133,10 @@ export async function generateDemoEvent(options: DemoDataOptions = {}): Promise<
                     canOutpostPickup: Math.random() > 0.2, // 80% can pickup from outpost
                     canPassToCorral: Math.random() > 0.3, // 70% can pass to corral
                     
-                    // Strategic Preferences
-                    preferredStartPositions,
-                    preferredActiveRoles: activeRoles,
-                    preferredInactiveRoles: inactiveRoles,
+                    // Strategic Preferences disabled
+                    // preferredStartPositions,
+                    // preferredActiveRoles: activeRoles,
+                    // preferredInactiveRoles: inactiveRoles,
                     
                     // Autonomous & Endgame
                     canAutoClimbL1,

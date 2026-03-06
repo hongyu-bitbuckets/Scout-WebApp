@@ -6,8 +6,8 @@ import { ScrollArea } from "@/core/components/ui/scroll-area";
 import { loadPitScoutingByTeamAndEvent, loadPitScoutingByTeam } from "@/core/db/database";
 import type { PitScoutingEntryBase } from "@/types/database";
 import { Skeleton } from "@/core/components/ui/skeleton";
-import { AutoPathsByPosition, type AutoPathListItem } from "@/game-template/components/team-stats/AutoPathsByPosition";
-import { useMemo } from "react";
+// import { AutoPathsByPosition, type AutoPathListItem } from "@/game-template/components/team-stats/AutoPathsByPosition";
+// import { useMemo } from "react";
 
 interface PitDataDisplayProps {
     teamNumber: string;
@@ -18,37 +18,38 @@ export function PitDataDisplay({ teamNumber, selectedEvent }: PitDataDisplayProp
     const [entry, setEntry] = useState<PitScoutingEntryBase | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    const reportedAutosByStartRaw = entry?.gameData?.reportedAutosByStart;
-    const reportedAutosByStart =
-        reportedAutosByStartRaw && typeof reportedAutosByStartRaw === 'object'
-            ? (reportedAutosByStartRaw as Record<string, unknown>)
-            : null;
+    // Recorded auto path display is currently disabled.
+    // const reportedAutosByStartRaw = entry?.gameData?.reportedAutosByStart;
+    // const reportedAutosByStart =
+    //     reportedAutosByStartRaw && typeof reportedAutosByStartRaw === 'object'
+    //         ? (reportedAutosByStartRaw as Record<string, unknown>)
+    //         : null;
 
-    const hasReportedAutos = reportedAutosByStart
-        ? Object.values(reportedAutosByStart).some((autos) => Array.isArray(autos) && autos.length > 0)
-        : false;
+    // const hasReportedAutos = reportedAutosByStart
+    //     ? Object.values(reportedAutosByStart).some((autos) => Array.isArray(autos) && autos.length > 0)
+    //     : false;
 
-    const pitItemsByPosition = useMemo(() => {
-        const starts = ['Left Trench', 'Left Bump', 'Hub', 'Right Bump', 'Right Trench'] as const;
-        return starts.reduce((acc, start, index) => {
-            const autos = reportedAutosByStart && Array.isArray(reportedAutosByStart[start])
-                ? reportedAutosByStart[start] as Array<{ id?: unknown; name?: unknown; actions?: unknown[] }>
-                : [];
+    // const pitItemsByPosition = useMemo(() => {
+    //     const starts = ['Left Trench', 'Left Bump', 'Hub', 'Right Bump', 'Right Trench'] as const;
+    //     return starts.reduce((acc, start, index) => {
+    //         const autos = reportedAutosByStart && Array.isArray(reportedAutosByStart[start])
+    //             ? reportedAutosByStart[start] as Array<{ id?: unknown; name?: unknown; actions?: unknown[] }>
+    //             : [];
 
-            acc[index] = autos.map((auto, itemIndex) => {
-                const actions = Array.isArray(auto.actions) ? auto.actions as any[] : [];
-                return {
-                    id: typeof auto.id === 'string' ? auto.id : `${start}-${itemIndex}`,
-                    label: typeof auto.name === 'string' && auto.name.trim() ? auto.name : `${start} Auto ${itemIndex + 1}`,
-                    actions,
-                    metricText: `${actions.length} actions`,
-                    detailText: `${start}`,
-                } satisfies AutoPathListItem;
-            });
+    //         acc[index] = autos.map((auto, itemIndex) => {
+    //             const actions = Array.isArray(auto.actions) ? auto.actions as any[] : [];
+    //             return {
+    //                 id: typeof auto.id === 'string' ? auto.id : `${start}-${itemIndex}`,
+    //                 label: typeof auto.name === 'string' && auto.name.trim() ? auto.name : `${start} Auto ${itemIndex + 1}`,
+    //                 actions,
+    //                 metricText: `${actions.length} actions`,
+    //                 detailText: `${start}`,
+    //             } satisfies AutoPathListItem;
+    //         });
 
-            return acc;
-        }, { 0: [], 1: [], 2: [], 3: [], 4: [] } as Record<number, AutoPathListItem[]>);
-    }, [reportedAutosByStart]);
+    //         return acc;
+    //     }, { 0: [], 1: [], 2: [], 3: [], 4: [] } as Record<number, AutoPathListItem[]>);
+    // }, [reportedAutosByStart]);
 
     useEffect(() => {
         let isMounted = true;
@@ -143,16 +144,16 @@ export function PitDataDisplay({ teamNumber, selectedEvent }: PitDataDisplayProp
                         <CardContent className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-1">
-                                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Drivetrain</span>
-                                    <div className="font-medium text-lg capitalize">{entry.drivetrain || "Unknown"}</div>
+                                    {/* <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Drivetrain</span>
+                                    <div className="font-medium text-lg capitalize">{entry.drivetrain || "Unknown"}</div> */}
                                 </div>
                                 <div className="space-y-1">
-                                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Weight</span>
-                                    <div className="font-medium text-lg">{entry.weight ? `${entry.weight} lbs` : "Unknown"}</div>
+                                    {/* <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Weight</span>
+                                    <div className="font-medium text-lg">{entry.weight ? `${entry.weight} lbs` : "Unknown"}</div> */}
                                 </div>
                                 <div className="space-y-1">
-                                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Programming</span>
-                                    <div className="font-medium text-lg">{entry.programmingLanguage || "Unknown"}</div>
+                                    {/* <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Programming</span>
+                                    <div className="font-medium text-lg">{entry.programmingLanguage || "Unknown"}</div> */}
                                 </div>
                                 <div className="space-y-1">
                                     <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Dimensions</span>
@@ -232,7 +233,7 @@ export function PitDataDisplay({ teamNumber, selectedEvent }: PitDataDisplayProp
                 </div>
             </div>
 
-            <Card>
+            {/* <Card>
                 <CardHeader>
                     <CardTitle>Reported Auto Paths (Pit Scouting)</CardTitle>
                 </CardHeader>
@@ -248,7 +249,7 @@ export function PitDataDisplay({ teamNumber, selectedEvent }: PitDataDisplayProp
                         <p className="text-sm text-muted-foreground">No reported auto paths have been recorded for this team.</p>
                     )}
                 </CardContent>
-            </Card>
+            </Card> */}
         </div>
     );
 }

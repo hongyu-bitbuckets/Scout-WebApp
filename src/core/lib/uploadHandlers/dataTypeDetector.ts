@@ -18,13 +18,13 @@ const isPitLikeEntry = (entry: Record<string, unknown>): boolean => {
     return true;
   }
 
-  const gameData = entry.gameData;
-  if (gameData && typeof gameData === 'object' && !Array.isArray(gameData)) {
-    const gameDataRecord = gameData as Record<string, unknown>;
-    if (gameDataRecord.reportedAutosByStart !== undefined) {
-      return true;
-    }
-  }
+  // const gameData = entry.gameData;
+  // if (gameData && typeof gameData === 'object' && !Array.isArray(gameData)) {
+  //   const gameDataRecord = gameData as Record<string, unknown>;
+  //   if (gameDataRecord.reportedAutosByStart !== undefined) {
+  //     return true;
+  //   }
+  // }
 
   return false;
 };

@@ -4,9 +4,9 @@ import { Button } from "@/core/components/ui/button";
 import { Users, UserPlus, X } from 'lucide-react';
 import type { PitAssignment } from '@/core/lib/pitAssignmentTypes';
 import type { NexusPitMap } from '@/core/lib/nexusUtils';
-import { getScoutColor } from './shared/scoutUtils';
-import { PitScoutLegend } from './shared/PitScoutLegend';
-import { PitAssignmentActionButtons } from './shared/PitAssignmentActionButtons';
+import { getScoutColor } from '../shared/scoutUtils';
+import { PitScoutLegend } from './PitScoutLegend';
+import { AssignmentActionButtons as PitAssignmentActionButtons } from '../shared/AssignmentActionButtons';
 import PitMapCard from './PitMapCard';
 
 interface TeamDisplaySectionProps {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { PitScoutSelectionBar } from './PitScoutSelectionBar';
-import { AssignmentProgressBar as PitAssignmentProgressBar } from '../shared/AssignmentProgressBar';
 import { AssignmentActionButtons as PitAssignmentActionButtons } from '../shared/AssignmentActionButtons';
+import { AssignmentLegend } from '../shared/AssignmentLegend';
 import type { PitAssignment } from '@/core/lib/pitAssignmentTypes';
 
 interface PitScoutLegendProps {
@@ -31,18 +31,16 @@ export const PitScoutLegend: React.FC<PitScoutLegendProps> = ({
   showMobileActions = false,
   helpText
 }) => {
-  return (
-    <div className="mb-4 p-4 rounded-lg border">
-      <div className="flex items-center justify-between mb-3">
-        <div className="text-sm font-medium">
-          {assignmentMode === 'manual' && !assignmentsConfirmed ? 'Scouts (Click to Select):' : 'Assignment Legend:'}
-        </div>
-        <div className="text-xs text-muted-foreground">
-          {scoutsList.length} scouts
-        </div>
-      </div>
+  const completedCount = assignments.filter((assignment) => assignment.completed).length;
+  const title = assignmentMode === 'manual' && !assignmentsConfirmed
+    ? 'Scouts (Click to Select):'
+    : 'Assignment Legend:';
 
-      <div className="mb-3">
+  return (
+    <AssignmentLegend
+      title={title}
+      scoutsCount={scoutsList.length}
+      selectionContent={
         <PitScoutSelectionBar
           scoutsList={scoutsList}
           assignments={assignments}
@@ -52,34 +50,30 @@ export const PitScoutLegend: React.FC<PitScoutLegendProps> = ({
           onScoutSelectionChange={onScoutSelectionChange}
           hasAssignments={hasAssignments}
         />
-      </div>
-
-      {/* Progress Bar - inside the scout selection card */}
-      {hasAssignments && (
-        <div className="mt-3 p-3">
-          <PitAssignmentProgressBar assignments={assignments} />
-          
-          {/* Mobile Actions */}
-          {showMobileActions && (
-            <div className="md:hidden mt-3">
-              <PitAssignmentActionButtons
-                assignmentMode={assignmentMode}
-                assignmentsConfirmed={assignmentsConfirmed}
-                assignmentsLength={assignments.length}
-                onClearAllAssignments={onClearAllAssignments}
-                onConfirmAssignments={onConfirmAssignments}
-                isMobile={true}
-              />
-            </div>
-          )}
-        </div>
-      )}
-      
-      {helpText && (
-        <div className="text-xs text-muted-foreground pt-4">
-          {helpText}
-        </div>
-      )}
-    </div>
+      }
+      progress={
+        hasAssignments
+          ? {
+              completedCount,
+              totalCount: assignments.length,
+            }
+          : undefined
+      }
+      mobileActions={
+        showMobileActions ? (
+          <div className="md:hidden mt-3">
+            <PitAssignmentActionButtons
+              assignmentMode={assignmentMode}
+              assignmentsConfirmed={assignmentsConfirmed}
+              assignmentsLength={assignments.length}
+              onClearAllAssignments={onClearAllAssignments}
+              onConfirmAssignments={onConfirmAssignments}
+              isMobile={true}
+            />
+          </div>
+        ) : undefined
+      }
+      helpText={helpText}
+    />
   );
 };

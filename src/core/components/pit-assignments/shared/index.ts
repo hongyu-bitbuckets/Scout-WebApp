@@ -1,8 +1,10 @@
 // Shared components for pit assignment functionality
-export { PitScoutSelectionBar } from './PitScoutSelectionBar';
-export { PitAssignmentProgressBar } from './PitAssignmentProgressBar';
-export { PitAssignmentActionButtons } from './PitAssignmentActionButtons';
-export { PitScoutLegend } from './PitScoutLegend';
+export { AssignmentActionButtons } from './AssignmentActionButtons';
+export { AssignmentActionButtons as PitAssignmentActionButtons } from './AssignmentActionButtons';
+export { AssignmentProgressBar } from './AssignmentProgressBar';
+export { AssignmentProgressBar as PitAssignmentProgressBar } from './AssignmentProgressBar';
+export { AssignmentLegend } from './AssignmentLegend';
+export { ScoutSelectionBar } from './ScoutSelectionBar';
 
 // Shared utilities
 export { getScoutColor } from './scoutUtils';
