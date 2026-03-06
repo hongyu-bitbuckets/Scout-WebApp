@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { AlertCircle, ClipboardList } from 'lucide-react';
 import { Alert, AlertDescription } from '@/core/components/ui/alert';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/core/components/ui/card';
@@ -9,30 +9,38 @@ import { MatchScoutAssignmentSection } from '@/core/components/pit-assignments/M
 import { MatchEventInformationCard } from '@/core/components/pit-assignments/MatchEventInformationCard';
 import { getAllStoredEventTeams } from '@/core/lib/tbaUtils';
 import { getStoredNexusTeams } from '@/core/lib/nexusUtils';
+import { normalizeStoredMatchSchedule } from '@/core/lib/matchScheduleTransfer';
+import { useScoutManagement } from '@/core/hooks/useScoutManagement';
+import { useWebRTC } from '@/core/contexts/WebRTCContext';
 
 const FALLBACK_MATCH_NUMBER = '1';
 
 const MatchAssignmentsPage: React.FC = () => {
-  const [matchNumber, setMatchNumber] = useState<string>(() => {
-    return localStorage.getItem('currentMatchNumber') || FALLBACK_MATCH_NUMBER;
-  });
+  const { scoutsList } = useScoutManagement();
+  const { connectedScouts } = useWebRTC();
+
+  
   const [selectedEvent, setSelectedEvent] = useState<string>('');
   const [teamDataSource, setTeamDataSource] = useState<'nexus' | 'tba' | null>(null);
   const [teamCount, setTeamCount] = useState<number>(0);
+  const [scheduleCount, setScheduleCount] = useState<number>(0);
+  const [scheduleRows, setScheduleRows] = useState(() => normalizeStoredMatchSchedule(JSON.parse(localStorage.getItem('matchData') || '[]')));
 
-  useEffect(() => {
-    const handleFocus = () => {
-      const storedMatchNumber = localStorage.getItem('currentMatchNumber');
-      if (storedMatchNumber && storedMatchNumber !== matchNumber) {
-        setMatchNumber(storedMatchNumber);
-      }
-    };
+  const availableScouts = useMemo(() => {
+    const connectedNames = connectedScouts
+      .filter((scout) => scout.status !== 'disconnected')
+      .map((scout) => scout.name.trim())
+      .filter((name) => name.length > 0);
 
-    window.addEventListener('focus', handleFocus);
-    return () => {
-      window.removeEventListener('focus', handleFocus);
-    };
-  }, [matchNumber]);
+    return Array.from(new Set([...scoutsList, ...connectedNames])).sort((a, b) => a.localeCompare(b));
+  }, [scoutsList, connectedScouts]);
+
+
+  //   window.addEventListener('focus', handleFocus);
+  //   return () => {
+  //     window.removeEventListener('focus', handleFocus);
+  //   };
+  // }, [matchNumber]);
 
   useEffect(() => {
     const loadEventContext = () => {
@@ -74,6 +82,17 @@ const MatchAssignmentsPage: React.FC = () => {
       setSelectedEvent(foundEvent);
       setTeamDataSource(foundSource);
       setTeamCount(foundTeamCount);
+
+      const storedSchedule = localStorage.getItem('matchData');
+      let normalizedSchedule = [];
+      try {
+        normalizedSchedule = normalizeStoredMatchSchedule(storedSchedule ? JSON.parse(storedSchedule) : []);
+      } catch {
+        normalizedSchedule = [];
+      }
+
+      setScheduleRows(normalizedSchedule);
+      setScheduleCount(normalizedSchedule.length);
     };
 
     loadEventContext();
@@ -84,20 +103,13 @@ const MatchAssignmentsPage: React.FC = () => {
     };
   }, []);
 
-  const handleMatchNumberChange = (value: string) => {
-    const numericOnly = value.replace(/\D/g, '');
-    const nextMatchNumber = numericOnly || FALLBACK_MATCH_NUMBER;
-
-    setMatchNumber(nextMatchNumber);
-    localStorage.setItem('currentMatchNumber', nextMatchNumber);
-  };
 
   return (
     <div className="min-h-screen container mx-auto px-4 pt-12 pb-24 space-y-6 max-w-4xl">
       <div className="text-start space-y-2">
         <h1 className="text-3xl font-bold">Match Assignments</h1>
         <p className="text-muted-foreground">
-          Assign scouting roles to each player station for the active match.
+          Assign scout names to player stations in match chunks, then review in the schedule table.
         </p>
         <div className="pt-1">
           <DataAttribution sources={['tba']} variant="compact" />
@@ -109,45 +121,26 @@ const MatchAssignmentsPage: React.FC = () => {
           selectedEvent={selectedEvent}
           teamDataSource={teamDataSource}
           teamCount={teamCount}
-          matchNumber={matchNumber}
+          scheduleCount={scheduleCount}
         />
 
-        <Card className="flex-1">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ClipboardList className="h-5 w-5" />
-              Active Match
-            </CardTitle>
-            <CardDescription>
-              Role assignments are saved by match number and station.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2 max-w-48">
-              <Label htmlFor="match-number">Match Number</Label>
-              <Input
-                id="match-number"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                value={matchNumber}
-                onChange={(e) => handleMatchNumberChange(e.target.value)}
-                placeholder="1"
-              />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
 
-      <MatchScoutAssignmentSection matchNumber={matchNumber} />
+      <MatchScoutAssignmentSection
+        eventKey={selectedEvent}
+        schedule={scheduleRows}
+        availableScouts={availableScouts}
+      />
 
       <Alert>
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          Scouts receive role assignments based on their selected station for the current match.
+          Scout assignment chunks are temporary planning data and are stored in localStorage only.
         </AlertDescription>
       </Alert>
     </div>
+    </div>
   );
-};
+}
+  
 
 export default MatchAssignmentsPage;

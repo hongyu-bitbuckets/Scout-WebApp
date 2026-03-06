@@ -7,6 +7,7 @@ import { useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { detectConflicts, type ConflictInfo } from '@/core/lib/scoutingDataUtils';
 import { importPitAssignmentsPayload, type PitAssignmentTransferPayload } from '@/core/lib/pitAssignmentTransfer';
+import { isMatchScoutAssignmentsPayload, saveMatchScoutAssignmentBlocks } from '@/core/lib/matchScoutAssignments';
 import type { ScoutingEntryBase } from '@/core/types/scouting-entry';
 import { debugLog } from '@/core/lib/peerTransferUtils';
 import { db, pitDB, saveScoutingEntry } from '@/core/db/database';
@@ -95,6 +96,14 @@ export function usePeerTransferImport(options: UsePeerTransferImportOptions) {
     }, []);
 
     const importMatchData = useCallback(async (matchData: { matches?: unknown[] }, scoutName: string) => {
+        if (isMatchScoutAssignmentsPayload(matchData)) {
+            saveMatchScoutAssignmentBlocks(matchData.eventKey, matchData.blocks);
+            localStorage.setItem('eventKey', matchData.eventKey);
+            localStorage.setItem('eventName', matchData.eventKey);
+            toast.success(`Imported ${matchData.blocks.length} match assignment blocks from ${scoutName}`);
+            return;
+        }
+
         if (matchData.matches && Array.isArray(matchData.matches)) {
             localStorage.setItem('matchData', JSON.stringify(matchData.matches));
             toast.success(`Imported ${matchData.matches.length} matches from ${scoutName}`);

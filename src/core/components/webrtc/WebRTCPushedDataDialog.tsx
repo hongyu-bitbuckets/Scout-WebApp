@@ -12,6 +12,10 @@ import {
   type PitAssignmentImportStrategy,
   type PitAssignmentTransferPayload,
 } from '@/core/lib/pitAssignmentTransfer';
+import {
+  isMatchScoutAssignmentsPayload,
+  saveMatchScoutAssignmentBlocks,
+} from '@/core/lib/matchScoutAssignments';
 import { pitDB, saveScoutingEntries } from '@/core/db/database';
 import { gamificationDB as gameDB } from '@/game-template/gamification';
 import { toast } from 'sonner';
@@ -74,8 +78,12 @@ export function WebRTCPushedDataDialog() {
           parts.push(`event ${data.eventKey}`);
         }
       } else if (pushedDataType === 'match') {
-        // Match data
-        if (data.matches) parts.push(`${Array.isArray(data.matches) ? data.matches.length : 0} matches`);
+        if (isMatchScoutAssignmentsPayload(data)) {
+          parts.push(`${data.blocks.length} assignment blocks`);
+          parts.push(`event ${data.eventKey}`);
+        } else if (data.matches) {
+          parts.push(`${Array.isArray(data.matches) ? data.matches.length : 0} matches`);
+        }
       } else if (pushedDataType === 'scout') {
         // Scout profile data
         if (data.scouts) parts.push(`${Array.isArray(data.scouts) ? data.scouts.length : 0} scouts`);
@@ -216,9 +224,15 @@ export function WebRTCPushedDataDialog() {
         console.log('✅ Imported pit assignments:', result);
 
       } else if (pushedDataType === 'match') {
-        // Import match data
         const data = pushedData as any;
-        if (data.matches && Array.isArray(data.matches)) {
+
+        if (isMatchScoutAssignmentsPayload(data)) {
+          saveMatchScoutAssignmentBlocks(data.eventKey, data.blocks);
+          localStorage.setItem('eventKey', data.eventKey);
+          localStorage.setItem('eventName', data.eventKey);
+          importedCount = data.blocks.length;
+          console.log('✅ Imported', importedCount, 'match scout assignment blocks');
+        } else if (data.matches && Array.isArray(data.matches)) {
           localStorage.setItem('matchData', JSON.stringify(data.matches));
           importedCount = data.matches.length;
           console.log('✅ Imported', importedCount, 'matches');
