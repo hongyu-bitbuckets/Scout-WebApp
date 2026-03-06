@@ -8,12 +8,9 @@ import { User, Hash, Calendar, FolderOpen, ClipboardList } from "lucide-react";
 
 interface BasicInformationProps {
   teamNumber: number | "";
-  teamName?: string;
   eventKey: string;
   scoutName: string;
   onTeamNumberChange: (value: number | "") => void;
-  onTeamNameChange: (value: string | undefined) => void;
-  isTeamNameAutoFilled?: boolean;
   onEventKeyChange: (value: string) => void;
   onScoutNameChange: (value: string) => void;
   onLoadExisting?: () => void;
@@ -25,12 +22,9 @@ interface BasicInformationProps {
 
 export function BasicInformation({
   teamNumber,
-  teamName,
   eventKey,
   scoutName,
   onTeamNumberChange,
-  onTeamNameChange,
-  isTeamNameAutoFilled = false,
   onEventKeyChange,
   onScoutNameChange,
   onLoadExisting,
@@ -114,24 +108,6 @@ export function BasicInformation({
             required
             className="text-lg"
           />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="teamName" className="flex items-center gap-2">
-            <User className="h-4 w-4" />
-            Team Name
-          </Label>
-          <Input
-            id="teamName"
-            type="text"
-            placeholder="Auto-filled from TBA (editable)"
-            value={teamName || ""}
-            onChange={(e) => onTeamNameChange(e.target.value || undefined)}
-            className="text-lg"
-          />
-          {isTeamNameAutoFilled && (
-            <p className="text-xs text-muted-foreground">Auto-filled from TBA</p>
-          )}
         </div>
 
         {/* Event Selector */}

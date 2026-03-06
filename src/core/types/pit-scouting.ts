@@ -47,7 +47,6 @@ export type ProgrammingLanguage = 'Java' | 'C++' | 'Python' | 'LabVIEW' | 'other
 export interface PitScoutingEntryBase {
     id: string;                    // "pit-{teamNumber}-{eventKey}-{timestamp}-{random}"
     teamNumber: number;             // Team number (matches ScoutingEntryBase): 3314
-    teamName?: string;              // Team nickname/name (for example from TBA)
     eventKey: string;               // TBA event key: "2025mrcmp"
     scoutName: string;              // Scout who recorded this entry
     timestamp: number;              // Unix milliseconds (not ISO string) for efficient comparison

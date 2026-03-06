@@ -53,7 +53,6 @@ export function PitScoutingPage({
   const {
     formState,
     setTeamNumber,
-    setTeamName,
     setEventKey,
     setScoutName,
     setRobotPhoto,
@@ -66,7 +65,6 @@ export function PitScoutingPage({
     loadExistingEntry,
     isLoading,
     existingEntryId,
-    isTeamNameAutoFilled,
   } = usePitScoutingForm();
 
   const completedAssignedCount = useMemo(
@@ -187,12 +185,9 @@ export function PitScoutingPage({
         {/* Universal Pit Scouting Fields */}
         <BasicInformation
           teamNumber={formState.teamNumber}
-          teamName={formState.teamName}
           eventKey={formState.eventKey}
           scoutName={formState.scoutName}
           onTeamNumberChange={setTeamNumber}
-          onTeamNameChange={setTeamName}
-          isTeamNameAutoFilled={isTeamNameAutoFilled}
           onEventKeyChange={setEventKey}
           onScoutNameChange={setScoutName}
           onLoadExisting={loadExistingEntry}
@@ -267,7 +262,7 @@ export function PitScoutingPage({
           onWeightChange={setWeight}
           onDrivetrainChange={setDrivetrain}
           onProgrammingLanguageChange={setProgrammingLanguage}
-        /> */}
+        />
 
         {/* Game-Specific Questions Slot */}
         {PitScoutingQuestions ? (
