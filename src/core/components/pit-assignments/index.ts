@@ -1,7 +1,7 @@
-export { ScoutManagementSection } from './ScoutManagementSection';
-export { TeamDisplaySection } from './TeamDisplaySection';
-export { AssignmentResults } from './AssignmentResults';
+export { TeamDisplaySection } from './PitTeamDisplaySection';
+export { AssignmentResults } from './pit/PitAssignmentResults';
 export { MatchScoutAssignmentSection } from './MatchScoutAssignmentSection';
 export { MatchTeamDisplaySection } from './MatchTeamDisplaySection';
 export { MatchAssignmentResults } from './MatchAssignmentResults';
-export { AssignmentEventInformationCard } from './AssignmentEventInformationCard';
+export { AssignmentEventInformationCard } from './shared/AssignmentEventInformationCard';
+export { default as AssignmentControlsCard } from './AssignmentControlsCard';

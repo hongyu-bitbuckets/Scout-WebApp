@@ -15,10 +15,10 @@ import {
 } from 'lucide-react';
 import { Input } from "@/core/components/ui/input";
 import type { PitAssignment } from '@/core/lib/pitAssignmentTypes';
-import { getScoutColor } from './shared/scoutUtils';
-import { PitScoutLegend } from './shared/PitScoutLegend';
-import { PitAssignmentActionButtons } from './shared/PitAssignmentActionButtons';
-import { PitAssignmentProgressBar } from './shared/PitAssignmentProgressBar';
+import { getScoutColor } from '../shared/scoutUtils';
+import { PitScoutLegend } from './PitScoutLegend';
+import { AssignmentActionButtons as PitAssignmentActionButtons } from '../shared/AssignmentActionButtons';
+import { AssignmentProgressBar as PitAssignmentProgressBar } from '../shared/AssignmentProgressBar';
 
 interface AssignmentResultsProps {
   assignments: PitAssignment[];

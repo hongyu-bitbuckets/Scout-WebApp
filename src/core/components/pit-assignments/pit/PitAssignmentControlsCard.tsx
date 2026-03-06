@@ -6,6 +6,9 @@ import { createSpatialClusters, type TeamPosition } from '@/core/lib/spatialClus
 import type { NexusPitMap } from '@/core/lib/nexusUtils';
 import type { PitAssignment } from '@/core/lib/pitAssignmentTypes';
 
+type AssignmentMode = 'sequential' | 'spatial' | 'manual';
+type AssignmentContext = 'pit' | 'match';
+
 // Define flexible types for pit map data that accounts for various formats
 interface FlexiblePitData {
   x?: number;
@@ -19,21 +22,45 @@ interface FlexiblePitData {
 }
 
 interface AssignmentControlsCardProps {
-  assignmentMode: 'sequential' | 'spatial' | 'manual';
-  pitMapData: NexusPitMap | null;
-  pitAddresses: { [teamNumber: string]: string } | null;
+  assignmentMode: AssignmentMode;
+  context?: AssignmentContext;
+  title?: string;
+  modeLabel?: string;
+  assignmentTargetLabel?: string;
+  modeOptions?: AssignmentMode[];
+  modeLabels?: Partial<Record<AssignmentMode, string>>;
+  modeDescriptions?: Partial<Record<AssignmentMode, string>>;
+  showGenerateButton?: boolean;
+  showPushButton?: boolean;
+  generateButtonLabel?: string;
+  pushButtonLabel?: string;
+  onGenerateAssignments?: () => void;
+  pitMapData?: NexusPitMap | null;
+  pitAddresses?: { [teamNumber: string]: string } | null;
   currentTeams: number[];
   scoutsList: string[];
   selectedEvent: string;
   hasAssignments: boolean;
   readyConnectedScoutsCount: number;
   onPushAssignments: () => void;
-  onAssignmentModeChange: (mode: 'sequential' | 'spatial' | 'manual') => void;
-  onAssignmentsGenerated: (assignments: PitAssignment[], confirmed: boolean) => void;
+  onAssignmentModeChange: (mode: AssignmentMode) => void;
+  onAssignmentsGenerated?: (assignments: PitAssignment[], confirmed: boolean) => void;
 }
 
 const AssignmentControlsCard: React.FC<AssignmentControlsCardProps> = ({
   assignmentMode,
+  context = 'pit',
+  title = 'Assignment Controls',
+  modeLabel = 'Assignment Mode:',
+  assignmentTargetLabel,
+  modeOptions,
+  modeLabels,
+  modeDescriptions,
+  showGenerateButton = true,
+  showPushButton = true,
+  generateButtonLabel = 'Generate Assignments',
+  pushButtonLabel = 'Push Assignments',
+  onGenerateAssignments,
   pitMapData,
   pitAddresses,
   currentTeams,
@@ -45,11 +72,39 @@ const AssignmentControlsCard: React.FC<AssignmentControlsCardProps> = ({
   onAssignmentModeChange,
   onAssignmentsGenerated,
 }) => {
-  const handleModeChange = (mode: 'sequential' | 'spatial' | 'manual') => {
+  const effectiveTargetLabel = assignmentTargetLabel ?? (context === 'match' ? 'matches' : 'teams');
+  const effectiveModeOptions = modeOptions ?? (pitMapData ? ['sequential', 'spatial', 'manual'] : ['sequential', 'manual']);
+
+  const modeText: Record<AssignmentMode, string> = {
+    sequential: modeLabels?.sequential ?? (context === 'match' ? 'Auto Rotation' : 'Block Assignment'),
+    spatial: modeLabels?.spatial ?? 'Spatial Assignment',
+    manual: modeLabels?.manual ?? 'Manual Assignment'
+  };
+
+  const defaultDescriptions: Record<AssignmentMode, string> = {
+    sequential: context === 'match'
+      ? `Auto Rotation: ${effectiveTargetLabel} are divided into consecutive chunks so scouts rotate consistently through the schedule`
+      : `Block Assignment: ${effectiveTargetLabel} are divided into consecutive blocks, with each scout getting ~${scoutsList.length > 0 ? Math.ceil(currentTeams.length / scoutsList.length) : 0} ${effectiveTargetLabel} in sequence`,
+    spatial: `Spatial Assignment: ${effectiveTargetLabel} are assigned based on physical proximity in the pit map, creating geographic zones for each scout`,
+    manual: context === 'match'
+      ? 'Manual Assignment: Select a scout and drag across station cells to assign coverage quickly'
+      : `Manual Assignment: Click on ${effectiveTargetLabel} cards to assign them to specific scouts one by one`
+  };
+
+  const handleModeChange = (mode: AssignmentMode) => {
     onAssignmentModeChange(mode);
   };
 
   const handleGenerateAssignments = () => {
+    if (onGenerateAssignments) {
+      onGenerateAssignments();
+      return;
+    }
+
+    if (!onAssignmentsGenerated) {
+      return;
+    }
+
     if (scoutsList.length === 0) {
       return;
     }
@@ -188,66 +243,72 @@ const AssignmentControlsCard: React.FC<AssignmentControlsCardProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Shuffle className="h-5 w-5" />
-          Assignment Controls
+          {title}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium mb-2 block">Assignment Mode:</label>
+            <label className="text-sm font-medium mb-2 block">{modeLabel}</label>
             <div className="flex gap-2 flex-wrap">
-              <Button
-                variant={assignmentMode === 'sequential' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => handleModeChange('sequential')}
-              >
-                Block Assignment
-              </Button>
-              {pitMapData && (
+              {effectiveModeOptions.includes('sequential') && (
+                <Button
+                  variant={assignmentMode === 'sequential' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleModeChange('sequential')}
+                >
+                  {modeText.sequential}
+                </Button>
+              )}
+
+              {effectiveModeOptions.includes('spatial') && (
                 <Button
                   variant={assignmentMode === 'spatial' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => handleModeChange('spatial')}
                 >
-                  Spatial Assignment
+                  {modeText.spatial}
                 </Button>
               )}
-              <Button
-                variant={assignmentMode === 'manual' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => handleModeChange('manual')}
-              >
-                Manual Assignment
-              </Button>
+
+              {effectiveModeOptions.includes('manual') && (
+                <Button
+                  variant={assignmentMode === 'manual' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleModeChange('manual')}
+                >
+                  {modeText.manual}
+                </Button>
+              )}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {assignmentMode === 'sequential'
-                ? `Block Assignment: Teams are divided into consecutive blocks, with each scout getting ~${Math.ceil(currentTeams.length / scoutsList.length)} teams in sequence`
-                : assignmentMode === 'spatial'
-                  ? 'Spatial Assignment: Teams are assigned based on their physical proximity in the pit map, creating geographic zones for each scout'
-                  : 'Manual Assignment: Click on team cards to assign them to specific scouts one by one'
-              }
+              {modeDescriptions?.[assignmentMode] ?? defaultDescriptions[assignmentMode]}
             </p>
           </div>
 
           <div className="flex gap-2">
-            <Button
-              disabled={hasAssignments || (assignmentMode !== 'sequential' && assignmentMode !== 'spatial')}
-              onClick={handleGenerateAssignments}
-              className="flex items-center gap-2"
-            >
-              <Shuffle className="h-4 w-4" />
-              Generate Assignments
-            </Button>
-            <Button
-              variant="outline"
-              disabled={!hasAssignments || readyConnectedScoutsCount === 0}
-              onClick={onPushAssignments}
-              className="flex items-center gap-2"
-            >
-              <Upload className="h-4 w-4" />
-              Push Assignments ({readyConnectedScoutsCount})
-            </Button>
+            {showGenerateButton && (
+              <Button
+                disabled={hasAssignments || (assignmentMode !== 'sequential' && assignmentMode !== 'spatial')}
+                onClick={handleGenerateAssignments}
+                className="flex items-center gap-2"
+              >
+                <Shuffle className="h-4 w-4" />
+                {generateButtonLabel}
+              </Button>
+            )}
+
+            {showPushButton && (
+              <Button
+                variant="outline"
+                disabled={!hasAssignments || readyConnectedScoutsCount === 0}
+                onClick={onPushAssignments}
+                className="flex items-center gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                {pushButtonLabel} ({readyConnectedScoutsCount})
+              </Button>
+            )}
           </div>
         </div>
       </CardContent>

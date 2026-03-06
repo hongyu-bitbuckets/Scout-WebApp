@@ -2,8 +2,8 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Map, CheckCircle } from 'lucide-react';
-import { PitScoutLegend } from './shared/PitScoutLegend';
-import { getScoutColorMap } from './shared/scoutUtils';
+import { PitScoutLegend } from './PitScoutLegend';
+import { getScoutColorMap } from '../shared/scoutUtils';
 import type { PitAssignment } from '@/core/lib/pitAssignmentTypes';
 import type { NexusPitMap } from '@/core/lib/nexusUtils';
 

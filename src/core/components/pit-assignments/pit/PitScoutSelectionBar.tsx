@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from "@/core/components/ui/button";
 import { Plus } from 'lucide-react';
 import type { PitAssignment } from '@/core/lib/pitAssignmentTypes';
-import { getScoutColor } from './scoutUtils';
+import { getScoutColor } from '../shared/scoutUtils';
 
 interface PitScoutSelectionBarProps {
   scoutsList: string[];

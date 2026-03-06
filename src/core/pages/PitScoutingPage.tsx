@@ -13,7 +13,7 @@ import { Badge } from "@/core/components/ui/badge";
 import {
   BasicInformation,
   RobotPhotoSection,
-  TechnicalSpecifications,
+  // TechnicalSpecifications,
   AdditionalNotes,
   GameSpecificQuestionsPlaceholder,
 } from "@/core/components/pit-scouting";
@@ -57,9 +57,9 @@ export function PitScoutingPage({
     setEventKey,
     setScoutName,
     setRobotPhoto,
-    setWeight,
-    setDrivetrain,
-    setProgrammingLanguage,
+    // setWeight,
+    // setDrivetrain,
+    // setProgrammingLanguage,
     setNotes,
     setGameData,
     handleSubmit,
@@ -260,14 +260,14 @@ export function PitScoutingPage({
           onRobotPhotoChange={setRobotPhoto}
         />
 
-        <TechnicalSpecifications
+        {/* <TechnicalSpecifications
           weight={formState.weight}
           drivetrain={formState.drivetrain}
           programmingLanguage={formState.programmingLanguage}
           onWeightChange={setWeight}
           onDrivetrainChange={setDrivetrain}
           onProgrammingLanguageChange={setProgrammingLanguage}
-        />
+        /> */}
 
         {/* Game-Specific Questions Slot */}
         {PitScoutingQuestions ? (

@@ -14,19 +14,18 @@ import { Button } from "@/core/components/ui/button";
 import { Label } from "@/core/components/ui/label";
 import { Input } from "@/core/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/core/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/core/components/ui/dialog";
+// import {
+//   Dialog,
+//   DialogContent,
+//   DialogDescription,
+//   DialogHeader,
+//   DialogTitle,
+// } from "@/core/components/ui/dialog";
 // import { ScoutOptionsSheet } from "@/core/components/GameStartComponents/ScoutOptionsSheet";
-import { AutoFieldMap } from "@/game-template/components/auto-path/AutoFieldMap";
-import type { PathWaypoint } from "@/game-template/components/field-map";
+// import { AutoFieldMap } from "@/game-template/components/auto-path/AutoFieldMap";
+// import type { PathWaypoint } from "@/game-template/components/field-map";
 // import { GameSpecificScoutOptions } from "@/game-template/components/game-start/ScoutOptions";
-import { Eraser, Save, X } from "lucide-react";
-import { useMemo, useState } from "react";
+// import { Eraser, Save, X } from "lucide-react";
 // import type { ScoutOptionsState } from "@/types";
 
 interface GameSpecificQuestionsProps {
@@ -34,66 +33,66 @@ interface GameSpecificQuestionsProps {
   onGameDataChange: (data: Record<string, unknown>) => void;
 }
 
-const START_POSITIONS = ['Left Trench', 'Left Bump', 'Hub', 'Right Bump', 'Right Trench'];
-// const ROLES = ['Cycler', 'Clean Up', 'Passer', 'Thief', 'Defense'];
+// const START_POSITIONS = ['Left Trench', 'Left Bump', 'Hub', 'Right Bump', 'Right Trench'];
+ const ROLES = ['Cycler', 'Clean Up', 'Passer', 'Thief', 'Defense'];
 
-type PitAutoStartPosition = typeof START_POSITIONS[number];
+// type PitAutoStartPosition = typeof START_POSITIONS[number];
 
-interface PitReportedAuto {
-  id: string;
-  name: string;
-  actions: PathWaypoint[];
-  createdAt: number;
-  updatedAt: number;
-}
+// interface PitReportedAuto {
+//   id: string;
+//   name: string;
+//   actions: PathWaypoint[];
+//   createdAt: number;
+//   updatedAt: number;
+// }
 
-type PitReportedAutosByStart = Record<PitAutoStartPosition, PitReportedAuto[]>;
+// type PitReportedAutosByStart = Record<PitAutoStartPosition, PitReportedAuto[]>;
 
-const PIT_START_TO_FIELD_KEY: Record<PitAutoStartPosition, 'trench1' | 'bump1' | 'hub' | 'bump2' | 'trench2'> = {
-  'Left Trench': 'trench1',
-  'Left Bump': 'bump1',
-  'Hub': 'hub',
-  'Right Bump': 'bump2',
-  'Right Trench': 'trench2',
-};
+// const PIT_START_TO_FIELD_KEY: Record<PitAutoStartPosition, 'trench1' | 'bump1' | 'hub' | 'bump2' | 'trench2'> = {
+//   'Left Trench': 'trench1',
+//   'Left Bump': 'bump1',
+//   'Hub': 'hub',
+//   'Right Bump': 'bump2',
+//   'Right Trench': 'trench2',
+// };
 
-function createEmptyReportedAutos(): PitReportedAutosByStart {
-  return {
-    'Left Trench': [],
-    'Left Bump': [],
-    'Hub': [],
-    'Right Bump': [],
-    'Right Trench': [],
-  };
-}
+// function createEmptyReportedAutos(): PitReportedAutosByStart {
+//   return {
+//     'Left Trench': [],
+//     'Left Bump': [],
+//     'Hub': [],
+//     'Right Bump': [],
+//     'Right Trench': [],
+//   };
+// }
 
-function coerceReportedAutos(value: unknown): PitReportedAutosByStart {
-  const empty = createEmptyReportedAutos();
-  if (!value || typeof value !== 'object') return empty;
+// function coerceReportedAutos(value: unknown): PitReportedAutosByStart {
+//   const empty = createEmptyReportedAutos();
+//   if (!value || typeof value !== 'object') return empty;
 
-  const input = value as Record<string, unknown>;
-  for (const start of START_POSITIONS) {
-    const rawAutos = input[start];
-    if (!Array.isArray(rawAutos)) continue;
+//   const input = value as Record<string, unknown>;
+//   for (const start of START_POSITIONS) {
+//     const rawAutos = input[start];
+//     if (!Array.isArray(rawAutos)) continue;
 
-    empty[start] = rawAutos
-      .filter((auto): auto is Record<string, unknown> => !!auto && typeof auto === 'object')
-      .map((auto, index) => ({
-        id: typeof auto.id === 'string' ? auto.id : `${start}-${index}-${Date.now()}`,
-        name: typeof auto.name === 'string' && auto.name.trim() ? auto.name.trim() : `${start} Auto ${index + 1}`,
-        actions: Array.isArray(auto.actions) ? (auto.actions as PathWaypoint[]) : [],
-        createdAt: typeof auto.createdAt === 'number' ? auto.createdAt : Date.now(),
-        updatedAt: typeof auto.updatedAt === 'number' ? auto.updatedAt : Date.now(),
-      }));
-  }
+//     empty[start] = rawAutos
+//       .filter((auto): auto is Record<string, unknown> => !!auto && typeof auto === 'object')
+//       .map((auto, index) => ({
+//         id: typeof auto.id === 'string' ? auto.id : `${start}-${index}-${Date.now()}`,
+//         name: typeof auto.name === 'string' && auto.name.trim() ? auto.name.trim() : `${start} Auto ${index + 1}`,
+//         actions: Array.isArray(auto.actions) ? (auto.actions as PathWaypoint[]) : [],
+//         createdAt: typeof auto.createdAt === 'number' ? auto.createdAt : Date.now(),
+//         updatedAt: typeof auto.updatedAt === 'number' ? auto.updatedAt : Date.now(),
+//       }));
+//   }
 
-  return empty;
-}
+//   return empty;
+// }
 
 export function GameSpecificQuestions({ gameData = {}, onGameDataChange }: GameSpecificQuestionsProps) {
-  const [recordingStart, setRecordingStart] = useState<PitAutoStartPosition | null>(null);
-  const [recordingActions, setRecordingActions] = useState<PathWaypoint[]>([]);
-  const [recordingName, setRecordingName] = useState('');
+  // const [recordingStart, setRecordingStart] = useState<PitAutoStartPosition | null>(null);
+  // const [recordingActions, setRecordingActions] = useState<PathWaypoint[]>([]);
+  // const [recordingName, setRecordingName] = useState('');
   // const [recordingScoutOptions, setRecordingScoutOptions] = useState<ScoutOptionsState>(() =>
   //   getEffectiveScoutOptions()
   // );
@@ -102,14 +101,14 @@ export function GameSpecificQuestions({ gameData = {}, onGameDataChange }: GameS
     onGameDataChange({ ...gameData, [key]: value });
   };
 
-  const reportedAutosByStart = useMemo(
-    () => coerceReportedAutos(gameData.reportedAutosByStart),
-    [gameData.reportedAutosByStart]
-  );
+  // const reportedAutosByStart = useMemo(
+  //   () => coerceReportedAutos(gameData.reportedAutosByStart),
+  //   [gameData.reportedAutosByStart]
+  // );
 
-  const persistReportedAutos = (next: PitReportedAutosByStart) => {
-    handleChange('reportedAutosByStart', next);
-  };
+  // const persistReportedAutos = (next: PitReportedAutosByStart) => {
+  //   handleChange('reportedAutosByStart', next);
+  // };
 
   // const openRecorder = (start: PitAutoStartPosition) => {
   //   const nextIndex = (reportedAutosByStart[start]?.length || 0) + 1;
@@ -118,33 +117,33 @@ export function GameSpecificQuestions({ gameData = {}, onGameDataChange }: GameS
   //   setRecordingName(`${start} Auto ${nextIndex}`);
   // };
 
-  const closeRecorder = () => {
-    setRecordingStart(null);
-    setRecordingActions([]);
-    setRecordingName('');
-  };
+  // const closeRecorder = () => {
+  //   setRecordingStart(null);
+  //   setRecordingActions([]);
+  //   setRecordingName('');
+  // };
 
-  const saveRecordedAuto = () => {
-    if (!recordingStart || recordingActions.length === 0) return;
+  // const saveRecordedAuto = () => {
+  //   if (!recordingStart || recordingActions.length === 0) return;
 
-    const currentAutos = reportedAutosByStart[recordingStart] ?? [];
+  //   const currentAutos = reportedAutosByStart[recordingStart] ?? [];
 
-    const now = Date.now();
-    const newAuto: PitReportedAuto = {
-      id: `pit-auto-${recordingStart}-${now}-${Math.random().toString(36).slice(2, 8)}`,
-      name: recordingName.trim() || `${recordingStart} Auto ${currentAutos.length + 1}`,
-      actions: recordingActions,
-      createdAt: now,
-      updatedAt: now,
-    };
+  //   const now = Date.now();
+  //   const newAuto: PitReportedAuto = {
+  //     id: `pit-auto-${recordingStart}-${now}-${Math.random().toString(36).slice(2, 8)}`,
+  //     name: recordingName.trim() || `${recordingStart} Auto ${currentAutos.length + 1}`,
+  //     actions: recordingActions,
+  //     createdAt: now,
+  //     updatedAt: now,
+  //   };
 
-    persistReportedAutos({
-      ...reportedAutosByStart,
-      [recordingStart]: [...currentAutos, newAuto],
-    });
+  //   persistReportedAutos({
+  //     ...reportedAutosByStart,
+  //     [recordingStart]: [...currentAutos, newAuto],
+  //   });
 
-    closeRecorder();
-  };
+  //   closeRecorder();
+  // };
 
   // const renameReportedAuto = (start: PitAutoStartPosition, autoId: string, name: string) => {
   //   const currentAutos = reportedAutosByStart[start] ?? [];
@@ -525,7 +524,7 @@ export function GameSpecificQuestions({ gameData = {}, onGameDataChange }: GameS
         </CardContent>
       </Card> */}
 
-      <Dialog open={recordingStart !== null} onOpenChange={(open) => { if (!open) closeRecorder(); }}>
+      {/* <Dialog open={recordingStart !== null} onOpenChange={(open) => { if (!open) closeRecorder(); }}>
         <DialogContent className="w-screen h-screen max-w-none max-h-none rounded-none border-0 p-4 sm:p-6 flex flex-col overflow-hidden">
           <DialogHeader>
             <DialogTitle>Record Reported Auto</DialogTitle>
@@ -556,23 +555,6 @@ export function GameSpecificQuestions({ gameData = {}, onGameDataChange }: GameS
                       className="h-8 w-48 sm:w-72"
                       aria-label="Auto name"
                     />
-                    {/* <ScoutOptionsSheet
-                      options={recordingScoutOptions}
-                      onOptionChange={handleRecordingScoutOptionChange}
-                      customContent={GameSpecificScoutOptions}
-                      trigger={
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8"
-                          aria-label="Scout settings"
-                          title="Scout settings"
-                        >
-                          <Settings2 className="h-4 w-4" />
-                        </Button>
-                      }
-                    /> */}
                   </div>
                 }
                 recordingActionSlot={
@@ -614,7 +596,7 @@ export function GameSpecificQuestions({ gameData = {}, onGameDataChange }: GameS
             </div>
           </div>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
     </div>
   );
 }

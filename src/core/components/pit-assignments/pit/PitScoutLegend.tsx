@@ -1,7 +1,7 @@
 import React from 'react';
 import { PitScoutSelectionBar } from './PitScoutSelectionBar';
-import { PitAssignmentProgressBar } from './PitAssignmentProgressBar';
-import { PitAssignmentActionButtons } from './PitAssignmentActionButtons';
+import { AssignmentProgressBar as PitAssignmentProgressBar } from '../shared/AssignmentProgressBar';
+import { AssignmentActionButtons as PitAssignmentActionButtons } from '../shared/AssignmentActionButtons';
 import type { PitAssignment } from '@/core/lib/pitAssignmentTypes';
 
 interface PitScoutLegendProps {

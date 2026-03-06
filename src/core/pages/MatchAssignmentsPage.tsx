@@ -4,7 +4,7 @@ import { Alert, AlertDescription } from '@/core/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/core/components/ui/card';
 import { DataAttribution } from '@/core/components/DataAttribution';
 import { MatchScoutAssignmentSection } from '@/core/components/pit-assignments/MatchScoutAssignmentSection';
-import { AssignmentEventInformationCard } from '@/core/components/pit-assignments/AssignmentEventInformationCard';
+import { AssignmentEventInformationCard } from '@/core/components/pit-assignments/shared/AssignmentEventInformationCard';
 import { normalizeStoredMatchSchedule } from '@/core/lib/matchScheduleTransfer';
 import { useScoutManagement } from '@/core/hooks/useScoutManagement';
 import { useWebRTC } from '@/core/contexts/WebRTCContext';

@@ -7,10 +7,9 @@ import { useWebRTC } from '@/core/contexts/WebRTCContext';
 import { getAllStoredEventTeams } from '@/core/lib/tbaUtils';
 import { getStoredNexusTeams, getStoredPitAddresses, getStoredPitData } from '@/core/lib/nexusUtils';
 import { loadPitScoutingEntry } from '@/core/lib/pitScoutingUtils';
-import { ScoutManagementSection } from '@/core/components/pit-assignments/ScoutManagementSection';
-import { TeamDisplaySection } from '@/core/components/pit-assignments/TeamDisplaySection';
-import { AssignmentResults } from '@/core/components/pit-assignments/AssignmentResults';
-import EventInformationCard from '@/core/components/pit-assignments/EventInformationCard';
+import { TeamDisplaySection } from '@/core/components/pit-assignments/PitTeamDisplaySection';
+import { AssignmentResults } from '@/core/components/pit-assignments/pit/PitAssignmentResults';
+import { AssignmentEventInformationCard } from '@/core/components/pit-assignments/shared/AssignmentEventInformationCard';
 import AssignmentControlsCard from '@/core/components/pit-assignments/AssignmentControlsCard';
 import { DataAttribution } from '@/core/components/DataAttribution';
 import type { PitAssignment } from '@/core/lib/pitAssignmentTypes';
@@ -432,12 +431,13 @@ const PitAssignmentsPage: React.FC = () => {
       {/* Event Information and Assignment Controls - Side by side */}
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Event Information */}
-        <EventInformationCard
+        <AssignmentEventInformationCard
+          variant="pit"
           selectedEvent={selectedEvent}
           teamDataSource={teamDataSource}
-          currentTeams={currentTeams}
-          pitAddresses={pitAddresses}
-          hasTeamData={currentTeams.length > 0}
+          teamCount={currentTeams.length}
+          pitLocationCount={pitAddresses ? Object.keys(pitAddresses).length : 0}
+          hasData={currentTeams.length > 0}
         />
 
         {/* Assignment Controls */}
