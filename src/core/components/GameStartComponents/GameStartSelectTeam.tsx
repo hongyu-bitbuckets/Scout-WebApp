@@ -260,6 +260,19 @@ const InitialSelectTeam = ({
     }
   };
 
+  // Allow input formats like "1678", "frc1678", or "1678 Team Name".
+  const parseTeamNumberFromInput = (value: string): string | null => {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+
+    if (/^\d+$/.test(trimmed)) {
+      return trimmed;
+    }
+
+    const embeddedNumber = trimmed.match(/\d{1,5}/);
+    return embeddedNumber ? embeddedNumber[0] : null;
+  };
+
   // Effect to set the selected team
   useEffect(() => {
     if (team1Status) {
@@ -269,7 +282,7 @@ const InitialSelectTeam = ({
     } else if (team3Status) {
       setSelectTeam(effectiveTeams[2]);
     } else if (customTeamStatus && customTeamValue != "") {
-      setSelectTeam(customTeamValue);
+      setSelectTeam(parseTeamNumberFromInput(customTeamValue));
     } else {
       setSelectTeam(null);
     }
@@ -350,9 +363,9 @@ const InitialSelectTeam = ({
             </h2>
             <Input
               className="w-full h-12 text-xl rounded-lg"
-              type="number"
-              inputMode="numeric"
-              placeholder="Team #"
+              type="text"
+              inputMode="text"
+              placeholder="Team # or Team Name"
               value={customTeamValue}
               onChange={(e) => setCustomTeamValue(e.target.value)}
               onFocus={() => {
@@ -362,6 +375,9 @@ const InitialSelectTeam = ({
               onBlur={() => setTextSelected(false)}
             />
           </div>
+          <p className="text-sm text-muted-foreground text-center">
+            Enter team number, or include it with team name (example: 1678 Citrus Circuits)
+          </p>
         </div>
       </div>
     </>
