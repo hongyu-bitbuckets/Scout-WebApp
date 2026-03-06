@@ -16,7 +16,7 @@ import type {
     StatSectionDefinition,
     RateSectionDefinition,
     MatchBadgeDefinition,
-    StartPositionConfig,
+    // StartPositionConfig,
 } from "@/types/team-stats-display";
 import { scoringCalculations } from "@/game-template/scoring";
 import type { GameData as CoreGameData } from "@/game-template/scoring";
@@ -116,7 +116,7 @@ export interface TeamStatsTemplate extends TeamStats {
     passedToNeutralRate: number;
 
     // Start position percentages
-    startPositions: Record<string, number>;
+    // startPositions: Record<string, number>;
 
     // Match results for performance tab
     matchResults: MatchResult[];
@@ -141,7 +141,7 @@ export interface MatchResult {
     climbLevel: number; // 0=none, 1-3=level
     brokeDown: boolean;
     noShow: boolean;
-    startPosition: number;
+    // startPosition: number;
     comment: string;
     // Fuel data
     autoFuel: number;
@@ -243,7 +243,7 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                 passedToAllianceFromNeutralRate: 0,
                 passedToAllianceFromOpponentRate: 0,
                 passedToNeutralRate: 0,
-                startPositions: {},
+                // startPositions: {},
                 matchResults: [],
                 primaryActiveRole: 'None',
                 primaryInactiveRole: 'None',
@@ -377,7 +377,7 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             accuracySome: 0,
             accuracyFew: 0,
             accuracyLittle: 0,
-            startPositionCounts: {} as Record<number, number>,
+            // startPositionCounts: {} as Record<number, number>,
             roleActiveCleanUp: 0,
             roleActivePasser: 0,
             roleActiveDefense: 0,
@@ -617,7 +617,7 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                 avgGamePiece1: Math.round((totals.autoFuel / matchCount) * 10) / 10,
                 avgGamePiece2: 0,
                 mobilityRate: Math.round((totals.mobility / matchCount) * 100),
-                startPositions: Object.entries(startPositions).map(([key, value]) => ({ position: key, percentage: value })),
+                // startPositions: Object.entries(startPositions).map(([key, value]) => ({ position: key, percentage: value })),
             },
             teleop: {
                 avgPoints: Math.round(avgTeleopPoints * 10) / 10,
@@ -725,7 +725,7 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             accuracyFewRate: Math.round((totals.accuracyFew / matchCount) * 100),
             accuracyLittleRate: Math.round((totals.accuracyLittle / matchCount) * 100),
             accuracyScore,
-            startPositions,
+            // startPositions,
             matchResults: matchResults.sort((a, b) => parseInt(a.matchNumber) - parseInt(b.matchNumber)),
             // Role statistics
             primaryActiveRole,
