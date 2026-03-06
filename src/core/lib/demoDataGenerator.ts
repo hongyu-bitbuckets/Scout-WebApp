@@ -43,7 +43,7 @@ const TEST_SCOUT_NAMES = [
     "Jordan Smith",
     "Casey Park"
 ];
-const START_POSITIONS = ['Left Trench', 'Left Bump', 'Hub', 'Right Bump', 'Right Trench'];
+// const START_POSITIONS = ['Left Trench', 'Left Bump', 'Hub', 'Right Bump', 'Right Trench'];
 
 // ============================================================================
 // Team Skill Profiles

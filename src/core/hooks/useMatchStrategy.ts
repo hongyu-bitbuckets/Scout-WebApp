@@ -299,7 +299,7 @@ function createDefaultPitEntryForTeam(teamNumber: number): PitScoutingEntryBase 
         scoutName,
         timestamp: now,
         gameData: {
-            // reportedAutosByStart: createEmptyReportedAutos(),
+            reportedAutosByStart: createEmptyReportedAutos(),
         },
     };
 }
@@ -597,18 +597,17 @@ export const useMatchStrategy = () => {
                 const latestPitByTeam = getMostRecentPitEntriesByTeam(pitEntries);
                 setLatestPitEntryByTeam(latestPitByTeam);
 
-                // Reported auto path loading from pit gameData is currently disabled.
-                // Object.entries(latestPitByTeam).forEach(([teamKey, pitEntry]) => {
-                //     const teamNumber = Number(teamKey);
-                //     if (!teamNumber || !isRecord(pitEntry.gameData)) return;
+                Object.entries(latestPitByTeam).forEach(([teamKey, pitEntry]) => {
+                    const teamNumber = Number(teamKey);
+                    if (!teamNumber || !isRecord(pitEntry.gameData)) return;
 
-                //     if (!routinesByTeam[teamNumber]) {
-                //         routinesByTeam[teamNumber] = { scouted: [], reported: [] };
-                //     }
+                    if (!routinesByTeam[teamNumber]) {
+                        routinesByTeam[teamNumber] = { scouted: [], reported: [] };
+                    }
 
-                //     const reportedAutosByStart = coerceReportedAutosByStart(pitEntry.gameData.reportedAutosByStart);
-                //     routinesByTeam[teamNumber].reported = buildReportedRoutinesFromReportedAutos(teamNumber, reportedAutosByStart);
-                // });
+                    const reportedAutosByStart = coerceReportedAutosByStart(pitEntry.gameData.reportedAutosByStart);
+                    routinesByTeam[teamNumber].reported = buildReportedRoutinesFromReportedAutos(teamNumber, reportedAutosByStart);
+                });
 
                 Object.values(routinesByTeam).forEach((teamRoutines) => {
                     teamRoutines.scouted.sort((a, b) => a.label.localeCompare(b.label));
@@ -755,203 +754,203 @@ export const useMatchStrategy = () => {
         return EMPTY_SPOTS;
     }, [teamSpotsByTeam]);
 
-    // const addReportedAutoForTeam = useCallback(async (
-    //     teamNumber: number,
-    //     startLabel: StartPositionLabel,
-    //     name: string,
-    //     actions: AutoRoutineWaypoint[]
-    // ): Promise<AutoRoutineSelection | null> => {
-    //     if (!teamNumber || actions.length === 0) return null;
+    const addReportedAutoForTeam = useCallback(async (
+        teamNumber: number,
+        startLabel: StartPositionLabel,
+        name: string,
+        actions: AutoRoutineWaypoint[]
+    ): Promise<AutoRoutineSelection | null> => {
+        if (!teamNumber || actions.length === 0) return null;
 
-    //     let latestEntry = latestPitEntryByTeam[teamNumber];
-    //     if (!latestEntry) {
-    //         const allTeamPitEntries = await loadPitScoutingByTeam(teamNumber);
-    //         latestEntry = allTeamPitEntries.sort((a, b) => b.timestamp - a.timestamp)[0];
-    //     }
-    //     if (!latestEntry) {
-    //         latestEntry = createDefaultPitEntryForTeam(teamNumber);
-    //     }
+        let latestEntry = latestPitEntryByTeam[teamNumber];
+        if (!latestEntry) {
+            const allTeamPitEntries = await loadPitScoutingByTeam(teamNumber);
+            latestEntry = allTeamPitEntries.sort((a, b) => b.timestamp - a.timestamp)[0];
+        }
+        if (!latestEntry) {
+            latestEntry = createDefaultPitEntryForTeam(teamNumber);
+        }
 
-    //     const reportedAutosByStart = coerceReportedAutosByStart(isRecord(latestEntry.gameData) ? latestEntry.gameData.reportedAutosByStart : undefined);
-    //     const now = Date.now();
-    //     const rawId = `pit-auto-${startLabel}-${now}-${Math.random().toString(36).slice(2, 8)}`;
+        const reportedAutosByStart = coerceReportedAutosByStart(isRecord(latestEntry.gameData) ? latestEntry.gameData.reportedAutosByStart : undefined);
+        const now = Date.now();
+        const rawId = `pit-auto-${startLabel}-${now}-${Math.random().toString(36).slice(2, 8)}`;
 
-    //     const nextStartAutos = [
-    //         ...(reportedAutosByStart[startLabel] ?? []),
-    //         {
-    //             id: rawId,
-    //             name: name.trim() || `${startLabel} Auto ${(reportedAutosByStart[startLabel] ?? []).length + 1}`,
-    //             actions,
-    //             createdAt: now,
-    //             updatedAt: now,
-    //         },
-    //     ];
+        const nextStartAutos = [
+            ...(reportedAutosByStart[startLabel] ?? []),
+            {
+                id: rawId,
+                name: name.trim() || `${startLabel} Auto ${(reportedAutosByStart[startLabel] ?? []).length + 1}`,
+                actions,
+                createdAt: now,
+                updatedAt: now,
+            },
+        ];
 
-    //     const nextReportedAutosByStart: ReportedAutosByStart = {
-    //         ...reportedAutosByStart,
-    //         [startLabel]: nextStartAutos,
-    //     };
+        const nextReportedAutosByStart: ReportedAutosByStart = {
+            ...reportedAutosByStart,
+            [startLabel]: nextStartAutos,
+        };
 
-    //     const updatedEntry: PitScoutingEntryBase = {
-    //         ...latestEntry,
-    //         timestamp: now,
-    //         gameData: {
-    //             ...(isRecord(latestEntry.gameData) ? latestEntry.gameData : {}),
-    //             reportedAutosByStart: nextReportedAutosByStart,
-    //         },
-    //     };
+        const updatedEntry: PitScoutingEntryBase = {
+            ...latestEntry,
+            timestamp: now,
+            gameData: {
+                ...(isRecord(latestEntry.gameData) ? latestEntry.gameData : {}),
+                reportedAutosByStart: nextReportedAutosByStart,
+            },
+        };
 
-    //     await savePitScoutingEntry(updatedEntry);
+        await savePitScoutingEntry(updatedEntry);
 
-    //     setLatestPitEntryByTeam((prev) => ({
-    //         ...prev,
-    //         [teamNumber]: updatedEntry,
-    //     }));
+        setLatestPitEntryByTeam((prev) => ({
+            ...prev,
+            [teamNumber]: updatedEntry,
+        }));
 
-    //     setTeamAutoRoutinesByTeam((prev) => {
-    //         const previousTeamRoutines = prev[teamNumber] ?? EMPTY_TEAM_AUTO_ROUTINES;
-    //         return {
-    //             ...prev,
-    //             [teamNumber]: {
-    //                 ...previousTeamRoutines,
-    //                 reported: buildReportedRoutinesFromReportedAutos(teamNumber, nextReportedAutosByStart),
-    //             },
-    //         };
-    //     });
+        setTeamAutoRoutinesByTeam((prev) => {
+            const previousTeamRoutines = prev[teamNumber] ?? EMPTY_TEAM_AUTO_ROUTINES;
+            return {
+                ...prev,
+                [teamNumber]: {
+                    ...previousTeamRoutines,
+                    reported: buildReportedRoutinesFromReportedAutos(teamNumber, nextReportedAutosByStart),
+                },
+            };
+        });
 
-    //     return { source: 'reported', routineId: `reported-${rawId}` };
-    // }, [latestPitEntryByTeam]);
+        return { source: 'reported', routineId: `reported-${rawId}` };
+    }, [latestPitEntryByTeam]);
 
-    // const updateReportedAutoForTeam = useCallback(async (
-    //     teamNumber: number,
-    //     routineId: string,
-    //     name: string,
-    //     actions: AutoRoutineWaypoint[]
-    // ): Promise<boolean> => {
-    //     if (!teamNumber || actions.length === 0) return false;
+    const updateReportedAutoForTeam = useCallback(async (
+        teamNumber: number,
+        routineId: string,
+        name: string,
+        actions: AutoRoutineWaypoint[]
+    ): Promise<boolean> => {
+        if (!teamNumber || actions.length === 0) return false;
 
-    //     let latestEntry = latestPitEntryByTeam[teamNumber];
-    //     if (!latestEntry) {
-    //         const allTeamPitEntries = await loadPitScoutingByTeam(teamNumber);
-    //         latestEntry = allTeamPitEntries.sort((a, b) => b.timestamp - a.timestamp)[0];
-    //         if (!latestEntry) return false;
-    //     }
+        let latestEntry = latestPitEntryByTeam[teamNumber];
+        if (!latestEntry) {
+            const allTeamPitEntries = await loadPitScoutingByTeam(teamNumber);
+            latestEntry = allTeamPitEntries.sort((a, b) => b.timestamp - a.timestamp)[0];
+            if (!latestEntry) return false;
+        }
 
-    //     const rawId = stripReportedPrefix(routineId);
-    //     const reportedAutosByStart = coerceReportedAutosByStart(isRecord(latestEntry.gameData) ? latestEntry.gameData.reportedAutosByStart : undefined);
-    //     const now = Date.now();
-    //     let didUpdate = false;
+        const rawId = stripReportedPrefix(routineId);
+        const reportedAutosByStart = coerceReportedAutosByStart(isRecord(latestEntry.gameData) ? latestEntry.gameData.reportedAutosByStart : undefined);
+        const now = Date.now();
+        let didUpdate = false;
 
-    //     const nextReportedAutosByStart: ReportedAutosByStart = START_POSITION_LABELS.reduce((acc, startLabel) => {
-    //         const autos = reportedAutosByStart[startLabel] ?? [];
-    //         acc[startLabel] = autos.map((auto) => {
-    //             if (auto.id !== rawId) return auto;
-    //             didUpdate = true;
-    //             return {
-    //                 ...auto,
-    //                 name: name.trim() || auto.name,
-    //                 actions,
-    //                 updatedAt: now,
-    //             };
-    //         });
-    //         return acc;
-    //     }, createEmptyReportedAutos());
+        const nextReportedAutosByStart: ReportedAutosByStart = START_POSITION_LABELS.reduce((acc, startLabel) => {
+            const autos = reportedAutosByStart[startLabel] ?? [];
+            acc[startLabel] = autos.map((auto) => {
+                if (auto.id !== rawId) return auto;
+                didUpdate = true;
+                return {
+                    ...auto,
+                    name: name.trim() || auto.name,
+                    actions,
+                    updatedAt: now,
+                };
+            });
+            return acc;
+        }, createEmptyReportedAutos());
 
-    //     if (!didUpdate) return false;
+        if (!didUpdate) return false;
 
-    //     const updatedEntry: PitScoutingEntryBase = {
-    //         ...latestEntry,
-    //         timestamp: now,
-    //         gameData: {
-    //             ...(isRecord(latestEntry.gameData) ? latestEntry.gameData : {}),
-    //             reportedAutosByStart: nextReportedAutosByStart,
-    //         },
-    //     };
+        const updatedEntry: PitScoutingEntryBase = {
+            ...latestEntry,
+            timestamp: now,
+            gameData: {
+                ...(isRecord(latestEntry.gameData) ? latestEntry.gameData : {}),
+                reportedAutosByStart: nextReportedAutosByStart,
+            },
+        };
 
-    //     await savePitScoutingEntry(updatedEntry);
+        await savePitScoutingEntry(updatedEntry);
 
-    //     setLatestPitEntryByTeam((prev) => ({
-    //         ...prev,
-    //         [teamNumber]: updatedEntry,
-    //     }));
+        setLatestPitEntryByTeam((prev) => ({
+            ...prev,
+            [teamNumber]: updatedEntry,
+        }));
 
-    //     setTeamAutoRoutinesByTeam((prev) => {
-    //         const previousTeamRoutines = prev[teamNumber] ?? EMPTY_TEAM_AUTO_ROUTINES;
-    //         return {
-    //             ...prev,
-    //             [teamNumber]: {
-    //                 ...previousTeamRoutines,
-    //                 reported: buildReportedRoutinesFromReportedAutos(teamNumber, nextReportedAutosByStart),
-    //             },
-    //         };
-    //     });
+        setTeamAutoRoutinesByTeam((prev) => {
+            const previousTeamRoutines = prev[teamNumber] ?? EMPTY_TEAM_AUTO_ROUTINES;
+            return {
+                ...prev,
+                [teamNumber]: {
+                    ...previousTeamRoutines,
+                    reported: buildReportedRoutinesFromReportedAutos(teamNumber, nextReportedAutosByStart),
+                },
+            };
+        });
 
-    //     return true;
-    // }, [latestPitEntryByTeam]);
+        return true;
+    }, [latestPitEntryByTeam]);
 
-    // const deleteReportedAutoForTeam = useCallback(async (
-    //     teamNumber: number,
-    //     routineId: string
-    // ): Promise<boolean> => {
-    //     if (!teamNumber) return false;
+    const deleteReportedAutoForTeam = useCallback(async (
+        teamNumber: number,
+        routineId: string
+    ): Promise<boolean> => {
+        if (!teamNumber) return false;
 
-    //     let latestEntry = latestPitEntryByTeam[teamNumber];
-    //     if (!latestEntry) {
-    //         const allTeamPitEntries = await loadPitScoutingByTeam(teamNumber);
-    //         latestEntry = allTeamPitEntries.sort((a, b) => b.timestamp - a.timestamp)[0];
-    //         if (!latestEntry) return false;
-    //     }
+        let latestEntry = latestPitEntryByTeam[teamNumber];
+        if (!latestEntry) {
+            const allTeamPitEntries = await loadPitScoutingByTeam(teamNumber);
+            latestEntry = allTeamPitEntries.sort((a, b) => b.timestamp - a.timestamp)[0];
+            if (!latestEntry) return false;
+        }
 
-    //     const rawId = stripReportedPrefix(routineId);
-    //     const reportedAutosByStart = coerceReportedAutosByStart(isRecord(latestEntry.gameData) ? latestEntry.gameData.reportedAutosByStart : undefined);
-    //     const now = Date.now();
-    //     let didDelete = false;
+        const rawId = stripReportedPrefix(routineId);
+        const reportedAutosByStart = coerceReportedAutosByStart(isRecord(latestEntry.gameData) ? latestEntry.gameData.reportedAutosByStart : undefined);
+        const now = Date.now();
+        let didDelete = false;
 
-    //     const nextReportedAutosByStart: ReportedAutosByStart = START_POSITION_LABELS.reduce((acc, startLabel) => {
-    //         const autos = reportedAutosByStart[startLabel] ?? [];
-    //         const nextAutos = autos.filter((auto) => auto.id !== rawId);
-    //         if (nextAutos.length !== autos.length) {
-    //             didDelete = true;
-    //         }
-    //         acc[startLabel] = nextAutos;
-    //         return acc;
-    //     }, createEmptyReportedAutos());
+        const nextReportedAutosByStart: ReportedAutosByStart = START_POSITION_LABELS.reduce((acc, startLabel) => {
+            const autos = reportedAutosByStart[startLabel] ?? [];
+            const nextAutos = autos.filter((auto) => auto.id !== rawId);
+            if (nextAutos.length !== autos.length) {
+                didDelete = true;
+            }
+            acc[startLabel] = nextAutos;
+            return acc;
+        }, createEmptyReportedAutos());
 
-    //     if (!didDelete) return false;
+        if (!didDelete) return false;
 
-    //     const updatedEntry: PitScoutingEntryBase = {
-    //         ...latestEntry,
-    //         timestamp: now,
-    //         gameData: {
-    //             ...(isRecord(latestEntry.gameData) ? latestEntry.gameData : {}),
-    //             reportedAutosByStart: nextReportedAutosByStart,
-    //         },
-    //     };
+        const updatedEntry: PitScoutingEntryBase = {
+            ...latestEntry,
+            timestamp: now,
+            gameData: {
+                ...(isRecord(latestEntry.gameData) ? latestEntry.gameData : {}),
+                reportedAutosByStart: nextReportedAutosByStart,
+            },
+        };
 
-    //     await savePitScoutingEntry(updatedEntry);
+        await savePitScoutingEntry(updatedEntry);
 
-    //     setLatestPitEntryByTeam((prev) => ({
-    //         ...prev,
-    //         [teamNumber]: updatedEntry,
-    //     }));
+        setLatestPitEntryByTeam((prev) => ({
+            ...prev,
+            [teamNumber]: updatedEntry,
+        }));
 
-    //     setTeamAutoRoutinesByTeam((prev) => {
-    //         const previousTeamRoutines = prev[teamNumber] ?? EMPTY_TEAM_AUTO_ROUTINES;
-    //         return {
-    //             ...prev,
-    //             [teamNumber]: {
-    //                 ...previousTeamRoutines,
-    //                 reported: buildReportedRoutinesFromReportedAutos(teamNumber, nextReportedAutosByStart),
-    //             },
-    //         };
-    //     });
+        setTeamAutoRoutinesByTeam((prev) => {
+            const previousTeamRoutines = prev[teamNumber] ?? EMPTY_TEAM_AUTO_ROUTINES;
+            return {
+                ...prev,
+                [teamNumber]: {
+                    ...previousTeamRoutines,
+                    reported: buildReportedRoutinesFromReportedAutos(teamNumber, nextReportedAutosByStart),
+                },
+            };
+        });
 
-    //     setSelectedAutoRoutineBySlot((prevSelections) =>
-    //         prevSelections.map((selection) => (selection?.routineId === routineId ? null : selection))
-    //     );
+        setSelectedAutoRoutineBySlot((prevSelections) =>
+            prevSelections.map((selection) => (selection?.routineId === routineId ? null : selection))
+        );
 
-    //     return true;
-    // }, [latestPitEntryByTeam]);
+        return true;
+    }, [latestPitEntryByTeam]);
 
     const applyAllianceToRed = (allianceId: string) => {
         setSelectedRedAlliance(allianceId === "none" ? "" : allianceId);
@@ -998,9 +997,9 @@ export const useMatchStrategy = () => {
         getSelectedAutoRoutineForSlot,
         getSelectedAutoRoutineSelectionForSlot,
         setSelectedAutoRoutineForSlot,
-        // addReportedAutoForTeam,
-        // updateReportedAutoForTeam,
-        // deleteReportedAutoForTeam,
+        addReportedAutoForTeam,
+        updateReportedAutoForTeam,
+        deleteReportedAutoForTeam,
         handleTeamChange,
         applyAllianceToRed,
         applyAllianceToBlue,

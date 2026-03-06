@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import type { PitScoutingEntryBase, DrivetrainType, ProgrammingLanguage } from "@/types/database";
+import type { PitScoutingEntryBase } from "@/core/types/pit-scouting";
 import {
   savePitScoutingEntry,
   loadPitScoutingByTeamAndEvent,

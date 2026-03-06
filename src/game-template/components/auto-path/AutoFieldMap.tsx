@@ -155,7 +155,7 @@ export function AutoFieldMap(props: AutoFieldMapProps) {
 // =============================================================================
 
 function AutoFieldMapContent({
-    scoutOptions,
+    // scoutOptions,
     recordingMode = false,
     preferredStartKey,
     headerLabel,

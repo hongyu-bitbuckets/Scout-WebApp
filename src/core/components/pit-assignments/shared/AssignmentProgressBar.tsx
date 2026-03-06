@@ -13,18 +13,20 @@ interface AssignmentProgressBarFromCountsProps {
 
 type AssignmentProgressBarProps = AssignmentProgressBarFromItemsProps | AssignmentProgressBarFromCountsProps;
 
-const hasAssignments = (
-  props: AssignmentProgressBarProps
-): props is AssignmentProgressBarFromItemsProps => 'assignments' in props;
+export const AssignmentProgressBar: React.FC<AssignmentProgressBarProps> = (props) => {
+  const className = props.className ?? '';
 
-export const AssignmentProgressBar: React.FC<AssignmentProgressBarProps> = ({
-  className = "",
-  ...props
-}) => {
-  const completedCount = hasAssignments(props)
-    ? props.assignments.filter((assignment) => assignment.completed).length
-    : props.completedCount;
-  const totalCount = hasAssignments(props) ? props.assignments.length : props.totalCount;
+  const counts = 'assignments' in props
+    ? {
+        completedCount: props.assignments.filter((assignment) => assignment.completed).length,
+        totalCount: props.assignments.length,
+      }
+    : {
+        completedCount: props.completedCount,
+        totalCount: props.totalCount,
+      };
+
+  const { completedCount, totalCount } = counts;
   const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
   return (

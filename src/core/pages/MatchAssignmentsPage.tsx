@@ -24,7 +24,7 @@ const MatchAssignmentsPage: React.FC = () => {
   useEffect(() => {
     const loadScheduleData = () => {
       const storedSchedule = localStorage.getItem('matchData');
-      let normalizedSchedule = [];
+      let normalizedSchedule: ReturnType<typeof normalizeStoredMatchSchedule> = [];
 
       try {
         normalizedSchedule = normalizeStoredMatchSchedule(storedSchedule ? JSON.parse(storedSchedule) : []);
