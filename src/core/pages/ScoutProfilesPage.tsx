@@ -6,8 +6,9 @@ import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Avatar, AvatarFallback } from "@/core/components/ui/avatar";
-import { Check, Trash2, Users } from "lucide-react";
+import { Check, Trash2, Users, Wifi, WifiOff } from "lucide-react";
 import { cn } from "@/core/lib/utils";
+import { useWebRTC } from "@/core/contexts/WebRTCContext";
 
 export default function ScoutProfilesPage() {
   const {
@@ -20,6 +21,7 @@ export default function ScoutProfilesPage() {
     toggleScoutRoleFor,
     updateScoutRoles,
   } = useScout();
+  const { connectedScouts } = useWebRTC();
 
   const [filter, setFilter] = useState("");
   const [newName, setNewName] = useState("");
@@ -29,6 +31,17 @@ export default function ScoutProfilesPage() {
     const lower = filter.toLowerCase();
     return scoutsList.filter(s => s.toLowerCase().includes(lower));
   }, [scoutsList, filter]);
+
+  const activeScouts = useMemo(() => {
+    return connectedScouts.filter((scout) => scout.status !== "disconnected");
+  }, [connectedScouts]);
+
+  const readyConnectedScouts = useMemo(() => {
+    return activeScouts.filter((scout) => {
+      const channelState = scout.channel?.readyState || scout.dataChannel?.readyState;
+      return channelState === "open" || scout.status === "connected";
+    });
+  }, [activeScouts]);
 
   const handleCreate = async () => {
     if (!newName.trim()) return;
@@ -143,6 +156,56 @@ export default function ScoutProfilesPage() {
           {filteredScouts.length} of {scoutsList.length}
         </span>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between gap-2">
+            <span className="flex items-center gap-2">
+              {readyConnectedScouts.length > 0 ? (
+                <Wifi className="h-5 w-5 text-green-600" />
+              ) : (
+                <WifiOff className="h-5 w-5 text-muted-foreground" />
+              )}
+              Connected Scouts (WiFi)
+            </span>
+            <span className="text-xs font-normal text-muted-foreground">
+              {readyConnectedScouts.length} live
+            </span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {activeScouts.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No scouts connected yet.</p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {activeScouts.map((scout) => {
+                const channelState = scout.channel?.readyState || scout.dataChannel?.readyState;
+                const isReady = channelState === "open" || scout.status === "connected";
+                const isProfiledScout = scoutsList.includes(scout.name);
+
+                return (
+                  <div
+                    key={scout.id}
+                    className={cn(
+                      "flex items-center gap-2 rounded-lg border px-3 py-1.5",
+                      isReady ? "bg-green-500/10" : "bg-yellow-500/10"
+                    )}
+                  >
+                    <span className={cn("h-2 w-2 rounded-full", isReady ? "bg-green-500" : "bg-yellow-500")} />
+                    <span className="text-sm font-medium">{scout.name}</span>
+                    {!isProfiledScout && (
+                      <span className="text-[10px] uppercase tracking-wide text-muted-foreground">No profile</span>
+                    )}
+                    <span className="text-xs text-muted-foreground">
+                      {isReady ? "Connected" : "Connecting"}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Scouts List */}
       <div className="space-y-2">

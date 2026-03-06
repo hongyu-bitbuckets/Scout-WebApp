@@ -45,10 +45,10 @@ import {
 import { TeleopPathProvider, useTeleopScoring } from '@/game-template/contexts';
 import { formatDurationSecondsLabel } from '@/game-template/duration';
 import { TELEOP_PHASE_DURATION_MS } from '@/game-template/constants';
-import {
-    GAME_SCOUT_OPTION_KEYS,
-    getEffectiveScoutOptions,
-} from '@/game-template/scout-options';
+// import {
+//     GAME_SCOUT_OPTION_KEYS,
+//     getEffectiveScoutOptions,
+// } from '@/game-template/scout-options';
 
 // Local sub-components
 import { TeleopActionLog } from './components/TeleopActionLog';
@@ -172,15 +172,11 @@ function TeleopFieldMapContent() {
     }), []) as React.RefObject<HTMLCanvasElement>;
 
     const isMobile = useIsMobile();
-    const effectiveScoutOptions = getEffectiveScoutOptions();
-    const disableHubFuelScoringPopup =
-        effectiveScoutOptions[GAME_SCOUT_OPTION_KEYS.disableHubFuelScoringPopup] === true;
-    const disablePassingPopup =
-        effectiveScoutOptions[GAME_SCOUT_OPTION_KEYS.disablePassingPopup] === true;
-    const disableDefensePopup =
-        effectiveScoutOptions[GAME_SCOUT_OPTION_KEYS.disableDefensePopup] === true;
-    const disablePathDrawingTapOnly =
-        effectiveScoutOptions[GAME_SCOUT_OPTION_KEYS.disableTeleopPathDrawingTapOnly] === true;
+    // Scout options are intentionally disabled.
+    const disableHubFuelScoringPopup = false;
+    const disablePassingPopup = false;
+    const disableDefensePopup = false;
+    const disablePathDrawingTapOnly = false;
 
     // Local state (UI-only)
     const [isFullscreen, setIsFullscreen] = useState(false);

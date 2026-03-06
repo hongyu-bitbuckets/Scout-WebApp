@@ -46,11 +46,11 @@ import { AutoPathProvider, useAutoScoring } from "@/game-template/contexts";
 import { actions as schemaActions } from "@/game-template/game-schema";
 import { formatDurationSecondsLabel } from "@/game-template/duration";
 import { AUTO_PHASE_DURATION_MS } from "@/game-template/constants";
-import {
-    GAME_SCOUT_OPTION_KEYS,
-    getEffectiveScoutOptions,
-} from "@/game-template/scout-options";
-import { CORE_SCOUT_OPTION_KEYS } from "@/core/components/GameStartComponents/ScoutOptionsSheet";
+// import {
+//     GAME_SCOUT_OPTION_KEYS,
+//     getEffectiveScoutOptions,
+// } from "@/game-template/scout-options";
+// import { CORE_SCOUT_OPTION_KEYS } from "@/core/components/GameStartComponents/ScoutOptionsSheet";
 
 // Local sub-components
 import { AutoActionLog } from "./components/AutoActionLog";
@@ -291,13 +291,10 @@ function AutoFieldMapContent({
     const isBrokenDown = brokenDownStart !== null;
 
     const isMobile = useIsMobile();
-    const effectiveScoutOptions = getEffectiveScoutOptions(scoutOptions);
-    const startAutoCueFromStartConfirmation =
-        effectiveScoutOptions[CORE_SCOUT_OPTION_KEYS.startAutoCueFromStartConfirmation] !== false;
-    const startAutoCueFromAutoScreenEntry =
-        effectiveScoutOptions[CORE_SCOUT_OPTION_KEYS.startAutoCueFromAutoScreenEntry] === true;
-    const autoAdvanceToTeleopAfter20s =
-        effectiveScoutOptions[CORE_SCOUT_OPTION_KEYS.autoAdvanceToTeleopAfter20s] === true;
+    // Scout options are intentionally disabled.
+    const startAutoCueFromStartConfirmation = true;
+    const startAutoCueFromAutoScreenEntry = false;
+    const autoAdvanceToTeleopAfter20s = false;
     const firstConfirmedStartTimestamp = useMemo(() => {
         const firstStartAction = actions.find((action) => action.type === 'start');
         return typeof firstStartAction?.timestamp === 'number'
@@ -312,12 +309,9 @@ function AutoFieldMapContent({
         : Math.max(0, Math.ceil((AUTO_CUE_TARGET_MS - autoElapsedMs) / 1000));
     const shouldPulseAutoBorder = autoElapsedMs >= AUTO_CUE_TARGET_MS;
     const shouldAutoAdvanceToTeleop = autoAdvanceToTeleopAfter20s && elapsedSinceStartConfirmationMs >= AUTO_CUE_TARGET_MS;
-    const disableHubFuelScoringPopup =
-        effectiveScoutOptions[GAME_SCOUT_OPTION_KEYS.disableHubFuelScoringPopup] === true;
-    const disablePassingPopup =
-        effectiveScoutOptions[GAME_SCOUT_OPTION_KEYS.disablePassingPopup] === true;
-    const disablePathDrawingTapOnly =
-        effectiveScoutOptions[GAME_SCOUT_OPTION_KEYS.disableAutoPathDrawingTapOnly] === true;
+    const disableHubFuelScoringPopup = false;
+    const disablePassingPopup = false;
+    const disablePathDrawingTapOnly = false;
 
     // Load pit scouting data for fuel capacity
     useEffect(() => {

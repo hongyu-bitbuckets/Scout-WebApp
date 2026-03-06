@@ -13,6 +13,9 @@ The Pit Assignments system helps lead scouts organize and track pit scouting wor
 3. **Tracking Progress**: Mark teams as completed when pit scouting is done
 4. **Persistence**: Assignments are saved per-event and restored on return
 
+> [!TIP]
+> Match role assignment is now managed separately on `/match-assignments`.
+
 ### Key Features
 
 - **Sequential Assignment**: Divide teams evenly among scouts in team number order
@@ -123,5 +126,6 @@ Uses the shared `useScoutManagement` hook for scout list:
 ## Related Docs
 
 - [Pit Scouting](./PIT_SCOUTING.md) - The scouting form scouts fill out
+- [Match Assignments](./MATCH_ASSIGNMENTS.md) - Assigning match roles by station
 - [Scout Management](./SCOUT_MANAGEMENT.md) - Managing scout profiles
 - [API Data](./API_DATA.md) - Importing team data from TBA/Nexus

@@ -21,17 +21,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/core/components/ui/dialog";
-import { ScoutOptionsSheet } from "@/core/components/GameStartComponents/ScoutOptionsSheet";
+// import { ScoutOptionsSheet } from "@/core/components/GameStartComponents/ScoutOptionsSheet";
 import { AutoFieldMap } from "@/game-template/components/auto-path/AutoFieldMap";
 import type { PathWaypoint } from "@/game-template/components/field-map";
-import { GameSpecificScoutOptions } from "@/game-template/components/game-start/ScoutOptions";
-import {
-  SCOUT_OPTIONS_STORAGE_KEY,
-  getEffectiveScoutOptions,
-} from "@/game-template/scout-options";
-import { Eraser, Save, Settings2, X } from "lucide-react";
+// import { GameSpecificScoutOptions } from "@/game-template/components/game-start/ScoutOptions";
+import { Eraser, Save, X } from "lucide-react";
 import { useMemo, useState } from "react";
-import type { ScoutOptionsState } from "@/types";
+// import type { ScoutOptionsState } from "@/types";
 
 interface GameSpecificQuestionsProps {
   gameData?: Record<string, unknown>;
@@ -98,9 +94,9 @@ export function GameSpecificQuestions({ gameData = {}, onGameDataChange }: GameS
   const [recordingStart, setRecordingStart] = useState<PitAutoStartPosition | null>(null);
   const [recordingActions, setRecordingActions] = useState<PathWaypoint[]>([]);
   const [recordingName, setRecordingName] = useState('');
-  const [recordingScoutOptions, setRecordingScoutOptions] = useState<ScoutOptionsState>(() =>
-    getEffectiveScoutOptions()
-  );
+  // const [recordingScoutOptions, setRecordingScoutOptions] = useState<ScoutOptionsState>(() =>
+  //   getEffectiveScoutOptions()
+  // );
 
   const handleChange = (key: string, value: unknown) => {
     onGameDataChange({ ...gameData, [key]: value });
@@ -205,16 +201,16 @@ export function GameSpecificQuestions({ gameData = {}, onGameDataChange }: GameS
     onGameDataChange(nextGameData);
   };
 
-  const handleRecordingScoutOptionChange = (key: string, value: boolean) => {
-    setRecordingScoutOptions((prev) => {
-      const next = {
-        ...prev,
-        [key]: value,
-      };
-      localStorage.setItem(SCOUT_OPTIONS_STORAGE_KEY, JSON.stringify(next));
-      return next;
-    });
-  };
+  // const handleRecordingScoutOptionChange = (key: string, value: boolean) => {
+  //   setRecordingScoutOptions((prev) => {
+  //     const next = {
+  //       ...prev,
+  //       [key]: value,
+  //     };
+  //     localStorage.setItem(SCOUT_OPTIONS_STORAGE_KEY, JSON.stringify(next));
+  //     return next;
+  //   });
+  // };
 
   return (
     <div className="space-y-4">
@@ -560,7 +556,7 @@ export function GameSpecificQuestions({ gameData = {}, onGameDataChange }: GameS
                       className="h-8 w-48 sm:w-72"
                       aria-label="Auto name"
                     />
-                    <ScoutOptionsSheet
+                    {/* <ScoutOptionsSheet
                       options={recordingScoutOptions}
                       onOptionChange={handleRecordingScoutOptionChange}
                       customContent={GameSpecificScoutOptions}
@@ -576,7 +572,7 @@ export function GameSpecificQuestions({ gameData = {}, onGameDataChange }: GameS
                           <Settings2 className="h-4 w-4" />
                         </Button>
                       }
-                    />
+                    /> */}
                   </div>
                 }
                 recordingActionSlot={

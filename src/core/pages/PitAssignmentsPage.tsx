@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { MatchScoutAssignmentSection } from "@/core/components/pit-assignments/MatchScoutAssignmentSection";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/core/components/animate-ui/radix/tabs";
 import { AlertCircle, Users, BarChart3 } from 'lucide-react';
 import { Alert, AlertDescription } from "@/core/components/ui/alert";
@@ -8,7 +7,7 @@ import { useWebRTC } from '@/core/contexts/WebRTCContext';
 import { getAllStoredEventTeams } from '@/core/lib/tbaUtils';
 import { getStoredNexusTeams, getStoredPitAddresses, getStoredPitData } from '@/core/lib/nexusUtils';
 import { loadPitScoutingEntry } from '@/core/lib/pitScoutingUtils';
-import { ScoutManagementSection } from '@/core/components/pit-assignments/ScoutManagementSection';
+// import { ScoutManagementSection } from '@/core/components/pit-assignments/ScoutManagementSection';
 import { TeamDisplaySection } from '@/core/components/pit-assignments/TeamDisplaySection';
 import { AssignmentResults } from '@/core/components/pit-assignments/AssignmentResults';
 import EventInformationCard from '@/core/components/pit-assignments/EventInformationCard';
@@ -401,15 +400,18 @@ const PitAssignmentsPage: React.FC = () => {
   };
 
   return (
+
     <div className="min-h-screen container mx-auto px-4 pt-12 pb-24 space-y-6 max-w-7xl">
       <div className="text-start">
         <div className="flex items-center justify-between">
+
           <div>
-            <h1 className="text-3xl font-bold">Match & Pit Assignments</h1>
+            <h1 className="text-3xl font-bold">Pit Assignments</h1>
             <p className="text-muted-foreground">
-              Manage scouts and assign teams for pit & match scouting
+              Manage scouts and assign teams for pit scouting
             </p>
           </div>
+
           {/* Data source attribution */}
           <div className="hidden md:block">
             <DataAttribution
@@ -428,7 +430,7 @@ const PitAssignmentsPage: React.FC = () => {
       </div>
 
       {/* Scout Management - Moved to top */}
-      <ScoutManagementSection />
+      {/* <ScoutManagementSection /> */}
 
       {/* Event Information and Assignment Controls - Side by side */}
       <div className="flex flex-col lg:flex-row gap-6">
@@ -459,7 +461,7 @@ const PitAssignmentsPage: React.FC = () => {
         )}
       </div>
 
-      {/* Combined Tabbed Interface for Team Display, Pit Assignments, and Match Assignments */}
+      {/* Tabbed interface for team card and table views */}
       {selectedEvent && currentTeams.length > 0 && (
         <Tabs
           value={activeTab}
@@ -467,7 +469,7 @@ const PitAssignmentsPage: React.FC = () => {
           enableSwipe={true}
           className="w-full"
         >
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="teams" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               Team Cards
@@ -475,10 +477,6 @@ const PitAssignmentsPage: React.FC = () => {
             <TabsTrigger value="assignments" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
               Table View
-            </TabsTrigger>
-            <TabsTrigger value="match-scout" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Match Scout Assign
             </TabsTrigger>
           </TabsList>
 
@@ -524,12 +522,6 @@ const PitAssignmentsPage: React.FC = () => {
               />
             </div>
           </TabsContent>
-
-          <TabsContent value="match-scout">
-            <div className="min-h-[400px] max-w-2xl mx-auto">
-              <MatchScoutAssignmentSection matchNumber={localStorage.getItem("currentMatchNumber") || "1"} />
-            </div>
-          </TabsContent>
         </Tabs>
       )}
 
@@ -544,6 +536,7 @@ const PitAssignmentsPage: React.FC = () => {
         </Alert>
       )}
     </div>
+
   );
 };
 

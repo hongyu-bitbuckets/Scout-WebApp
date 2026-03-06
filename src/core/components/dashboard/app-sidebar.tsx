@@ -93,8 +93,14 @@ const data = {
       icon: Users,
       items: [
         {
-          title: "Match & Pit Assignments",
+          title: "Pit Assignments",
           url: "/pit-assignments",
+          requiredRoles: ["leadership", "mentors"] as ScoutRole[],
+        },
+
+        {
+          title: "Match Assignments",
+          url: "/match-assignments",
           requiredRoles: ["leadership", "mentors"] as ScoutRole[],
         },
         

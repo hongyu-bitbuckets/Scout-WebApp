@@ -11,6 +11,7 @@ const tbaAllowed = [
   /^\/event\/[a-z0-9]+\/matches(?:\/simple)?$/i,
   /^\/event\/[a-z0-9]+\/coprs$/i,
   /^\/event\/[a-z0-9]+\/teams\/keys$/i,
+  /^\/team\/frc\d+$/i,
   /^\/match\/[a-z0-9_]+$/i,
 ];
 

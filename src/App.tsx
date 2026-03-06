@@ -45,6 +45,7 @@ import AchievementsPage from "@/core/pages/AchievementsPage";
 import DevUtilitiesPage from "@/core/pages/DevUtilitiesPage";
 import { MatchValidationPage } from "@/core/pages/MatchValidationPage";
 import PitAssignmentsPage from "@/core/pages/PitAssignmentsPage";
+import MatchAssignmentsPage from "@/core/pages/MatchAssignmentsPage";
 import CommentScoutMatchPage from "@/core/pages/CommentScoutMatchPage";
 import { InstallPrompt } from '@/core/components/pwa/InstallPrompt';
 import { PWAUpdatePrompt } from '@/core/components/pwa/PWAUpdatePrompt';
@@ -63,7 +64,7 @@ import { gameDataTransformation } from "@/game-template/transformation";
 import {
   StatusToggles,
   GameSpecificQuestions,
-  GameSpecificScoutOptions,
+  // GameSpecificScoutOptions,
 } from "@/game-template/components";
 
 // Mock implementations for missing template parts
@@ -93,7 +94,8 @@ function App() {
               ...mockUI,
               StatusToggles,
               PitScoutingQuestions: GameSpecificQuestions,
-              ScoutOptionsContent: GameSpecificScoutOptions,
+              // Scout options are intentionally disabled.
+              // ScoutOptionsContent: GameSpecificScoutOptions,
             } as any}
           >
             <MainLayout />
@@ -120,6 +122,7 @@ function App() {
         <Route path="/peer-transfer" element={<PeerTransferPage />} />
         <Route path="/qr-transfer" element={<QRDataTransferPage />} />
         <Route path="/pit-assignments" element={<PitAssignmentsPage />} />
+        <Route path="/match-assignments" element={<MatchAssignmentsPage />} />
         <Route path="/comment-scout-match" element={<CommentScoutMatchPage />} />
         <Route path="/achievements" element={<AchievementsPage />} />
         <Route path="/scout-management" element={<ScoutManagementDashboardPage />} />
@@ -146,6 +149,7 @@ function App() {
         <Route path="/match-validation" element={<MatchValidationPage />} />
         <Route path="/dev-utilities" element={<DevUtilitiesPage />} />
       <Route path="/pit-assignments" element={<PitAssignmentsPage />} />
+        <Route path="/match-assignments" element={<MatchAssignmentsPage />} />
         <Route path="/achievements" element={<AchievementsPage />} />
         <Route path="/scout-management" element={<ScoutManagementDashboardPage />} />
         <Route path="/scouts-profile" element={<ScoutProfilesPage />} />
