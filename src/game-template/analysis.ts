@@ -9,7 +9,6 @@
  * - Secondary: Tower climbing (3 levels)
  * - New: Auto L1 climb for bonus points
  */
-
 import type { StrategyAnalysis, TeamStats } from "@/types/game-interfaces";
 import type { ScoutingEntryBase } from "@/types/scouting-entry";
 import type {
@@ -23,8 +22,6 @@ import type { GameData as CoreGameData } from "@/game-template/scoring";
 // Use 2026 field images
 import fieldMapRedImage from "@/game-template/assets/2026-field-red.png";
 import fieldMapBlueImage from "@/game-template/assets/2026-field-blue.png";
-
-
 /**
  * Template scouting entry type
  * Extends ScoutingEntryBase with game-specific gameData
@@ -33,30 +30,32 @@ type ScoutingEntryTemplate = ScoutingEntryBase & {
     gameData: CoreGameData;
 };
 
-const getPhaseFuelScored = (phaseData: Record<string, unknown> | undefined): number => {
-    if (!phaseData) return 0;
-
-    if (typeof phaseData.fuelScoredCount === 'number') {
-        return phaseData.fuelScoredCount;
-    }
-
-    if (typeof phaseData.ballsShotCount === 'number') {
-        return phaseData.ballsShotCount;
-    }
-
-    return 0;
-};
-
 /**
  * Team statistics for 2026 REBUILT
  */
+
+    
+          
+            
+    
+
+          
+          Expand Down
+          
+            
+    
+
+          
+          Expand Up
+    
+    @@ -269,8 +283,8 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
+  
 export interface TeamStatsTemplate extends TeamStats {
     // Point averages
     avgTotalPoints: number;
     avgAutoPoints: number;
     avgTeleopPoints: number;
     avgEndgamePoints: number;
-
     // Fuel averages
     avgAutoFuel: number;
     avgTeleopFuel: number;
@@ -72,7 +71,6 @@ export interface TeamStatsTemplate extends TeamStats {
     fuelTotalOPR: number;
     avgAutoClimbStartTimeSec: number;
     avgTeleopClimbStartTimeSec: number;
-
     // Fuel maximums
     maxAutoFuel: number;
     maxTeleopFuel: number;
@@ -80,7 +78,6 @@ export interface TeamStatsTemplate extends TeamStats {
     maxTeleopFuelPassed: number;
     maxFuelPassed: number;
     maxTotalFuel: number;
-
     // Rate metrics (0-100%)
     mobilityRate: number;
     autoClimbRate: number;
@@ -117,7 +114,6 @@ export interface TeamStatsTemplate extends TeamStats {
     autoShotStationaryRate: number;
     teleopShotOnTheMoveRate: number;
     teleopShotStationaryRate: number;
-
     // Stuck metrics (percentage of matches)
     trenchStuckRate: number;
     bumpStuckRate: number;
@@ -128,14 +124,11 @@ export interface TeamStatsTemplate extends TeamStats {
     passedToAllianceFromNeutralRate: number;
     passedToAllianceFromOpponentRate: number;
     passedToNeutralRate: number;
-
     // Start position percentages
     startPositions: Record<string, number>;
-
     // Match results for performance tab
     matchResults: MatchResult[];
 }
-
 /**
  * Match result data for performance display
  */
@@ -168,7 +161,6 @@ export interface MatchResult {
     teleopPath?: any[]; // Array of waypoint actions from teleop period
     [key: string]: unknown;
 }
-
 /**
  * Strategy Analysis Implementation for 2026
  */
@@ -178,7 +170,6 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
      */
     calculateBasicStats(entries: ScoutingEntryTemplate[]): TeamStatsTemplate {
         const matchCount = entries.length;
-
         if (matchCount === 0) {
             return {
                 // Base TeamStats required fields
@@ -273,25 +264,39 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                 roleInactiveThiefRate: 0,
             };
         }
-
         // Calculate totals
         const totals = entries.reduce((acc, entry) => {
             const gameData = entry.gameData;
-
             const scaledMetrics = gameData?.scaledMetrics as {
                 scaledAutoFuel?: number;
                 scaledTeleopFuel?: number;
             } | undefined;
 
-            const rawAutoFuel = getPhaseFuelScored(gameData?.auto as Record<string, unknown> | undefined);
-            const rawTeleopFuel = getPhaseFuelScored(gameData?.teleop as Record<string, unknown> | undefined);
+            const rawAutoFuel = gameData?.auto?.fuelScoredCount || 0;
+            const rawTeleopFuel = gameData?.teleop?.fuelScoredCount || 0;
             const scaledAutoFuel = typeof scaledMetrics?.scaledAutoFuel === 'number'
                 ? scaledMetrics.scaledAutoFuel
                 : rawAutoFuel;
+
+    
+          
+            
+    
+
+          
+          Expand Down
+          
+            
+    
+
+          
+          Expand Up
+    
+    @@ -426,8 +440,8 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
+  
             const scaledTeleopFuel = typeof scaledMetrics?.scaledTeleopFuel === 'number'
                 ? scaledMetrics.scaledTeleopFuel
                 : rawTeleopFuel;
-
             // Fuel counts
             acc.autoFuel += rawAutoFuel;
             acc.teleopFuel += rawTeleopFuel;
@@ -300,7 +305,6 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             acc.autoFuelPassed += gameData?.auto?.fuelPassedCount || 0;
             acc.teleopFuelPassed += gameData?.teleop?.fuelPassedCount || 0;
             acc.fuelPassed += (gameData?.auto?.fuelPassedCount || 0) + (gameData?.teleop?.fuelPassedCount || 0);
-
             // Toggles
             acc.mobility += gameData?.auto?.leftStartZone ? 1 : 0;
             acc.autoClimb += gameData?.auto?.autoClimbL1 ? 1 : 0;
@@ -317,7 +321,6 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             acc.autoShotStationary += Number(gameData?.auto?.shotStationaryCount ?? 0);
             acc.teleopShotOnTheMove += Number(gameData?.teleop?.shotOnTheMoveCount ?? 0);
             acc.teleopShotStationary += Number(gameData?.teleop?.shotStationaryCount ?? 0);
-
             // Track stuck occurrences (any stuck in auto or teleop)
             acc.trenchStuck += (gameData?.auto?.trenchStuckCount || 0) > 0 || (gameData?.teleop?.trenchStuckCount || 0) > 0 ? 1 : 0;
             acc.bumpStuck += (gameData?.auto?.bumpStuckCount || 0) > 0 || (gameData?.teleop?.bumpStuckCount || 0) > 0 ? 1 : 0;
@@ -333,27 +336,23 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             acc.accuracySome += gameData?.endgame?.accuracySome ? 1 : 0;
             acc.accuracyFew += gameData?.endgame?.accuracyFew ? 1 : 0;
             acc.accuracyLittle += gameData?.endgame?.accuracyLittle ? 1 : 0;
-
             // Active shift roles (stored in endgame section)
             acc.roleActiveCleanUp += gameData?.endgame?.roleActiveCleanUp ? 1 : 0;
             acc.roleActivePasser += gameData?.endgame?.roleActivePasser ? 1 : 0;
             acc.roleActiveDefense += gameData?.endgame?.roleActiveDefense ? 1 : 0;
             acc.roleActiveCycler += gameData?.endgame?.roleActiveCycler ? 1 : 0;
             acc.roleActiveThief += gameData?.endgame?.roleActiveThief ? 1 : 0;
-
             // Inactive shift roles (stored in endgame section)
             acc.roleInactiveCleanUp += gameData?.endgame?.roleInactiveCleanUp ? 1 : 0;
             acc.roleInactivePasser += gameData?.endgame?.roleInactivePasser ? 1 : 0;
             acc.roleInactiveDefense += gameData?.endgame?.roleInactiveDefense ? 1 : 0;
             acc.roleInactiveCycler += gameData?.endgame?.roleInactiveCycler ? 1 : 0;
             acc.roleInactiveThief += gameData?.endgame?.roleInactiveThief ? 1 : 0;
-
             // Track start positions
             const pos = gameData?.auto?.startPosition;
             if (pos !== null && pos !== undefined && pos >= 0) {
                 acc.startPositionCounts[pos] = (acc.startPositionCounts[pos] || 0) + 1;
             }
-
             return acc;
         }, {
             autoFuel: 0,
@@ -404,13 +403,11 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             roleInactiveCycler: 0,
             roleInactiveThief: 0,
         });
-
         // Calculate match results
         const matchResults: MatchResult[] = entries.map(entry => {
             const autoPoints = scoringCalculations.calculateAutoPoints(entry as any);
             const teleopPoints = scoringCalculations.calculateTeleopPoints(entry as any);
             const endgamePoints = scoringCalculations.calculateEndgamePoints(entry as any);
-
             // Determine climb level
             let climbLevel = 0;
             if (entry.gameData?.endgame?.climbL3) climbLevel = 3;
@@ -420,7 +417,6 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             const climbAttempted = climbLevel > 0 || climbFailed;
             const isNoShow = (entry as ScoutingEntryTemplate & { noShow?: boolean }).noShow === true
                 || /no\s*show/i.test(entry.comments || '');
-
             return {
                 matchNumber: String(entry.matchNumber),
                 teamNumber: entry.teamNumber,
@@ -440,11 +436,28 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                 noShow: isNoShow,
                 startPosition: entry.gameData?.auto?.startPosition ?? -1,
                 comment: entry.comments || '',
-                autoFuel: getPhaseFuelScored(entry.gameData?.auto as Record<string, unknown> | undefined),
-                teleopFuel: getPhaseFuelScored(entry.gameData?.teleop as Record<string, unknown> | undefined),
+                autoFuel: entry.gameData?.auto?.fuelScoredCount || 0,
+                teleopFuel: entry.gameData?.teleop?.fuelScoredCount || 0,
                 fuelPassed: (entry.gameData?.auto?.fuelPassedCount || 0) + (entry.gameData?.teleop?.fuelPassedCount || 0),
                 autoFuelPassed: entry.gameData?.auto?.fuelPassedCount || 0,
                 teleopFuelPassed: entry.gameData?.teleop?.fuelPassedCount || 0,
+
+    
+          
+            
+    
+
+          
+          Expand Down
+          
+            
+    
+
+          
+          Expand Up
+    
+    @@ -760,6 +774,7 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
+  
                 autoPath: Array.isArray(entry.gameData?.auto?.autoPath) 
                     ? entry.gameData.auto.autoPath.filter((wp: any) => wp && wp.position) 
                     : (Array.isArray(entry.gameData?.auto?.actions) ? entry.gameData.auto.actions.filter((wp: any) => wp && wp.position) : []),
@@ -454,13 +467,11 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                 gameData: entry.gameData,
             };
         });
-
         // Calculate start position percentages
         const startPositions: Record<string, number> = {};
         Object.entries(totals.startPositionCounts).forEach(([pos, count]) => {
             startPositions[`position${pos}`] = Math.round((count / matchCount) * 100);
         });
-
         const avgAutoPoints = matchResults.reduce((sum, m) => sum + m.autoPoints, 0) / matchCount;
         const avgTeleopPoints = matchResults.reduce((sum, m) => sum + m.teleopPoints, 0) / matchCount;
         const avgEndgamePoints = matchResults.reduce((sum, m) => sum + m.endgamePoints, 0) / matchCount;
@@ -472,7 +483,6 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             const endgame = entry.gameData?.endgame as Record<string, unknown> | undefined;
             if (endgame?.[`climbAttemptL${level}`] === true) return true;
             if (endgame?.[`climbL${level}`] === true) return true;
-
             const teleopPath = entry.gameData?.teleop?.teleopPath;
             if (Array.isArray(teleopPath)) {
                 return teleopPath.some((waypoint) => {
@@ -481,7 +491,6 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                     return record.type === 'climb' && record.climbLevel === level;
                 });
             }
-
             return false;
         };
         const climbAttemptL1Count = entries.filter(entry => hasAttemptAtLevel(entry, 1)).length;
@@ -489,7 +498,6 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
         const climbAttemptL3Count = entries.filter(entry => hasAttemptAtLevel(entry, 3)).length;
         const levelAttemptCount = climbAttemptL1Count + climbAttemptL2Count + climbAttemptL3Count;
         const teleopClimbAttemptCount = Math.max(levelAttemptCount, climbSuccessCount + totals.climbFailed, endgameClimbLocationAttemptCount);
-
         const autoClimbStartTimes = entries
             .map(entry => entry.gameData?.auto?.autoClimbStartTimeSecRemaining)
             .filter((time): time is number => typeof time === 'number');
@@ -514,35 +522,28 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
         const accuracyScore = accuracySelectionCount > 0
             ? Math.round((weightedAccuracyTotal / (accuracySelectionCount * 5)) * 100)
             : 0;
-
         const defenseByTargetAccumulator: Record<string, { attempts: number; very: number; somewhat: number; not: number; }> = {};
         let totalDefenseEvents = 0;
         let veryEffectiveCount = 0;
         let somewhatEffectiveCount = 0;
         let notEffectiveCount = 0;
-
         entries.forEach((entry) => {
             const teleopPath = entry.gameData?.teleop?.teleopPath;
             if (!Array.isArray(teleopPath)) return;
-
             teleopPath.forEach((waypoint) => {
                 if (!waypoint || typeof waypoint !== 'object') return;
                 const record = waypoint as Record<string, unknown>;
                 if (record.type !== 'defense') return;
-
                 totalDefenseEvents += 1;
                 const defendedTeamNumber = Number(record.defendedTeamNumber);
                 const targetKey = Number.isFinite(defendedTeamNumber) && defendedTeamNumber > 0
                     ? String(defendedTeamNumber)
                     : 'Unknown';
-
                 if (!defenseByTargetAccumulator[targetKey]) {
                     defenseByTargetAccumulator[targetKey] = { attempts: 0, very: 0, somewhat: 0, not: 0 };
                 }
-
                 const targetSummary = defenseByTargetAccumulator[targetKey]!;
                 targetSummary.attempts += 1;
-
                 const effectiveness = record.defenseEffectiveness;
                 if (effectiveness === 'very') {
                     veryEffectiveCount += 1;
@@ -556,22 +557,18 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                 }
             });
         });
-
         const defenseByTarget: TeamStatsTemplate['defenseByTarget'] = Object.fromEntries(
             Object.entries(defenseByTargetAccumulator).map(([team, stats]) => {
                 const weighted = (stats.very * 2) + stats.somewhat;
                 const effectivenessScore = stats.attempts > 0
                     ? Math.round((weighted / (stats.attempts * 2)) * 100)
                     : 0;
-
                 return [team, { ...stats, effectivenessScore }];
             })
         );
-
         const mostDefendedTeam = Object.entries(defenseByTarget)
             .filter(([team]) => team !== 'Unknown')
             .sort(([, a], [, b]) => b.attempts - a.attempts)[0]?.[0] || 'None';
-
         const mostEffectiveDefenseTargetEntry = Object.entries(defenseByTarget)
             .filter(([team, stats]) => team !== 'Unknown' && stats.attempts > 0)
             .sort(([, a], [, b]) => {
@@ -580,15 +577,12 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                 }
                 return b.attempts - a.attempts;
             })[0];
-
         const mostEffectiveDefenseTarget = mostEffectiveDefenseTargetEntry
             ? `${mostEffectiveDefenseTargetEntry[0]} (${mostEffectiveDefenseTargetEntry[1].effectivenessScore}%)`
             : 'None';
-
         const defenseEffectivenessScore = totalDefenseEvents > 0
             ? Math.round((((veryEffectiveCount * 2) + somewhatEffectiveCount) / (totalDefenseEvents * 2)) * 100)
             : 0;
-
         // Calculate primary roles (most frequently played, supporting ties)
         const activeRoles = [
             { name: 'Cycler', count: totals.roleActiveCycler },
@@ -600,7 +594,6 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
         const maxActiveCount = Math.max(...activeRoles.map(r => r.count));
         const topActiveRoles = activeRoles.filter(r => r.count === maxActiveCount && r.count > 0);
         const primaryActiveRole = topActiveRoles.length > 0 ? topActiveRoles.map(r => r.name).join(' / ') : 'None';
-
         const inactiveRoles = [
             { name: 'Cycler', count: totals.roleInactiveCycler },
             { name: 'Clean Up', count: totals.roleInactiveCleanUp },
@@ -611,7 +604,6 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
         const maxInactiveCount = Math.max(...inactiveRoles.map(r => r.count));
         const topInactiveRoles = inactiveRoles.filter(r => r.count === maxInactiveCount && r.count > 0);
         const primaryInactiveRole = topInactiveRoles.length > 0 ? topInactiveRoles.map(r => r.name).join(' / ') : 'None';
-
         return {
             // Base TeamStats required fields
             teamNumber: entries[0]?.teamNumber || 0,
@@ -757,7 +749,6 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             roleInactiveThiefRate: Math.round((totals.roleInactiveThief / matchCount) * 100),
         };
     },
-
     /**
      * Get stat sections for the Team Statistics page
      */
@@ -774,10 +765,26 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                     { key: 'avgAutoPoints', label: 'Auto Points', type: 'number', color: 'blue' },
                     { key: 'avgTeleopPoints', label: 'Teleop Points', type: 'number', color: 'purple' },
                     { key: 'avgEndgamePoints', label: 'Endgame Points', type: 'number', color: 'orange' },
-                    
                     { key: 'statboticsTotalPoints', label: 'Statbotics EPA', type: 'number', color: 'green', subtitle: 'Total Points' },
                     { key: 'statboticsTeleopPoints', label: 'Statbotics EPA', type: 'number', color: 'purple', subtitle: 'Teleop Points' },
                     { key: 'statboticsAutoPoints', label: 'Statbotics EPA', type: 'number', color: 'blue', subtitle: 'Auto Points' },
+
+    
+          
+            
+    
+
+          
+          Expand Down
+          
+            
+    
+
+          
+          Expand Up
+    
+    @@ -821,10 +836,10 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
+  
                     { key: 'statboticsEndgamePoints', label: 'Statbotics EPA', type: 'number', color: 'orange', subtitle: 'Endgame Points' },
                     { key: 'coprTotalPoints', label: 'TBA COPR', type: 'number', color: 'green', subtitle: 'Total Points' },
                     { key: 'coprTotalTeleopPoints', label: 'TBA COPR', type: 'number', color: 'purple', subtitle: 'Teleop Points' },
@@ -822,7 +829,6 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                     { key: 'mostEffectiveDefenseTarget', label: 'Most Effective Target', type: 'text', color: 'purple' },
                 ],
             },
-
             // Scoring tab - fuel breakdown
             {
                 id: 'auto-scoring',
@@ -836,13 +842,24 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                     { key: 'statboticsAutoFuel', label: 'Statbotics EPA', type: 'number', color: 'blue', subtitle: 'Auto Fuel' },
                     { key: 'coprHubAutoPoints', label: 'TBA COPR', type: 'number', color: 'blue', subtitle: 'Hub Auto Points' },
                     { key: 'maxAutoFuel', label: 'Max Fuel Scored', type: 'number', subtitle: 'best match' },
-                    // { key: 'autoShotOnTheMoveRate', label: 'On The Move %', type: 'percentage', color: 'orange' },
-                    // { key: 'autoShotStationaryRate', label: 'Stationary %', type: 'percentage', color: 'blue' },
-                    // { key: 'avgAutoFuelPassed', label: 'Fuel Passed', type: 'number', subtitle: 'avg per match' },
-                    // { key: 'maxAutoFuelPassed', label: 'Max Fuel Passed', type: 'number', subtitle: 'best match' },
+                    { key: 'autoShotOnTheMoveRate', label: 'On The Move %', type: 'percentage', color: 'orange' },
+                    { key: 'autoShotStationaryRate', label: 'Stationary %', type: 'percentage', color: 'blue' },
+                    { key: 'avgAutoFuelPassed', label: 'Fuel Passed', type: 'number', subtitle: 'avg per match' },
+                    { key: 'maxAutoFuelPassed', label: 'Max Fuel Passed', type: 'number', subtitle: 'best match' },
                 ],
             },
             {
+
+    
+        
+          
+    
+
+        
+        Expand All
+    
+    @@ -839,10 +854,10 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
+  
                 id: 'teleop-scoring',
                 title: 'Teleop Fuel',
                 tab: 'scoring',
@@ -854,13 +871,24 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                     { key: 'statboticsTeleopFuel', label: 'Statbotics EPA', type: 'number', color: 'purple', subtitle: 'Teleop + Endgame Fuel' },
                     { key: 'coprHubTeleopPoints', label: 'TBA COPR', type: 'number', color: 'purple', subtitle: 'Hub Teleop Points' },
                     { key: 'maxTeleopFuel', label: 'Max Fuel Scored', type: 'number', subtitle: 'best match' },
-                    // { key: 'teleopShotOnTheMoveRate', label: 'On The Move %', type: 'percentage', color: 'orange' },
-                    // { key: 'teleopShotStationaryRate', label: 'Stationary %', type: 'percentage', color: 'blue' },
-                    //  { key: 'avgTeleopFuelPassed', label: 'Fuel Passed', type: 'number', subtitle: 'avg per match' },
-                    // { key: 'maxTeleopFuelPassed', label: 'Max Fuel Passed', type: 'number', subtitle: 'best match' },
+                    { key: 'teleopShotOnTheMoveRate', label: 'On The Move %', type: 'percentage', color: 'orange' },
+                    { key: 'teleopShotStationaryRate', label: 'Stationary %', type: 'percentage', color: 'blue' },
+                    { key: 'avgTeleopFuelPassed', label: 'Fuel Passed', type: 'number', subtitle: 'avg per match' },
+                    { key: 'maxTeleopFuelPassed', label: 'Max Fuel Passed', type: 'number', subtitle: 'best match' },
                 ],
             },
             {
+
+    
+          
+            
+    
+
+          
+          Expand Down
+    
+    
+  
                 id: 'auto-climbing',
                 title: 'Auto Climbing',
                 tab: 'scoring',
@@ -896,7 +924,6 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             },
         ];
     },
-
     /**
      * Get rate sections (progress bars) for the Team Statistics page
      */
@@ -967,7 +994,6 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             },
         ];
     },
-
     /**
      * Get match badges for match-by-match performance list
      */
@@ -977,7 +1003,6 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             { key: 'climbFailed', label: 'Failed', variant: 'destructive', showWhen: true },
         ];
     },
-
     /**
      * Get start position configuration for 2026 field
      * Uses the 2026 field images with 5 starting positions along the traversal line
@@ -1003,5 +1028,4 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
         };
     },
 };
-
 export default strategyAnalysis;
