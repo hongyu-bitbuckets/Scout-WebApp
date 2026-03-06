@@ -137,6 +137,110 @@ export const buildMatchAssignmentMap = (
   return byMatch;
 };
 
+export const buildMatchBlocksFromAssignmentMap = (
+  eventKey: string,
+  assignmentMap: Map<number, Partial<Record<PlayerStation, string>>>,
+): MatchScoutAssignmentBlock[] => {
+  if (!eventKey.trim()) return [];
+
+  const now = Date.now();
+  const sortedMatches = Array.from(assignmentMap.keys())
+    .filter((matchNum) => Number.isFinite(matchNum) && matchNum > 0)
+    .sort((a, b) => a - b);
+
+  const blocks: MatchScoutAssignmentBlock[] = [];
+
+  PLAYER_STATIONS.forEach((station) => {
+    let activeScout: string | null = null;
+    let startMatch = 0;
+    let previousMatch = 0;
+
+    const flushActiveBlock = () => {
+      if (!activeScout || startMatch <= 0 || previousMatch <= 0) return;
+
+      blocks.push({
+        id: `${eventKey}:${station}:${startMatch}-${previousMatch}:${activeScout.toLowerCase()}`,
+        eventKey,
+        station,
+        scoutName: activeScout,
+        startMatch,
+        endMatch: previousMatch,
+        generatedAt: now,
+      });
+    };
+
+    sortedMatches.forEach((matchNum) => {
+      const assignedScout = assignmentMap.get(matchNum)?.[station] ?? null;
+
+      if (!assignedScout) {
+        flushActiveBlock();
+        activeScout = null;
+        startMatch = 0;
+        previousMatch = 0;
+        return;
+      }
+
+      if (
+        activeScout &&
+        assignedScout === activeScout &&
+        previousMatch > 0 &&
+        matchNum === previousMatch + 1
+      ) {
+        previousMatch = matchNum;
+        return;
+      }
+
+      flushActiveBlock();
+      activeScout = assignedScout;
+      startMatch = matchNum;
+      previousMatch = matchNum;
+    });
+
+    flushActiveBlock();
+  });
+
+  return blocks;
+};
+
+export const setMatchStationAssignment = (
+  blocks: MatchScoutAssignmentBlock[],
+  eventKey: string,
+  matchNum: number,
+  station: PlayerStation,
+  scoutName?: string,
+): MatchScoutAssignmentBlock[] => {
+  if (!eventKey.trim() || !Number.isFinite(matchNum) || matchNum <= 0) {
+    return blocks;
+  }
+
+  const nextMap = buildMatchAssignmentMap(blocks);
+  const row = { ...(nextMap.get(matchNum) ?? {}) };
+  const normalizedScout = scoutName?.trim() ?? '';
+  const currentScout = row[station] ?? '';
+
+  if (normalizedScout && currentScout === normalizedScout) {
+    return blocks;
+  }
+
+  if (!normalizedScout && !currentScout) {
+    return blocks;
+  }
+
+  if (normalizedScout) {
+    row[station] = normalizedScout;
+    nextMap.set(matchNum, row);
+  } else {
+    delete row[station];
+    if (Object.keys(row).length === 0) {
+      nextMap.delete(matchNum);
+    } else {
+      nextMap.set(matchNum, row);
+    }
+  }
+
+  return buildMatchBlocksFromAssignmentMap(eventKey, nextMap);
+};
+
 export const generateAutoAssignmentBlocks = (
   eventKey: string,
   matchNumbers: number[],

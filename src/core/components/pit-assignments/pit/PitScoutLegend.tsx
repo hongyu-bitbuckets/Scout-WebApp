@@ -1,10 +1,10 @@
 import React from 'react';
-import { ScoutSelectionBar } from './ScoutSelectionBar';
-import { AssignmentProgressBar } from './AssignmentProgressBar';
-import { AssignmentActionButtons } from './AssignmentActionButtons';
+import { PitScoutSelectionBar } from './PitScoutSelectionBar';
+import { PitAssignmentProgressBar } from './PitAssignmentProgressBar';
+import { PitAssignmentActionButtons } from './PitAssignmentActionButtons';
 import type { PitAssignment } from '@/core/lib/pitAssignmentTypes';
 
-interface ScoutLegendSectionProps {
+interface PitScoutLegendProps {
   scoutsList: string[];
   assignments: PitAssignment[];
   assignmentMode: 'sequential' | 'spatial' | 'manual';
@@ -18,7 +18,7 @@ interface ScoutLegendSectionProps {
   helpText?: string;
 }
 
-export const ScoutLegendSection: React.FC<ScoutLegendSectionProps> = ({
+export const PitScoutLegend: React.FC<PitScoutLegendProps> = ({
   scoutsList,
   assignments,
   assignmentMode,
@@ -43,7 +43,7 @@ export const ScoutLegendSection: React.FC<ScoutLegendSectionProps> = ({
       </div>
 
       <div className="mb-3">
-        <ScoutSelectionBar
+        <PitScoutSelectionBar
           scoutsList={scoutsList}
           assignments={assignments}
           assignmentMode={assignmentMode}
@@ -57,12 +57,12 @@ export const ScoutLegendSection: React.FC<ScoutLegendSectionProps> = ({
       {/* Progress Bar - inside the scout selection card */}
       {hasAssignments && (
         <div className="mt-3 p-3">
-          <AssignmentProgressBar assignments={assignments} />
+          <PitAssignmentProgressBar assignments={assignments} />
           
           {/* Mobile Actions */}
           {showMobileActions && (
             <div className="md:hidden mt-3">
-              <AssignmentActionButtons
+              <PitAssignmentActionButtons
                 assignmentMode={assignmentMode}
                 assignmentsConfirmed={assignmentsConfirmed}
                 assignmentsLength={assignments.length}

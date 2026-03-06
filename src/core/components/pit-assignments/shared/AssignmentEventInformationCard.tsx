@@ -55,7 +55,7 @@ export const AssignmentEventInformationCard: React.FC<AssignmentEventInformation
       ? teamDataSource === 'nexus'
         ? 'Teams extracted from Nexus pit addresses. Pit locations available for enhanced assignments.'
         : 'Teams imported from The Blue Alliance. Import new data on the TBA Data page to change events.'
-      : 'Use Assignment Controls to auto-generate station chunk rotations. Manual block editing will be added later.';
+      : 'Use Assignment Controls to auto-generate station chunk rotations, or switch to manual mode and drag to assign scouts by station.';
 
   return (
     <Card className="flex-1">
