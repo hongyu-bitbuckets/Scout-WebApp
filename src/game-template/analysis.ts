@@ -968,25 +968,25 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
      * Uses the 2026 field images with 5 starting positions along the traversal line
      * Positions 0-4 from driver station view: Left Trench, Left Bump, Hub, Right Bump, Right Trench
      */
-    getStartPositionConfig(): StartPositionConfig {
-        return {
-            positionCount: 5,
-            positionLabels: ['Left Trench', 'Left Bump', 'Hub', 'Right Bump', 'Right Trench'],
-            positionColors: ['yellow', 'orange', 'green', 'orange', 'yellow'],
-            fieldImageRed: fieldMapRedImage,
-            fieldImageBlue: fieldMapBlueImage,
-            // Zone definitions for the auto start position map
-            // Field image is viewed from alliance wall, positions run horizontally across
-            // Approximate positions based on field image (1013x728 aspect ratio)
-            zones: [
-                { x: 40, y: 120, width: 90, height: 100, position: 0, label: 'Trench (L)' },
-                { x: 130, y: 120, width: 150, height: 100, position: 1, label: 'Left Bump' },
-                { x: 280, y: 120, width: 80, height: 100, position: 2, label: 'Hub' },
-                { x: 360, y: 120, width: 150, height: 100, position: 3, label: 'Right Bump' },
-                { x: 510, y: 120, width: 90, height: 100, position: 4, label: 'Trench (R)' },
-            ],
-        };
-    },
+    // getStartPositionConfig(): StartPositionConfig {
+    //     return {
+    //         positionCount: 5,
+    //         positionLabels: ['Left Trench', 'Left Bump', 'Hub', 'Right Bump', 'Right Trench'],
+    //         positionColors: ['yellow', 'orange', 'green', 'orange', 'yellow'],
+    //         fieldImageRed: fieldMapRedImage,
+    //         fieldImageBlue: fieldMapBlueImage,
+    //         // Zone definitions for the auto start position map
+    //         // Field image is viewed from alliance wall, positions run horizontally across
+    //         // Approximate positions based on field image (1013x728 aspect ratio)
+    //         zones: [
+    //             { x: 40, y: 120, width: 90, height: 100, position: 0, label: 'Trench (L)' },
+    //             { x: 130, y: 120, width: 150, height: 100, position: 1, label: 'Left Bump' },
+    //             { x: 280, y: 120, width: 80, height: 100, position: 2, label: 'Hub' },
+    //             { x: 360, y: 120, width: 150, height: 100, position: 3, label: 'Right Bump' },
+    //             { x: 510, y: 120, width: 90, height: 100, position: 4, label: 'Trench (R)' },
+    //         ],
+    //     };
+    // },
 };
 
 export default strategyAnalysis;
