@@ -14,7 +14,6 @@ import { Card, CardContent } from "@/core/components/ui/card";
 import { ConfiguredStatsSections } from "@/core/components/team-stats";
 import type { TeamStats } from '@/core/types/team-stats';
 import { strategyAnalysis } from "@/game-template/analysis";
-import { AutoAnalysis } from "@/game-template/components/team-stats/AutoAnalysis";
 import { DefenseAgainstTeamAnalysis } from "@/game-template/components/team-stats/DefenseAgainstTeamAnalysis";
 
 interface TeamStatsDialogProps {
@@ -54,7 +53,7 @@ export function TeamStatsDialog({
     const scoringStatSections = statSections.filter((section) => section.tab === 'scoring');
     const overviewRateSections = rateSections.filter((section) => section.tab === 'overview');
     const performanceRateSections = rateSections.filter((section) => section.tab === 'performance');
-    const startPositionConfig = strategyAnalysis.getStartPositionConfig();
+    // const startPositionConfig = strategyAnalysis.getStartPositionConfig();
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -138,14 +137,14 @@ export function TeamStatsDialog({
                                 />
                             </TabsContent>
 
-                            <TabsContent value="auto" className="space-y-4 h-full mt-0">
+                            {/* <TabsContent value="auto" className="space-y-4 h-full mt-0">
                                 <AutoAnalysis
                                     teamStats={teamStats}
                                     compareStats={null}
                                     startPositionConfig={startPositionConfig}
                                     showStartPositionMap={false}
                                 />
-                            </TabsContent>
+                            </TabsContent> */}
                         </div>
                     </Tabs>
                 </div>

@@ -34,7 +34,10 @@ export const useTeamStatistics = (
         return allTeamStats.map(stats => {
             const teamData: TeamData = {
                 teamNumber: stats.teamNumber,
-                teamName: resolveTeamNameForEventTeam(stats.eventKey, stats.teamNumber, stats.teamName),
+                teamName:
+                    resolveTeamNameForEventTeam(stats.eventKey, stats.teamNumber, stats.teamName) ??
+                    stats.teamName ??
+                    String(stats.teamNumber),
                 eventKey: stats.eventKey,
                 matchCount: stats.matchCount,
             };

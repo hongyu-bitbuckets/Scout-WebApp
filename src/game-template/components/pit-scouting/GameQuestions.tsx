@@ -303,7 +303,7 @@ export function GameSpecificQuestions({ gameData = {}, onGameDataChange }: GameS
               value={(gameData.shootingAccuracy as number) || ''}
               onChange={(e) => handleChange('shootingAccuracy', parseInt(e.target.value) || 0)}
             />
-          </div> */}
+          </div>
 
           <div className="flex items-center gap-2">
             <Button

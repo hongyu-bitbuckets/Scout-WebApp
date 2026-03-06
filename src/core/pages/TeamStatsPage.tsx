@@ -94,7 +94,6 @@ export function TeamStatsPage(props: TeamStatsPageProps) {
     const statSections = props.statSections ?? displayConfig.statSections;
     const rateSections = props.rateSections ?? displayConfig.rateSections;
     const matchBadges = props.matchBadges ?? displayConfig.matchBadges;
-    const startPositionConfig = props.startPositionConfig ?? displayConfig.startPositionConfig;
     const calculateStats = props.calculateStats ?? hookCalculate;
     const PitDataComponent = props.PitDataComponent ?? PitDataDisplay;
 
