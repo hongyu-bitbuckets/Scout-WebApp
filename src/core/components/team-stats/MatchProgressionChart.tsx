@@ -63,7 +63,7 @@ const metricOptions = [
     { key: 'endgamePoints', label: 'Endgame Points' },
     { key: 'autoFuel', label: 'Auto Fuel' },
     { key: 'teleopFuel', label: 'Teleop Fuel' },
-    { key: 'fuelPassed', label: 'Fuel Passed' },
+    // { key: 'fuelPassed', label: 'Fuel Passed' },
     { key: 'climbLevel', label: 'Climb Level' },
 ];
 

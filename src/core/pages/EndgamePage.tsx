@@ -20,6 +20,27 @@ const ENDGAME_CLIMB_LEVEL_OPTIONS = [
   { value: "3", label: "Level 3" },
 ];
 
+const MALFUNCTION_COMMENT_FIELDS = [
+  {
+    id: "shooter-malfunction-comment",
+    toggleKey: "hardwareShooterMalfunction",
+    commentKey: "shooterMalfunctionComment",
+    label: "Shooter malfunction comment (optional)",
+  },
+  {
+    id: "hopper-malfunction-comment",
+    toggleKey: "hardwareHopperMalfunction",
+    commentKey: "hopperMalfunctionComment",
+    label: "Hopper malfunction comment (optional)",
+  },
+  {
+    id: "intake-malfunction-comment",
+    toggleKey: "hardwareIntakeMalfunction",
+    commentKey: "intakeMalfunctionComment",
+    label: "Intake malfunction comment (optional)",
+  },
+] as const;
+
 const EndgamePage = () => {
   const { ui, transformation } = useGame();
   const { StatusToggles } = ui;
@@ -41,13 +62,19 @@ const EndgamePage = () => {
         ? "1"
         : "none";
 
-  const updateRobotStatus = (updates: Partial<any>) => {
+  const updateRobotStatus = (updates: Partial<any>, options?: { silent?: boolean }) => {
     setRobotStatus((prev: any) => {
       const newStatus = { ...prev, ...updates };
       localStorage.setItem("endgameRobotStatus", JSON.stringify(newStatus));
       return newStatus;
     });
-    toast.success("Status updated");
+    if (!options?.silent) {
+      toast.success("Status updated");
+    }
+  };
+
+  const updateRobotStatusText = (key: string, value: string) => {
+    updateRobotStatus({ [key]: value }, { silent: true });
   };
 
   const handleEndgameClimbLevelChange = (value: string) => {
@@ -136,17 +163,118 @@ const EndgamePage = () => {
           </Card>
         )}
 
-        {/* Endgame Robot Status Section */}
+        {/* Robot Hardware */}
         {workflowConfig.pages.showEndgameStatus && (
           <Card className="w-full">
             <CardHeader>
-              <CardTitle className="text-lg">Endgame Status</CardTitle>
+              <CardTitle className="text-lg">Robot Hardware</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <StatusToggles
+                phase="endgame"
+                status={robotStatus}
+                onStatusUpdate={updateRobotStatus}
+                visibleGroups={["hardwareDisadvantage"]}
+              />
+
+              <div className="space-y-3">
+                {MALFUNCTION_COMMENT_FIELDS.map((field) => {
+                  if (!robotStatus?.[field.toggleKey]) return null;
+
+                  return (
+                    <div className="space-y-2" key={field.id}>
+                      <Label htmlFor={field.id}>{field.label}</Label>
+                      <Textarea
+                        id={field.id}
+                        placeholder="Add optional details"
+                        value={(robotStatus?.[field.commentKey] as string) || ""}
+                        onChange={(event) => updateRobotStatusText(field.commentKey, event.target.value)}
+                        className="min-h-20"
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+
+              <StatusToggles
+                phase="endgame"
+                status={robotStatus}
+                onStatusUpdate={updateRobotStatus}
+                visibleGroups={["hardwareAdvantage"]}
+              />
+
+              <StatusToggles
+                phase="endgame"
+                status={robotStatus}
+                onStatusUpdate={updateRobotStatus}
+                visibleGroups={["shootingStyle"]}
+              />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Robot Status */}
+        {workflowConfig.pages.showEndgameStatus && (
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle className="text-lg">Robot Status</CardTitle>
             </CardHeader>
             <CardContent>
               <StatusToggles
                 phase="endgame"
                 status={robotStatus}
                 onStatusUpdate={updateRobotStatus}
+                visibleGroups={["robotStatus"]}
+              />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Rate The Robot */}
+        {workflowConfig.pages.showEndgameStatus && (
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle className="text-lg">Rate the Robot</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <StatusToggles
+                phase="endgame"
+                status={robotStatus}
+                onStatusUpdate={updateRobotStatus}
+                visibleGroups={["robotRating"]}
+              />
+
+              <div className="space-y-2">
+                <Label htmlFor="rating-comment">Personal opinion comment (optional)</Label>
+                <Textarea
+                  id="rating-comment"
+                  placeholder="Share your personal reliability/performance impression"
+                  value={(robotStatus?.ratingComment as string) || ""}
+                  onChange={(event) => updateRobotStatusText("ratingComment", event.target.value)}
+                  className="min-h-20"
+                />
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Existing Endgame Tags */}
+        {workflowConfig.pages.showEndgameStatus && (
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle className="text-lg">Additional Endgame Tags</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <StatusToggles
+                phase="endgame"
+                status={robotStatus}
+                onStatusUpdate={updateRobotStatus}
+                visibleGroups={[
+                  "passingZone",
+                  "teleopTraversal",
+                  "accuracy",
+                  // "Corral",
+                ]}
               />
             </CardContent>
           </Card>

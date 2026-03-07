@@ -115,6 +115,30 @@ export interface TeamStatsTemplate extends TeamStats {
     passedToAllianceFromOpponentRate: number;
     passedToNeutralRate: number;
 
+    // Robot hardware and reliability profile rates (0-100%)
+    hardwareDefenseBotRate: number;
+    hardwareOnlyDriveBaseRate: number;
+    hardwareShooterMalfunctionRate: number;
+    hardwareHopperMalfunctionRate: number;
+    hardwareIntakeMalfunctionRate: number;
+    hardwareLongAlignTimeRate: number;
+    hardwareNeedsCloseRangeShotsRate: number;
+    hardwareBigHopperRate: number;
+    shootingStyleStaticStillRate: number;
+    shootingStyleDynamicStillRate: number;
+    shootingStyleDynamicTraversalRate: number;
+    statusRobotNotShownRate: number;
+    statusAutoStoppedSuddenlyRate: number;
+    statusDisabledVoltageBurnoutRate: number;
+    statusBrokeOnFieldRate: number;
+    statusHighMobilityRate: number;
+    statusStuckOnTrenchSignificantRate: number;
+    statusStuckOnBumpSignificantRate: number;
+    statusStuckOnGamePieceCongestionSignificantRate: number;
+    ratingBadRate: number;
+    ratingMediocreRate: number;
+    ratingExcellentStableRate: number;
+
     // Start position percentages
     startPositions: Record<string, number>;
 
@@ -243,6 +267,28 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                 passedToAllianceFromNeutralRate: 0,
                 passedToAllianceFromOpponentRate: 0,
                 passedToNeutralRate: 0,
+                hardwareDefenseBotRate: 0,
+                hardwareOnlyDriveBaseRate: 0,
+                hardwareShooterMalfunctionRate: 0,
+                hardwareHopperMalfunctionRate: 0,
+                hardwareIntakeMalfunctionRate: 0,
+                hardwareLongAlignTimeRate: 0,
+                hardwareNeedsCloseRangeShotsRate: 0,
+                hardwareBigHopperRate: 0,
+                shootingStyleStaticStillRate: 0,
+                shootingStyleDynamicStillRate: 0,
+                shootingStyleDynamicTraversalRate: 0,
+                statusRobotNotShownRate: 0,
+                statusAutoStoppedSuddenlyRate: 0,
+                statusDisabledVoltageBurnoutRate: 0,
+                statusBrokeOnFieldRate: 0,
+                statusHighMobilityRate: 0,
+                statusStuckOnTrenchSignificantRate: 0,
+                statusStuckOnBumpSignificantRate: 0,
+                statusStuckOnGamePieceCongestionSignificantRate: 0,
+                ratingBadRate: 0,
+                ratingMediocreRate: 0,
+                ratingExcellentStableRate: 0,
                 startPositions: {},
                 matchResults: [],
                 primaryActiveRole: 'None',
@@ -319,6 +365,28 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             acc.accuracySome += gameData?.endgame?.accuracySome ? 1 : 0;
             acc.accuracyFew += gameData?.endgame?.accuracyFew ? 1 : 0;
             acc.accuracyLittle += gameData?.endgame?.accuracyLittle ? 1 : 0;
+            acc.hardwareDefenseBot += gameData?.endgame?.hardwareDefenseBot ? 1 : 0;
+            acc.hardwareOnlyDriveBase += gameData?.endgame?.hardwareOnlyDriveBase ? 1 : 0;
+            acc.hardwareShooterMalfunction += gameData?.endgame?.hardwareShooterMalfunction ? 1 : 0;
+            acc.hardwareHopperMalfunction += gameData?.endgame?.hardwareHopperMalfunction ? 1 : 0;
+            acc.hardwareIntakeMalfunction += gameData?.endgame?.hardwareIntakeMalfunction ? 1 : 0;
+            acc.hardwareLongAlignTime += gameData?.endgame?.hardwareLongAlignTime ? 1 : 0;
+            acc.hardwareNeedsCloseRangeShots += gameData?.endgame?.hardwareNeedsCloseRangeShots ? 1 : 0;
+            acc.hardwareBigHopper += gameData?.endgame?.hardwareBigHopper ? 1 : 0;
+            acc.shootingStyleStaticStill += gameData?.endgame?.shootingStyleStaticStill ? 1 : 0;
+            acc.shootingStyleDynamicStill += gameData?.endgame?.shootingStyleDynamicStill ? 1 : 0;
+            acc.shootingStyleDynamicTraversal += gameData?.endgame?.shootingStyleDynamicTraversal ? 1 : 0;
+            acc.statusRobotNotShown += gameData?.endgame?.statusRobotNotShown ? 1 : 0;
+            acc.statusAutoStoppedSuddenly += gameData?.endgame?.statusAutoStoppedSuddenly ? 1 : 0;
+            acc.statusDisabledVoltageBurnout += gameData?.endgame?.statusDisabledVoltageBurnout ? 1 : 0;
+            acc.statusBrokeOnField += gameData?.endgame?.statusBrokeOnField ? 1 : 0;
+            acc.statusHighMobility += gameData?.endgame?.statusHighMobility ? 1 : 0;
+            acc.statusStuckOnTrenchSignificant += gameData?.endgame?.statusStuckOnTrenchSignificant ? 1 : 0;
+            acc.statusStuckOnBumpSignificant += gameData?.endgame?.statusStuckOnBumpSignificant ? 1 : 0;
+            acc.statusStuckOnGamePieceCongestionSignificant += gameData?.endgame?.statusStuckOnGamePieceCongestionSignificant ? 1 : 0;
+            acc.ratingBad += gameData?.endgame?.ratingBad ? 1 : 0;
+            acc.ratingMediocre += gameData?.endgame?.ratingMediocre ? 1 : 0;
+            acc.ratingExcellentStable += gameData?.endgame?.ratingExcellentStable ? 1 : 0;
 
             // Active shift roles (stored in endgame section)
             acc.roleActiveCleanUp += gameData?.endgame?.roleActiveCleanUp ? 1 : 0;
@@ -378,6 +446,28 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             accuracySome: 0,
             accuracyFew: 0,
             accuracyLittle: 0,
+            hardwareDefenseBot: 0,
+            hardwareOnlyDriveBase: 0,
+            hardwareShooterMalfunction: 0,
+            hardwareHopperMalfunction: 0,
+            hardwareIntakeMalfunction: 0,
+            hardwareLongAlignTime: 0,
+            hardwareNeedsCloseRangeShots: 0,
+            hardwareBigHopper: 0,
+            shootingStyleStaticStill: 0,
+            shootingStyleDynamicStill: 0,
+            shootingStyleDynamicTraversal: 0,
+            statusRobotNotShown: 0,
+            statusAutoStoppedSuddenly: 0,
+            statusDisabledVoltageBurnout: 0,
+            statusBrokeOnField: 0,
+            statusHighMobility: 0,
+            statusStuckOnTrenchSignificant: 0,
+            statusStuckOnBumpSignificant: 0,
+            statusStuckOnGamePieceCongestionSignificant: 0,
+            ratingBad: 0,
+            ratingMediocre: 0,
+            ratingExcellentStable: 0,
             startPositionCounts: {} as Record<number, number>,
             roleActiveCleanUp: 0,
             roleActivePasser: 0,
@@ -594,9 +684,11 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             { name: 'Thief', count: totals.roleInactiveThief },
             { name: 'Defense', count: totals.roleInactiveDefense },
         ];
-        const maxInactiveCount = Math.max(...inactiveRoles.map(r => r.count));
-        const topInactiveRoles = inactiveRoles.filter(r => r.count === maxInactiveCount && r.count > 0);
-        const primaryInactiveRole = topInactiveRoles.length > 0 ? topInactiveRoles.map(r => r.name).join(' / ') : 'None';
+        const maxInactiveCount = Math.max(...inactiveRoles.map((role) => role.count));
+        const topInactiveRoles = inactiveRoles.filter((role) => role.count === maxInactiveCount && role.count > 0);
+        const primaryInactiveRole = topInactiveRoles.length > 0
+            ? topInactiveRoles.map((role) => role.name).join(' / ')
+            : 'None';
 
         return {
             // Base TeamStats required fields
@@ -618,7 +710,7 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                 avgGamePiece1: Math.round((totals.autoFuel / matchCount) * 10) / 10,
                 avgGamePiece2: 0,
                 mobilityRate: Math.round((totals.mobility / matchCount) * 100),
-                startPositions: Object.entries(startPositions).map(([key, value]) => ({ position: key, percentage: value })),
+                // startPositions: Object.entries(startPositions).map(([key, value]) => ({ position: key, percentage: value })),
             },
             teleop: {
                 avgPoints: Math.round(avgTeleopPoints * 10) / 10,
@@ -640,9 +732,9 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             avgEndgamePoints: Math.round(avgEndgamePoints * 10) / 10,
             avgAutoFuel: Math.round((totals.autoFuel / matchCount) * 10) / 10,
             avgTeleopFuel: Math.round((totals.teleopFuel / matchCount) * 10) / 10,
-            avgAutoFuelPassed: Math.round((totals.autoFuelPassed / matchCount) * 10) / 10,
-            avgTeleopFuelPassed: Math.round((totals.teleopFuelPassed / matchCount) * 10) / 10,
-            avgFuelPassed: Math.round((totals.fuelPassed / matchCount) * 10) / 10,
+            // avgAutoFuelPassed: Math.round((totals.autoFuelPassed / matchCount) * 10) / 10,
+            // avgTeleopFuelPassed: Math.round((totals.teleopFuelPassed / matchCount) * 10) / 10,
+            // avgFuelPassed: Math.round((totals.fuelPassed / matchCount) * 10) / 10,
             avgTotalFuel: Math.round(((totals.autoFuel + totals.teleopFuel) / matchCount) * 10) / 10,
             avgScaledAutoFuel: Math.round((totals.scaledAutoFuel / matchCount) * 10) / 10,
             avgScaledTeleopFuel: Math.round((totals.scaledTeleopFuel / matchCount) * 10) / 10,
@@ -654,9 +746,9 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             avgTeleopClimbStartTimeSec: Math.round(avgTeleopClimbStartTimeSec * 10) / 10,
             maxAutoFuel: Math.max(...matchResults.map(m => m.autoFuel || 0)),
             maxTeleopFuel: Math.max(...matchResults.map(m => m.teleopFuel || 0)),
-            maxAutoFuelPassed: Math.max(...matchResults.map(m => m.autoFuelPassed || 0)),
-            maxTeleopFuelPassed: Math.max(...matchResults.map(m => m.teleopFuelPassed || 0)),
-            maxFuelPassed: Math.max(...matchResults.map(m => (m.autoFuelPassed || 0) + (m.teleopFuelPassed || 0))),
+            // maxAutoFuelPassed: Math.max(...matchResults.map(m => m.autoFuelPassed || 0)),
+            // maxTeleopFuelPassed: Math.max(...matchResults.map(m => m.teleopFuelPassed || 0)),
+            // maxFuelPassed: Math.max(...matchResults.map(m => (m.autoFuelPassed || 0) + (m.teleopFuelPassed || 0))),
             maxTotalFuel: Math.max(...matchResults.map(m => (m.autoFuel || 0) + (m.teleopFuel || 0))),
             mobilityRate: Math.round((totals.mobility / matchCount) * 100),
             autoClimbRate: autoClimbAttemptCount > 0
@@ -703,10 +795,10 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             defenseNotEffectiveRate: totalDefenseEvents > 0
                 ? Math.round((notEffectiveCount / totalDefenseEvents) * 100)
                 : 0,
-            defenseEffectivenessScore,
-            mostDefendedTeam,
-            mostEffectiveDefenseTarget,
-            defenseByTarget,
+            // defenseEffectivenessScore,
+            // mostDefendedTeam,
+            // mostEffectiveDefenseTarget,
+            // defenseByTarget,
             autoShotOnTheMoveRate: autoShotTypeTotal > 0 ? Math.round((totals.autoShotOnTheMove / autoShotTypeTotal) * 100) : 0,
             autoShotStationaryRate: autoShotTypeTotal > 0 ? Math.round((totals.autoShotStationary / autoShotTypeTotal) * 100) : 0,
             teleopShotOnTheMoveRate: teleopShotTypeTotal > 0 ? Math.round((totals.teleopShotOnTheMove / teleopShotTypeTotal) * 100) : 0,
@@ -720,6 +812,28 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             passedToAllianceFromNeutralRate: Math.round((totals.passedToAllianceFromNeutral / matchCount) * 100),
             passedToAllianceFromOpponentRate: Math.round((totals.passedToAllianceFromOpponent / matchCount) * 100),
             passedToNeutralRate: Math.round((totals.passedToNeutral / matchCount) * 100),
+            hardwareDefenseBotRate: Math.round((totals.hardwareDefenseBot / matchCount) * 100),
+            hardwareOnlyDriveBaseRate: Math.round((totals.hardwareOnlyDriveBase / matchCount) * 100),
+            hardwareShooterMalfunctionRate: Math.round((totals.hardwareShooterMalfunction / matchCount) * 100),
+            hardwareHopperMalfunctionRate: Math.round((totals.hardwareHopperMalfunction / matchCount) * 100),
+            hardwareIntakeMalfunctionRate: Math.round((totals.hardwareIntakeMalfunction / matchCount) * 100),
+            hardwareLongAlignTimeRate: Math.round((totals.hardwareLongAlignTime / matchCount) * 100),
+            hardwareNeedsCloseRangeShotsRate: Math.round((totals.hardwareNeedsCloseRangeShots / matchCount) * 100),
+            hardwareBigHopperRate: Math.round((totals.hardwareBigHopper / matchCount) * 100),
+            shootingStyleStaticStillRate: Math.round((totals.shootingStyleStaticStill / matchCount) * 100),
+            shootingStyleDynamicStillRate: Math.round((totals.shootingStyleDynamicStill / matchCount) * 100),
+            shootingStyleDynamicTraversalRate: Math.round((totals.shootingStyleDynamicTraversal / matchCount) * 100),
+            statusRobotNotShownRate: Math.round((totals.statusRobotNotShown / matchCount) * 100),
+            statusAutoStoppedSuddenlyRate: Math.round((totals.statusAutoStoppedSuddenly / matchCount) * 100),
+            statusDisabledVoltageBurnoutRate: Math.round((totals.statusDisabledVoltageBurnout / matchCount) * 100),
+            statusBrokeOnFieldRate: Math.round((totals.statusBrokeOnField / matchCount) * 100),
+            statusHighMobilityRate: Math.round((totals.statusHighMobility / matchCount) * 100),
+            statusStuckOnTrenchSignificantRate: Math.round((totals.statusStuckOnTrenchSignificant / matchCount) * 100),
+            statusStuckOnBumpSignificantRate: Math.round((totals.statusStuckOnBumpSignificant / matchCount) * 100),
+            statusStuckOnGamePieceCongestionSignificantRate: Math.round((totals.statusStuckOnGamePieceCongestionSignificant / matchCount) * 100),
+            ratingBadRate: Math.round((totals.ratingBad / matchCount) * 100),
+            ratingMediocreRate: Math.round((totals.ratingMediocre / matchCount) * 100),
+            ratingExcellentStableRate: Math.round((totals.ratingExcellentStable / matchCount) * 100),
             accuracyAllRate: Math.round((totals.accuracyAll / matchCount) * 100),
             accuracyMostRate: Math.round((totals.accuracyMost / matchCount) * 100),
             accuracySomeRate: Math.round((totals.accuracySome / matchCount) * 100),
@@ -807,6 +921,18 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                     { key: 'mostEffectiveDefenseTarget', label: 'Most Effective Target', type: 'text', color: 'purple' },
                 ],
             },
+            {
+                id: 'robot-rating-profile',
+                title: 'Robot Rating Profile',
+                tab: 'overview',
+                columns: 2,
+                stats: [
+                    { key: 'ratingExcellentStableRate', label: 'Excellent! (Stable Robot)', type: 'percentage', color: 'green' },
+                    { key: 'ratingMediocreRate', label: 'Mediocre', type: 'percentage', color: 'orange' },
+                    { key: 'ratingBadRate', label: 'Bad', type: 'percentage', color: 'red' },
+                    { key: 'statusHighMobilityRate', label: 'High Mobility', type: 'percentage', color: 'blue' },
+                ],
+            },
 
             // Scoring tab - fuel breakdown
             {
@@ -879,6 +1005,48 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                     { key: 'avgTeleopClimbStartTimeSec', label: 'Avg Start Time', type: 'number', color: 'orange', subtitle: 'seconds remaining' },
                 ],
             },
+            {
+                id: 'robot-hardware-disadvantages',
+                title: 'Robot Hardware Disadvantages',
+                tab: 'performance',
+                columns: 2,
+                stats: [
+                    { key: 'hardwareDefenseBotRate', label: 'Defense Bot', type: 'percentage', color: 'slate' },
+                    { key: 'hardwareOnlyDriveBaseRate', label: 'Only Drive Base', type: 'percentage', color: 'slate' },
+                    { key: 'hardwareShooterMalfunctionRate', label: 'Shooter Malfunction', type: 'percentage', color: 'red' },
+                    { key: 'hardwareHopperMalfunctionRate', label: 'Hopper Malfunction', type: 'percentage', color: 'red' },
+                    { key: 'hardwareIntakeMalfunctionRate', label: 'Intake Malfunction', type: 'percentage', color: 'red' },
+                    { key: 'hardwareLongAlignTimeRate', label: 'Takes Long Time To Align', type: 'percentage', color: 'orange' },
+                    { key: 'hardwareNeedsCloseRangeShotsRate', label: 'Needs To Shoot Up Close', type: 'percentage', color: 'orange' },
+                ],
+            },
+            {
+                id: 'robot-hardware-advantages-style',
+                title: 'Robot Advantage and Shooting Style',
+                tab: 'performance',
+                columns: 2,
+                stats: [
+                    { key: 'hardwareBigHopperRate', label: 'Big Hopper', type: 'percentage', color: 'green' },
+                    { key: 'shootingStyleStaticStillRate', label: 'Style: Static and Still', type: 'percentage', color: 'blue' },
+                    { key: 'shootingStyleDynamicStillRate', label: 'Style: Dynamic and Still', type: 'percentage', color: 'purple' },
+                    { key: 'shootingStyleDynamicTraversalRate', label: 'Style: Dynamic and Traversals', type: 'percentage', color: 'green' },
+                ],
+            },
+            {
+                id: 'robot-status-signals',
+                title: 'Robot Status Signals',
+                tab: 'performance',
+                columns: 2,
+                stats: [
+                    { key: 'statusRobotNotShownRate', label: 'Robot Not Shown', type: 'percentage', color: 'red' },
+                    { key: 'statusAutoStoppedSuddenlyRate', label: 'A-Stopped / Sudden Stop in Auto', type: 'percentage', color: 'red' },
+                    { key: 'statusDisabledVoltageBurnoutRate', label: 'Disabled / E-Stopped / Voltage Burnout', type: 'percentage', color: 'red' },
+                    { key: 'statusBrokeOnFieldRate', label: 'Broke On Field', type: 'percentage', color: 'red' },
+                    { key: 'statusStuckOnTrenchSignificantRate', label: 'Stuck On Trench (Significant)', type: 'percentage', color: 'orange' },
+                    { key: 'statusStuckOnBumpSignificantRate', label: 'Stuck On Bump (Significant)', type: 'percentage', color: 'orange' },
+                    { key: 'statusStuckOnGamePieceCongestionSignificantRate', label: 'Stuck On Game Piece/Field Congestion', type: 'percentage', color: 'orange' },
+                ],
+            },
         ];
     },
 
@@ -904,6 +1072,16 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                     { key: 'climbL1Rate', label: 'Level 1 (10 pts)' },
                     { key: 'climbL2Rate', label: 'Level 2 (20 pts)' },
                     { key: 'climbL3Rate', label: 'Level 3 (30 pts)' },
+                ],
+            },
+            {
+                id: 'robot-rating-rates',
+                title: 'Robot Rating',
+                tab: 'performance',
+                rates: [
+                    { key: 'ratingExcellentStableRate', label: 'Excellent! (Stable Robot)' },
+                    { key: 'ratingMediocreRate', label: 'Mediocre' },
+                    { key: 'ratingBadRate', label: 'Bad' },
                 ],
             },
             {
@@ -948,6 +1126,25 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                     { key: 'passedToAllianceFromNeutralRate', label: 'Passed to Alliance Zone from Neutral Zone' },
                     { key: 'passedToAllianceFromOpponentRate', label: 'Passed to Alliance Zone from Opponent Zone' },
                     { key: 'passedToNeutralRate', label: 'Passed to Neutral Zone from Opponent Zone' },
+                    { key: 'hardwareDefenseBotRate', label: 'Defense Bot' },
+                    { key: 'hardwareOnlyDriveBaseRate', label: 'Only Drive Base' },
+                    { key: 'hardwareShooterMalfunctionRate', label: 'Shooter Malfunction' },
+                    { key: 'hardwareHopperMalfunctionRate', label: 'Hopper Malfunction' },
+                    { key: 'hardwareIntakeMalfunctionRate', label: 'Intake Malfunction' },
+                    { key: 'hardwareLongAlignTimeRate', label: 'Takes Long Time To Align' },
+                    { key: 'hardwareNeedsCloseRangeShotsRate', label: 'Needs To Shoot Up Close' },
+                    { key: 'hardwareBigHopperRate', label: 'Big Hopper' },
+                    { key: 'shootingStyleStaticStillRate', label: 'Shooting Style: Static and Still' },
+                    { key: 'shootingStyleDynamicStillRate', label: 'Shooting Style: Dynamic and Still' },
+                    { key: 'shootingStyleDynamicTraversalRate', label: 'Shooting Style: Dynamic and Traversals' },
+                    { key: 'statusRobotNotShownRate', label: 'Robot Not Shown' },
+                    { key: 'statusAutoStoppedSuddenlyRate', label: 'A-Stopped / Sudden Stop in Auto' },
+                    { key: 'statusDisabledVoltageBurnoutRate', label: 'Disabled / E-Stopped / Voltage Burnout' },
+                    { key: 'statusBrokeOnFieldRate', label: 'Broke On Field' },
+                    { key: 'statusHighMobilityRate', label: 'High Mobility' },
+                    { key: 'statusStuckOnTrenchSignificantRate', label: 'Stuck On Trench (Significant)' },
+                    { key: 'statusStuckOnBumpSignificantRate', label: 'Stuck On Bump (Significant)' },
+                    { key: 'statusStuckOnGamePieceCongestionSignificantRate', label: 'Stuck On Game Piece/Field Congestion' },
                 ],
             },
         ];

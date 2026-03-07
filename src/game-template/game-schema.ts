@@ -209,6 +209,126 @@ export const toggles = {
         // Teleop toggles (currently empty - all tracking is path-based)
     },
     endgame: {
+        // Robot hardware disadvantages
+        hardwareDefenseBot: {
+            label: "Defense Bot",
+            description: "Primarily functions as a defense-focused robot",
+            group: "hardwareDisadvantage",
+        },
+        hardwareOnlyDriveBase: {
+            label: "Only Drive Base",
+            description: "Robot currently has only a drive base configuration",
+            group: "hardwareDisadvantage",
+        },
+        hardwareShooterMalfunction: {
+            label: "Shooter Malfunction",
+            description: "Shooter had functional issues",
+            group: "hardwareDisadvantage",
+        },
+        hardwareHopperMalfunction: {
+            label: "Hopper Malfunction",
+            description: "Hopper had functional issues",
+            group: "hardwareDisadvantage",
+        },
+        hardwareIntakeMalfunction: {
+            label: "Intake Malfunction",
+            description: "Intake had functional issues",
+            group: "hardwareDisadvantage",
+        },
+        hardwareLongAlignTime: {
+            label: "Takes Long Time To Align",
+            description: "Requires noticeable time to line up shots",
+            group: "hardwareDisadvantage",
+        },
+        hardwareNeedsCloseRangeShots: {
+            label: "Needs To Shoot Up Close",
+            description: "Performs best when shooting from close range",
+            group: "hardwareDisadvantage",
+        },
+
+        // Robot hardware advantages
+        hardwareBigHopper: {
+            label: "Big Hopper",
+            description: "Can hold a larger amount of fuel",
+            group: "hardwareAdvantage",
+        },
+
+        // Style of shooting (mutually exclusive, group: "shootingStyle")
+        shootingStyleStaticStill: {
+            label: "Static and Still",
+            description: "Shoots mostly from fixed/stationary setup",
+            group: "shootingStyle",
+        },
+        shootingStyleDynamicStill: {
+            label: "Dynamic and Still",
+            description: "Can relocate quickly but shoots from set positions",
+            group: "shootingStyle",
+        },
+        shootingStyleDynamicTraversal: {
+            label: "Dynamic and Traversals",
+            description: "Shoots dynamically while moving and traversing routes",
+            group: "shootingStyle",
+        },
+
+        // Robot status observations
+        statusRobotNotShown: {
+            label: "Robot Not Shown",
+            description: "Robot did not meaningfully appear or participate",
+            group: "robotStatus",
+        },
+        statusAutoStoppedSuddenly: {
+            label: "A-Stopped / Stopped Suddenly in Auto",
+            description: "Robot halted unexpectedly during autonomous",
+            group: "robotStatus",
+        },
+        statusDisabledVoltageBurnout: {
+            label: "Disabled / E-Stopped / Voltage Burnout",
+            description: "Robot was disabled or electrically compromised",
+            group: "robotStatus",
+        },
+        statusBrokeOnField: {
+            label: "Broke On Field",
+            description: "Robot experienced a breakage during match play",
+            group: "robotStatus",
+        },
+        statusHighMobility: {
+            label: "High Mobility",
+            description: "Robot moved effectively and consistently around the field",
+            group: "robotStatus",
+        },
+        statusStuckOnTrenchSignificant: {
+            label: "Stuck On Trench Caused Significant Issues",
+            description: "Trench interaction substantially disrupted performance",
+            group: "robotStatus",
+        },
+        statusStuckOnBumpSignificant: {
+            label: "Stuck On Bump Caused Significant Issues",
+            description: "Bump interaction substantially disrupted performance",
+            group: "robotStatus",
+        },
+        statusStuckOnGamePieceCongestionSignificant: {
+            label: "Stuck On Game Piece/Field Congestion Caused Significant Issues",
+            description: "Congestion with game pieces or traffic caused major delays",
+            group: "robotStatus",
+        },
+
+        // Robot rating (mutually exclusive, group: "robotRating")
+        ratingBad: {
+            label: "Bad",
+            description: "Below expected reliability/performance",
+            group: "robotRating",
+        },
+        ratingMediocre: {
+            label: "Mediocre",
+            description: "Mixed reliability/performance",
+            group: "robotRating",
+        },
+        ratingExcellentStable: {
+            label: "Excellent! (Stable Robot)",
+            description: "Consistently stable and high-performing",
+            group: "robotRating",
+        },
+
         // Active Phase Role toggles (multi-select, group: "roleActive")
         // roleActiveCleanUp: {
         //     label: "Clean Up",

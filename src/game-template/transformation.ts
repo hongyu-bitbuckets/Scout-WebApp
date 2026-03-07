@@ -22,6 +22,17 @@ function toNonNegativeInt(value: unknown): number | null {
   return Math.max(0, Math.floor(value));
 }
 
+function toOptionalString(value: unknown): string {
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+function enforceSingleSelection(target: Record<string, any>, keys: string[]): void {
+  const selectedKey = keys.find((key) => target[key] === true);
+  keys.forEach((key) => {
+    target[key] = key === selectedKey;
+  });
+}
+
 /**
  * Generate default values for action counters
  * Only includes actions that are actually used in each phase
@@ -117,6 +128,10 @@ export const gameDataTransformation: DataTransformation = {
       },
       endgame: {
         ...generateToggleDefaults('endgame'),
+        shooterMalfunctionComment: '',
+        hopperMalfunctionComment: '',
+        intakeMalfunctionComment: '',
+        ratingComment: '',
       },
     };
 
@@ -362,6 +377,22 @@ export const gameDataTransformation: DataTransformation = {
     if (teleopManualFuel !== null) result.teleop.fuelScoredCount = teleopManualFuel;
     if (autoCycles !== null) result.auto.cycleCount = autoCycles;
     if (teleopCycles !== null) result.teleop.cycleCount = teleopCycles;
+
+    // Normalize endgame single-select groups and optional text notes.
+    enforceSingleSelection(result.endgame, [
+      'shootingStyleStaticStill',
+      'shootingStyleDynamicStill',
+      'shootingStyleDynamicTraversal',
+    ]);
+    enforceSingleSelection(result.endgame, [
+      'ratingBad',
+      'ratingMediocre',
+      'ratingExcellentStable',
+    ]);
+    result.endgame.shooterMalfunctionComment = toOptionalString(result.endgame.shooterMalfunctionComment);
+    result.endgame.hopperMalfunctionComment = toOptionalString(result.endgame.hopperMalfunctionComment);
+    result.endgame.intakeMalfunctionComment = toOptionalString(result.endgame.intakeMalfunctionComment);
+    result.endgame.ratingComment = toOptionalString(result.endgame.ratingComment);
 
     // Copy any additional fields
     const additionalFields = { ...matchData };

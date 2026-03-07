@@ -408,6 +408,7 @@ export interface UIComponents<T extends ScoutingEntryBase> {
     phase: 'auto' | 'teleop' | 'endgame';
     status: any;
     onStatusUpdate: (updates: any) => void;
+    visibleGroups?: string[];
   }>;
   PitScoutingQuestions?: React.ComponentType<PitScoutingQuestionsProps>; // OPTIONAL - game-specific pit scouting questions
   ScoutOptionsContent?: React.ComponentType<ScoutOptionsContentProps>; // OPTIONAL - game-specific scouting options shown on Game Start

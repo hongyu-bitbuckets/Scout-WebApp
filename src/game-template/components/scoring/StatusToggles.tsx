@@ -12,12 +12,14 @@ interface StatusTogglesProps {
   phase: 'auto' | 'teleop' | 'endgame';
   status: any;
   onStatusUpdate: (updates: Partial<any>) => void;
+  visibleGroups?: string[];
 }
 
 export function StatusToggles({
   phase,
   status,
   onStatusUpdate,
+  visibleGroups,
 }: StatusTogglesProps) {
   const phaseToggles = toggles[phase];
   if (!phaseToggles) return null;
@@ -31,6 +33,10 @@ export function StatusToggles({
     if ((config as any).excludeFromUI) return;
     
     const group = (config as any).group || 'default';
+    if (Array.isArray(visibleGroups) && visibleGroups.length > 0 && !visibleGroups.includes(group)) {
+      return;
+    }
+
     if (!grouped.has(group)) {
       grouped.set(group, []);
     }
@@ -43,6 +49,11 @@ export function StatusToggles({
     status: 'Status',
     roleActive: 'Active Phase Role(s)',
     roleInactive: 'Inactive Phase Role(s)',
+    hardwareDisadvantage: 'Disadvantage',
+    hardwareAdvantage: 'Advantage',
+    shootingStyle: 'Style of Shooting',
+    robotStatus: 'Robot Status',
+    robotRating: 'Rate the Robot',
     passingZone: 'Passing Zones',
     teleopTraversal: 'Teleop Traversal',
     accuracy: 'Shooting Accuracy',
@@ -54,7 +65,7 @@ export function StatusToggles({
       {Array.from(grouped.entries()).map(([groupName, items]) => {
         // Check if this is a mutually exclusive group (climb, accuracy)
         // roleActive and roleInactive are multi-select, not mutually exclusive
-        const isMutuallyExclusive = ['climb', 'accuracy'].includes(groupName);
+        const isMutuallyExclusive = ['climb', 'accuracy', 'shootingStyle', 'robotRating'].includes(groupName);
         
         return (
           <div key={groupName}>
