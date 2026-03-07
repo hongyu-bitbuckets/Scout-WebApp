@@ -280,19 +280,16 @@ function createEmptyTeamStats(teamNumber: number, eventKey: string): TeamStats {
             avgTotalPoints: 0,
             totalPiecesScored: 0,
             avgGamePiece1: 0,
-            avgGamePiece2: 0,
         },
         auto: {
             avgPoints: 0,
             avgGamePiece1: 0,
-            avgGamePiece2: 0,
             mobilityRate: 0,
-            startPositions: [],
+            // startPositions: [],
         },
         teleop: {
             avgPoints: 0,
             avgGamePiece1: 0,
-            avgGamePiece2: 0,
         },
         endgame: {
             avgPoints: 0,

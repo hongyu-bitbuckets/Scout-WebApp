@@ -199,9 +199,9 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                 autoPoints: 0,
                 teleopPoints: 0,
                 endgamePoints: 0,
-                overall: { avgTotalPoints: 0, totalPiecesScored: 0, avgGamePiece1: 0, avgGamePiece2: 0 },
-                auto: { avgPoints: 0, avgGamePiece1: 0, avgGamePiece2: 0, mobilityRate: 0, startPositions: [] },
-                teleop: { avgPoints: 0, avgGamePiece1: 0, avgGamePiece2: 0 },
+                overall: { avgTotalPoints: 0, totalPiecesScored: 0, avgGamePiece1: 0 },
+                auto: { avgPoints: 0, avgGamePiece1: 0, mobilityRate: 0 },
+                teleop: { avgPoints: 0, avgGamePiece1: 0 },
                 endgame: { avgPoints: 0, climbRate: 0, parkRate: 0 },
                 // Template-specific fields
                 matchesPlayed: 0,
@@ -591,104 +591,104 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             ? Math.round((weightedAccuracyTotal / (accuracySelectionCount * 5)) * 100)
             : 0;
 
-        const defenseByTargetAccumulator: Record<string, { attempts: number; very: number; somewhat: number; not: number; }> = {};
-        let totalDefenseEvents = 0;
-        let veryEffectiveCount = 0;
-        let somewhatEffectiveCount = 0;
-        let notEffectiveCount = 0;
+        // const defenseByTargetAccumulator: Record<string, { attempts: number; very: number; somewhat: number; not: number; }> = {};
+        // let totalDefenseEvents = 0;
+        // let veryEffectiveCount = 0;
+        // let somewhatEffectiveCount = 0;
+        // let notEffectiveCount = 0;
 
-        entries.forEach((entry) => {
-            const teleopPath = entry.gameData?.teleop?.teleopPath;
-            if (!Array.isArray(teleopPath)) return;
+        // entries.forEach((entry) => {
+        //     const teleopPath = entry.gameData?.teleop?.teleopPath;
+        //     if (!Array.isArray(teleopPath)) return;
 
-            teleopPath.forEach((waypoint) => {
-                if (!waypoint || typeof waypoint !== 'object') return;
-                const record = waypoint as Record<string, unknown>;
-                if (record.type !== 'defense') return;
+        //     teleopPath.forEach((waypoint) => {
+        //         if (!waypoint || typeof waypoint !== 'object') return;
+        //         const record = waypoint as Record<string, unknown>;
+        //         if (record.type !== 'defense') return;
 
-                totalDefenseEvents += 1;
-                const defendedTeamNumber = Number(record.defendedTeamNumber);
-                const targetKey = Number.isFinite(defendedTeamNumber) && defendedTeamNumber > 0
-                    ? String(defendedTeamNumber)
-                    : 'Unknown';
+        //         totalDefenseEvents += 1;
+        //         const defendedTeamNumber = Number(record.defendedTeamNumber);
+        //         const targetKey = Number.isFinite(defendedTeamNumber) && defendedTeamNumber > 0
+        //             ? String(defendedTeamNumber)
+        //             : 'Unknown';
 
-                if (!defenseByTargetAccumulator[targetKey]) {
-                    defenseByTargetAccumulator[targetKey] = { attempts: 0, very: 0, somewhat: 0, not: 0 };
-                }
+        //         if (!defenseByTargetAccumulator[targetKey]) {
+        //             defenseByTargetAccumulator[targetKey] = { attempts: 0, very: 0, somewhat: 0, not: 0 };
+        //         }
 
-                const targetSummary = defenseByTargetAccumulator[targetKey]!;
-                targetSummary.attempts += 1;
+        //         const targetSummary = defenseByTargetAccumulator[targetKey]!;
+        //         targetSummary.attempts += 1;
 
-                const effectiveness = record.defenseEffectiveness;
-                if (effectiveness === 'very') {
-                    veryEffectiveCount += 1;
-                    targetSummary.very += 1;
-                } else if (effectiveness === 'somewhat') {
-                    somewhatEffectiveCount += 1;
-                    targetSummary.somewhat += 1;
-                } else if (effectiveness === 'not') {
-                    notEffectiveCount += 1;
-                    targetSummary.not += 1;
-                }
-            });
-        });
+        //         const effectiveness = record.defenseEffectiveness;
+        //         if (effectiveness === 'very') {
+        //             veryEffectiveCount += 1;
+        //             targetSummary.very += 1;
+        //         } else if (effectiveness === 'somewhat') {
+        //             somewhatEffectiveCount += 1;
+        //             targetSummary.somewhat += 1;
+        //         } else if (effectiveness === 'not') {
+        //             notEffectiveCount += 1;
+        //             targetSummary.not += 1;
+        //         }
+        //     });
+        // });
 
-        const defenseByTarget: TeamStatsTemplate['defenseByTarget'] = Object.fromEntries(
-            Object.entries(defenseByTargetAccumulator).map(([team, stats]) => {
-                const weighted = (stats.very * 2) + stats.somewhat;
-                const effectivenessScore = stats.attempts > 0
-                    ? Math.round((weighted / (stats.attempts * 2)) * 100)
-                    : 0;
+        // const defenseByTarget: TeamStatsTemplate['defenseByTarget'] = Object.fromEntries(
+        //     Object.entries(defenseByTargetAccumulator).map(([team, stats]) => {
+        //         const weighted = (stats.very * 2) + stats.somewhat;
+        //         const effectivenessScore = stats.attempts > 0
+        //             ? Math.round((weighted / (stats.attempts * 2)) * 100)
+        //             : 0;
 
-                return [team, { ...stats, effectivenessScore }];
-            })
-        );
+        //         return [team, { ...stats, effectivenessScore }];
+        //     })
+        // );
 
-        const mostDefendedTeam = Object.entries(defenseByTarget)
-            .filter(([team]) => team !== 'Unknown')
-            .sort(([, a], [, b]) => b.attempts - a.attempts)[0]?.[0] || 'None';
+        // const mostDefendedTeam = Object.entries(defenseByTarget)
+        //     .filter(([team]) => team !== 'Unknown')
+        //     .sort(([, a], [, b]) => b.attempts - a.attempts)[0]?.[0] || 'None';
 
-        const mostEffectiveDefenseTargetEntry = Object.entries(defenseByTarget)
-            .filter(([team, stats]) => team !== 'Unknown' && stats.attempts > 0)
-            .sort(([, a], [, b]) => {
-                if (b.effectivenessScore !== a.effectivenessScore) {
-                    return b.effectivenessScore - a.effectivenessScore;
-                }
-                return b.attempts - a.attempts;
-            })[0];
+        // const mostEffectiveDefenseTargetEntry = Object.entries(defenseByTarget)
+        //     .filter(([team, stats]) => team !== 'Unknown' && stats.attempts > 0)
+        //     .sort(([, a], [, b]) => {
+        //         if (b.effectivenessScore !== a.effectivenessScore) {
+        //             return b.effectivenessScore - a.effectivenessScore;
+        //         }
+        //         return b.attempts - a.attempts;
+        //     })[0];
 
-        const mostEffectiveDefenseTarget = mostEffectiveDefenseTargetEntry
-            ? `${mostEffectiveDefenseTargetEntry[0]} (${mostEffectiveDefenseTargetEntry[1].effectivenessScore}%)`
-            : 'None';
+        // const mostEffectiveDefenseTarget = mostEffectiveDefenseTargetEntry
+        //     ? `${mostEffectiveDefenseTargetEntry[0]} (${mostEffectiveDefenseTargetEntry[1].effectivenessScore}%)`
+        //     : 'None';
 
-        const defenseEffectivenessScore = totalDefenseEvents > 0
-            ? Math.round((((veryEffectiveCount * 2) + somewhatEffectiveCount) / (totalDefenseEvents * 2)) * 100)
-            : 0;
+        // const defenseEffectivenessScore = totalDefenseEvents > 0
+        //     ? Math.round((((veryEffectiveCount * 2) + somewhatEffectiveCount) / (totalDefenseEvents * 2)) * 100)
+        //     : 0;
 
-        // Calculate primary roles (most frequently played, supporting ties)
-        const activeRoles = [
-            { name: 'Cycler', count: totals.roleActiveCycler },
-            { name: 'Clean Up', count: totals.roleActiveCleanUp },
-            { name: 'Passer', count: totals.roleActivePasser },
-            { name: 'Thief', count: totals.roleActiveThief },
-            { name: 'Defense', count: totals.roleActiveDefense },
-        ];
-        const maxActiveCount = Math.max(...activeRoles.map(r => r.count));
-        const topActiveRoles = activeRoles.filter(r => r.count === maxActiveCount && r.count > 0);
-        const primaryActiveRole = topActiveRoles.length > 0 ? topActiveRoles.map(r => r.name).join(' / ') : 'None';
+        // // Calculate primary roles (most frequently played, supporting ties)
+        // const activeRoles = [
+        //     { name: 'Cycler', count: totals.roleActiveCycler },
+        //     { name: 'Clean Up', count: totals.roleActiveCleanUp },
+        //     { name: 'Passer', count: totals.roleActivePasser },
+        //     { name: 'Thief', count: totals.roleActiveThief },
+        //     { name: 'Defense', count: totals.roleActiveDefense },
+        // ];
+        // const maxActiveCount = Math.max(...activeRoles.map(r => r.count));
+        // const topActiveRoles = activeRoles.filter(r => r.count === maxActiveCount && r.count > 0);
+        // const primaryActiveRole = topActiveRoles.length > 0 ? topActiveRoles.map(r => r.name).join(' / ') : 'None';
 
-        const inactiveRoles = [
-            { name: 'Cycler', count: totals.roleInactiveCycler },
-            { name: 'Clean Up', count: totals.roleInactiveCleanUp },
-            { name: 'Passer', count: totals.roleInactivePasser },
-            { name: 'Thief', count: totals.roleInactiveThief },
-            { name: 'Defense', count: totals.roleInactiveDefense },
-        ];
-        const maxInactiveCount = Math.max(...inactiveRoles.map((role) => role.count));
-        const topInactiveRoles = inactiveRoles.filter((role) => role.count === maxInactiveCount && role.count > 0);
-        const primaryInactiveRole = topInactiveRoles.length > 0
-            ? topInactiveRoles.map((role) => role.name).join(' / ')
-            : 'None';
+        // const inactiveRoles = [
+        //     { name: 'Cycler', count: totals.roleInactiveCycler },
+        //     { name: 'Clean Up', count: totals.roleInactiveCleanUp },
+        //     { name: 'Passer', count: totals.roleInactivePasser },
+        //     { name: 'Thief', count: totals.roleInactiveThief },
+        //     { name: 'Defense', count: totals.roleInactiveDefense },
+        // ];
+        // const maxInactiveCount = Math.max(...inactiveRoles.map((role) => role.count));
+        // const topInactiveRoles = inactiveRoles.filter((role) => role.count === maxInactiveCount && role.count > 0);
+        // const primaryInactiveRole = topInactiveRoles.length > 0
+        //     ? topInactiveRoles.map((role) => role.name).join(' / ')
+        //     : 'None';
 
         return {
             // Base TeamStats required fields
@@ -702,20 +702,17 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             overall: {
                 avgTotalPoints: Math.round((avgAutoPoints + avgTeleopPoints + avgEndgamePoints) * 10) / 10,
                 totalPiecesScored: Math.round((totals.autoFuel + totals.teleopFuel) / matchCount * 10) / 10,
-                avgGamePiece1: Math.round(((totals.autoFuel + totals.teleopFuel) / matchCount) * 10) / 10,
-                avgGamePiece2: Math.round((totals.fuelPassed / matchCount) * 10) / 10,
+                avgGamePiece1: Math.round((totals.teleopFuel / matchCount) * 10) / 10,
             },
             auto: {
                 avgPoints: Math.round(avgAutoPoints * 10) / 10,
-                avgGamePiece1: Math.round((totals.autoFuel / matchCount) * 10) / 10,
-                avgGamePiece2: 0,
+                avgGamePiece1: Math.round((totals.teleopFuel / matchCount) * 10) / 10,
                 mobilityRate: Math.round((totals.mobility / matchCount) * 100),
                 // startPositions: Object.entries(startPositions).map(([key, value]) => ({ position: key, percentage: value })),
             },
             teleop: {
                 avgPoints: Math.round(avgTeleopPoints * 10) / 10,
                 avgGamePiece1: Math.round((totals.teleopFuel / matchCount) * 10) / 10,
-                avgGamePiece2: Math.round((totals.fuelPassed / matchCount) * 10) / 10,
             },
             endgame: {
                 avgPoints: Math.round(avgEndgamePoints * 10) / 10,
@@ -732,9 +729,9 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             avgEndgamePoints: Math.round(avgEndgamePoints * 10) / 10,
             avgAutoFuel: Math.round((totals.autoFuel / matchCount) * 10) / 10,
             avgTeleopFuel: Math.round((totals.teleopFuel / matchCount) * 10) / 10,
-            // avgAutoFuelPassed: Math.round((totals.autoFuelPassed / matchCount) * 10) / 10,
-            // avgTeleopFuelPassed: Math.round((totals.teleopFuelPassed / matchCount) * 10) / 10,
-            // avgFuelPassed: Math.round((totals.fuelPassed / matchCount) * 10) / 10,
+            avgAutoFuelPassed: Math.round((totals.autoFuelPassed / matchCount) * 10) / 10,
+            avgTeleopFuelPassed: Math.round((totals.teleopFuelPassed / matchCount) * 10) / 10,
+            avgFuelPassed: Math.round((totals.fuelPassed / matchCount) * 10) / 10,
             avgTotalFuel: Math.round(((totals.autoFuel + totals.teleopFuel) / matchCount) * 10) / 10,
             avgScaledAutoFuel: Math.round((totals.scaledAutoFuel / matchCount) * 10) / 10,
             avgScaledTeleopFuel: Math.round((totals.scaledTeleopFuel / matchCount) * 10) / 10,
@@ -746,9 +743,9 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             avgTeleopClimbStartTimeSec: Math.round(avgTeleopClimbStartTimeSec * 10) / 10,
             maxAutoFuel: Math.max(...matchResults.map(m => m.autoFuel || 0)),
             maxTeleopFuel: Math.max(...matchResults.map(m => m.teleopFuel || 0)),
-            // maxAutoFuelPassed: Math.max(...matchResults.map(m => m.autoFuelPassed || 0)),
-            // maxTeleopFuelPassed: Math.max(...matchResults.map(m => m.teleopFuelPassed || 0)),
-            // maxFuelPassed: Math.max(...matchResults.map(m => (m.autoFuelPassed || 0) + (m.teleopFuelPassed || 0))),
+            maxAutoFuelPassed: Math.max(...matchResults.map(m => m.autoFuelPassed || 0)),
+            maxTeleopFuelPassed: Math.max(...matchResults.map(m => m.teleopFuelPassed || 0)),
+            maxFuelPassed: Math.max(...matchResults.map(m => (m.autoFuelPassed || 0) + (m.teleopFuelPassed || 0))),
             maxTotalFuel: Math.max(...matchResults.map(m => (m.autoFuel || 0) + (m.teleopFuel || 0))),
             mobilityRate: Math.round((totals.mobility / matchCount) * 100),
             autoClimbRate: autoClimbAttemptCount > 0
@@ -786,19 +783,13 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
                 ? Math.round((totals.climbFromMiddle / endgameClimbLocationAttemptCount) * 100)
                 : 0,
             defenseRate: Math.round((totals.defense / matchCount) * 100),
-            defenseVeryEffectiveRate: totalDefenseEvents > 0
-                ? Math.round((veryEffectiveCount / totalDefenseEvents) * 100)
-                : 0,
-            defenseSomewhatEffectiveRate: totalDefenseEvents > 0
-                ? Math.round((somewhatEffectiveCount / totalDefenseEvents) * 100)
-                : 0,
-            defenseNotEffectiveRate: totalDefenseEvents > 0
-                ? Math.round((notEffectiveCount / totalDefenseEvents) * 100)
-                : 0,
-            // defenseEffectivenessScore,
-            // mostDefendedTeam,
-            // mostEffectiveDefenseTarget,
-            // defenseByTarget,
+            defenseVeryEffectiveRate: 0,
+            defenseSomewhatEffectiveRate: 0,
+            defenseNotEffectiveRate: 0,
+            defenseEffectivenessScore: 0,
+            mostDefendedTeam: 'None',
+            mostEffectiveDefenseTarget: 'None',
+            defenseByTarget: {},
             autoShotOnTheMoveRate: autoShotTypeTotal > 0 ? Math.round((totals.autoShotOnTheMove / autoShotTypeTotal) * 100) : 0,
             autoShotStationaryRate: autoShotTypeTotal > 0 ? Math.round((totals.autoShotStationary / autoShotTypeTotal) * 100) : 0,
             teleopShotOnTheMoveRate: teleopShotTypeTotal > 0 ? Math.round((totals.teleopShotOnTheMove / teleopShotTypeTotal) * 100) : 0,
@@ -843,18 +834,18 @@ export const strategyAnalysis: StrategyAnalysis<ScoutingEntryTemplate> = {
             startPositions,
             matchResults: matchResults.sort((a, b) => parseInt(a.matchNumber) - parseInt(b.matchNumber)),
             // Role statistics
-            primaryActiveRole,
-            primaryInactiveRole,
-            roleActiveCleanUpRate: Math.round((totals.roleActiveCleanUp / matchCount) * 100),
-            roleActivePasserRate: Math.round((totals.roleActivePasser / matchCount) * 100),
-            roleActiveDefenseRate: Math.round((totals.roleActiveDefense / matchCount) * 100),
-            roleActiveCyclerRate: Math.round((totals.roleActiveCycler / matchCount) * 100),
-            roleActiveThiefRate: Math.round((totals.roleActiveThief / matchCount) * 100),
-            roleInactiveCleanUpRate: Math.round((totals.roleInactiveCleanUp / matchCount) * 100),
-            roleInactivePasserRate: Math.round((totals.roleInactivePasser / matchCount) * 100),
-            roleInactiveDefenseRate: Math.round((totals.roleInactiveDefense / matchCount) * 100),
-            roleInactiveCyclerRate: Math.round((totals.roleInactiveCycler / matchCount) * 100),
-            roleInactiveThiefRate: Math.round((totals.roleInactiveThief / matchCount) * 100),
+            // primaryActiveRole,
+            // primaryInactiveRole,
+            // roleActiveCleanUpRate: Math.round((totals.roleActiveCleanUp / matchCount) * 100),
+            // roleActivePasserRate: Math.round((totals.roleActivePasser / matchCount) * 100),
+            // roleActiveDefenseRate: Math.round((totals.roleActiveDefense / matchCount) * 100),
+            // roleActiveCyclerRate: Math.round((totals.roleActiveCycler / matchCount) * 100),
+            // roleActiveThiefRate: Math.round((totals.roleActiveThief / matchCount) * 100),
+            // roleInactiveCleanUpRate: Math.round((totals.roleInactiveCleanUp / matchCount) * 100),
+            // roleInactivePasserRate: Math.round((totals.roleInactivePasser / matchCount) * 100),
+            // roleInactiveDefenseRate: Math.round((totals.roleInactiveDefense / matchCount) * 100),
+            // roleInactiveCyclerRate: Math.round((totals.roleInactiveCycler / matchCount) * 100),
+            // roleInactiveThiefRate: Math.round((totals.roleInactiveThief / matchCount) * 100),
         };
     },
 

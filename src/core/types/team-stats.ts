@@ -21,23 +21,20 @@ export interface TeamStats {
         avgTotalPoints: number;
         totalPiecesScored: number;
         avgGamePiece1: number;  // Generic: could be coral, notes, cargo, etc.
-        avgGamePiece2: number;  // Generic: could be algae, cones, etc.
     };
 
     // Autonomous phase stats
     auto: {
         avgPoints: number;
         avgGamePiece1: number;
-        avgGamePiece2: number;
         mobilityRate: number;  // Percentage
-        startPositions: Array<{ position: string; percentage: number }>;
+        // startPositions: Array<{ position: string; percentage: number }>;
     };
 
     // Teleop phase stats
     teleop: {
         avgPoints: number;
         avgGamePiece1: number;
-        avgGamePiece2: number;
     };
 
     // Endgame phase stats

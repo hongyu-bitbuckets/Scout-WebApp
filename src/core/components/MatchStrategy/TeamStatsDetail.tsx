@@ -5,7 +5,6 @@
  * Uses match-strategy-config.ts to determine which stats to show and how to format them.
  */
 
-import { Badge } from "@/core/components/ui/badge";
 import { matchStrategyConfig, getStatValue, formatStatValue } from "@/game-template/match-strategy-config";
 import type { TeamStats } from "@/core/types/team-stats";
 
@@ -45,7 +44,7 @@ export const TeamStatsDetail = ({ stats, activeStatsTab }: TeamStatsDetailProps)
                 </div>
 
                 {/* Special handling for starting positions in auto phase */}
-                {activeStatsTab === 'auto' && stats.auto.startPositions && stats.auto.startPositions.length > 0 && (
+                {/* {activeStatsTab === 'auto' && stats.auto.startPositions && stats.auto.startPositions.length > 0 && (
                     <div className="flex flex-col items-center mt-3 pt-3 border-t border-gray-50 dark:border-gray-800/50">
                         <p className="font-medium text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Starting Positions:</p>
                         <div className="flex flex-wrap gap-1.5 justify-center">
@@ -61,7 +60,7 @@ export const TeamStatsDetail = ({ stats, activeStatsTab }: TeamStatsDetailProps)
                             )}
                         </div>
                     </div>
-                )}
+                )} */}
             </div>
 
             <div className="text-center text-xs text-muted-foreground mt-2">

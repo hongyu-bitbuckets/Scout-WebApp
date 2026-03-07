@@ -26,10 +26,10 @@ export const TeamCardStats = ({ team }: TeamCardStatsProps) => {
     };
 
     const autoFuel = getNumber(auto, 'avgFuelScored') || getNumber(auto, 'avgGamePiece1');
-    const autoPass = getNumber(auto, 'avgFuelPassed') || getNumber(auto, 'avgGamePiece2');
+    const autoPass = getNumber(auto, 'avgFuelPassed');
 
     const teleopFuel = getNumber(teleop, 'avgFuelScored') || getNumber(teleop, 'avgGamePiece1');
-    const teleopPass = getNumber(teleop, 'avgFuelPassed') || getNumber(teleop, 'avgGamePiece2');
+    const teleopPass = getNumber(teleop, 'avgFuelPassed');
 
     return (
         <>

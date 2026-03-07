@@ -65,6 +65,56 @@ export function PerformanceAnalysis({
         return typeof match['comment'] === 'string' && /no\s*show/i.test(match['comment']);
     };
 
+    const getEndgameRecord = (match: Record<string, unknown>): Record<string, unknown> => {
+        const gameData = match['gameData'];
+        if (!gameData || typeof gameData !== 'object') return {};
+        const endgame = (gameData as Record<string, unknown>)['endgame'];
+        if (!endgame || typeof endgame !== 'object') return {};
+        return endgame as Record<string, unknown>;
+    };
+
+    const getMatchSignalBadges = (match: Record<string, unknown>): string[] => {
+        const endgame = getEndgameRecord(match);
+        const badges: string[] = [];
+
+        if (endgame['ratingExcellentStable'] === true) badges.push('Rated Excellent');
+        if (endgame['ratingMediocre'] === true) badges.push('Rated Mediocre');
+        if (endgame['ratingBad'] === true) badges.push('Rated Bad');
+
+        if (endgame['statusHighMobility'] === true) badges.push('High Mobility');
+        if (endgame['hardwareBigHopper'] === true) badges.push('Big Hopper');
+        if (endgame['hardwareDefenseBot'] === true) badges.push('Defense Bot');
+        if (endgame['statusAutoStoppedSuddenly'] === true) badges.push('Stopped in Auto');
+        if (endgame['statusDisabledVoltageBurnout'] === true) badges.push('Disabled / Burnout');
+        if (endgame['statusBrokeOnField'] === true) badges.push('Broke On Field');
+        if (endgame['statusStuckOnTrenchSignificant'] === true) badges.push('Significant Trench Stuck');
+        if (endgame['statusStuckOnBumpSignificant'] === true) badges.push('Significant Bump Stuck');
+        if (endgame['statusStuckOnGamePieceCongestionSignificant'] === true) badges.push('Significant Congestion Stuck');
+
+        if (endgame['shootingStyleStaticStill'] === true) badges.push('Style: Static and Still');
+        if (endgame['shootingStyleDynamicStill'] === true) badges.push('Style: Dynamic and Still');
+        if (endgame['shootingStyleDynamicTraversal'] === true) badges.push('Style: Dynamic and Traversals');
+
+        return badges;
+    };
+
+    const getMatchSignalNotes = (match: Record<string, unknown>): string[] => {
+        const endgame = getEndgameRecord(match);
+        const notes: string[] = [];
+
+        const shooterNote = endgame['shooterMalfunctionComment'];
+        const hopperNote = endgame['hopperMalfunctionComment'];
+        const intakeNote = endgame['intakeMalfunctionComment'];
+        const ratingNote = endgame['ratingComment'];
+
+        if (typeof shooterNote === 'string' && shooterNote.trim()) notes.push(`Shooter: ${shooterNote.trim()}`);
+        if (typeof hopperNote === 'string' && hopperNote.trim()) notes.push(`Hopper: ${hopperNote.trim()}`);
+        if (typeof intakeNote === 'string' && intakeNote.trim()) notes.push(`Intake: ${intakeNote.trim()}`);
+        if (typeof ratingNote === 'string' && ratingNote.trim()) notes.push(`Rating: ${ratingNote.trim()}`);
+
+        return notes;
+    };
+
     // Extract match results for progression chart
     const matchResults = (teamStats as TeamStats & { matchResults?: any[] })?.matchResults || [];
     const compareMatchResults = compareStats ? (compareStats as TeamStats & { matchResults?: any[] })?.matchResults || [] : undefined;
@@ -89,6 +139,8 @@ export function PerformanceAnalysis({
                     const comment = typeof match['comment'] === 'string' ? match['comment'] : "";
                     const matchHasBreakdown = hasMatchBreakdown(match);
                     const matchHasNoShow = hasMatchNoShow(match);
+                    const matchSignalBadges = getMatchSignalBadges(match);
+                    const matchSignalNotes = getMatchSignalNotes(match);
 
                     return (
                         <div key={index} className="flex flex-col p-3 border rounded gap-3">
@@ -129,6 +181,15 @@ export function PerformanceAnalysis({
                                         return null;
                                     })}
                                 </div>
+                                {matchSignalBadges.length > 0 && (
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        {matchSignalBadges.map((badgeLabel, badgeIndex) => (
+                                            <Badge key={`${badgeLabel}-${badgeIndex}`} variant="secondary">
+                                                {badgeLabel}
+                                            </Badge>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                             <div className="flex justify-between items-center">
                                 <div className="font-bold text-lg">{totalPoints} pts</div>
@@ -141,6 +202,13 @@ export function PerformanceAnalysis({
                             {comment.trim() !== "" && (
                                 <div className="text-xs text-muted-foreground italic border-t pt-2">
                                     "{comment}"
+                                </div>
+                            )}
+                            {matchSignalNotes.length > 0 && (
+                                <div className="text-xs text-muted-foreground border-t pt-2 space-y-1">
+                                    {matchSignalNotes.map((note, noteIndex) => (
+                                        <div key={`${note}-${noteIndex}`}>{note}</div>
+                                    ))}
                                 </div>
                             )}
                             <MatchStatsDialog

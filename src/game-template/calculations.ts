@@ -572,8 +572,7 @@ export const calculateTeamStats = (teamMatches: ScoutingEntry[]): Omit<TeamStats
         overall: {
             avgTotalPoints: round(totalPoints / matchCount),
             totalPiecesScored: round(totalPieces / matchCount),
-            avgGamePiece1: round(totalFuelScored / matchCount),  // Fuel scored
-            avgGamePiece2: round(totalFuelPassed / matchCount),  // Fuel passed
+            avgGamePiece1: round(teleopFuelTotal / matchCount),  // Teleop fuel scored button value
             // 2026-specific
             avgFuelScored: round(totalFuelScored / matchCount),
             avgFuelPassed: round(totalFuelPassed / matchCount),
@@ -582,8 +581,7 @@ export const calculateTeamStats = (teamMatches: ScoutingEntry[]): Omit<TeamStats
         // Auto phase
         auto: {
             avgPoints: round(totalAutoPoints / matchCount),
-            avgGamePiece1: round(autoFuelTotal / matchCount),     // Auto fuel
-            avgGamePiece2: round(autoFuelPassedTotal / matchCount), // Auto passed
+            avgGamePiece1: round(teleopFuelTotal / matchCount),   // Teleop fuel scored button value
             mobilityRate: 0, // Not applicable in 2026
             autoClimbRate: percent(autoClimbCount, matchCount),
             autoClimbFromSideRate: percent(autoClimbFromSideCount, matchCount),
@@ -602,8 +600,7 @@ export const calculateTeamStats = (teamMatches: ScoutingEntry[]): Omit<TeamStats
         // Teleop phase
         teleop: {
             avgPoints: round(totalTeleopPoints / matchCount),
-            avgGamePiece1: round(teleopFuelTotal / matchCount),     // Teleop fuel
-            avgGamePiece2: round(teleopFuelPassedTotal / matchCount), // Teleop passed
+            avgGamePiece1: round(teleopFuelTotal / matchCount),     // Teleop fuel scored button value
             avgFuelScored: round(teleopFuelTotal / matchCount),
             avgFuelPassed: round(teleopFuelPassedTotal / matchCount),
             shotOnTheMoveRate: percent(teleopShotOnTheMoveTotal, teleopShotTypeTotal),
@@ -702,12 +699,10 @@ function getEmptyStats(): Omit<TeamStats, 'teamNumber' | 'eventKey'> {
             avgTotalPoints: 0,
             totalPiecesScored: 0,
             avgGamePiece1: 0,
-            avgGamePiece2: 0,
         },
         auto: {
             avgPoints: 0,
             avgGamePiece1: 0,
-            avgGamePiece2: 0,
             mobilityRate: 0,
             autoClimbRate: 0,
             autoClimbFromSideRate: 0,
@@ -717,7 +712,6 @@ function getEmptyStats(): Omit<TeamStats, 'teamNumber' | 'eventKey'> {
         teleop: {
             avgPoints: 0,
             avgGamePiece1: 0,
-            avgGamePiece2: 0,
         },
         endgame: {
             avgPoints: 0,
