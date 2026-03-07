@@ -16,6 +16,7 @@ import {
 import { toast } from "sonner";
 import GameStartSelectTeam from "@/core/components/GameStartComponents/GameStartSelectTeam";
 import { EventNameSelector } from "@/core/components/GameStartComponents/EventNameSelector";
+import { MatchAssignmentSchedulePreview } from "@/core/components/GameStartComponents/MatchAssignmentSchedulePreview";
 // import { ScoutOptionsSheet } from "@/core/components/GameStartComponents/ScoutOptionsSheet";
 import { CommentScoutAllianceSheet, PlayerStationSheet } from "@/core/components/GameStartComponents/PlayerStationOption";
 import { createMatchPrediction, getPredictionForMatch } from "@/core/lib/scoutGamificationUtils";
@@ -151,6 +152,7 @@ const GameStartPage = () => {
   }, [isCommentScouter, eventKey, matchNumber, currentScout]);
 
   const [predictedWinner, setPredictedWinner] = useState<"red" | "blue" | "none">("none");
+
   const selectedTeamDisplayLabel = useMemo(() => {
     if (isCommentScouter) {
       return "Alliance 3-team";
@@ -496,6 +498,14 @@ const GameStartPage = () => {
                 </p>
               )}
             </div>
+
+            {!isCommentScouter && currentScout && (
+              <MatchAssignmentSchedulePreview
+                eventKey={eventKey}
+                currentScout={currentScout}
+                matchNumber={matchNumber}
+              />
+            )}
 
             {/* Alliance is always selectable; station only suggests a default for match scouts. */}
             <div className="space-y-2">

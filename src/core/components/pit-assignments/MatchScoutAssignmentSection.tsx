@@ -346,6 +346,11 @@ export const MatchScoutAssignmentSection: React.FC<MatchScoutAssignmentSectionPr
   }, []);
 
   const handleImportAssignments = (importedBlocks: MatchScoutAssignmentBlock[]) => {
+    // Persist immediately so imports survive focus/unmount timing edge cases.
+    if (eventKey) {
+      saveMatchScoutAssignmentBlocks(eventKey, importedBlocks);
+    }
+
     setAssignmentBlocks(importedBlocks);
     setAssignmentsConfirmed(true);
     setSelectedScoutForAssignment(null);
