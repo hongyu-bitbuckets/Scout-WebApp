@@ -1,6 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { useWebRTC } from '@/core/contexts/WebRTCContext';
+import { getOrCreateScoutByName } from '@/core/lib/scoutGamificationUtils';
+import { gamificationDB } from '@/game-template/gamification';
+import type { ScoutRole } from '@/core/types/scoutRole';
 import type { MatchScheduleTransferEntry } from '@/core/lib/matchScheduleTransfer';
 import {
   buildMatchScoutAssignmentsPayload,
@@ -275,6 +278,82 @@ export const MatchScoutAssignmentSection: React.FC<MatchScoutAssignmentSectionPr
     );
   };
 
+  const ensureScoutProfilesFromAssignments = useCallback(async (blocks: MatchScoutAssignmentBlock[]) => {
+    const importedScoutNames = new Set<string>();
+
+    for (const block of blocks) {
+      for (const scoutName of Object.values(block.assignments)) {
+        const trimmedName = scoutName?.trim();
+        if (trimmedName) {
+          importedScoutNames.add(trimmedName);
+        }
+      }
+    }
+
+    if (importedScoutNames.size === 0) {
+      return;
+    }
+
+    const existingScoutsRaw = localStorage.getItem('scoutsList');
+    let existingScouts: string[] = [];
+
+    try {
+      existingScouts = existingScoutsRaw ? JSON.parse(existingScoutsRaw) : [];
+      if (!Array.isArray(existingScouts)) {
+        existingScouts = [];
+      }
+    } catch {
+      existingScouts = [];
+    }
+
+    const existingLowercase = new Set(existingScouts.map((name) => name.toLowerCase()));
+    const newProfilesToAdd: string[] = [];
+    const defaultImportedRoles: ScoutRole[] = ['dataScouter', 'unlockLeaderboard'];
+
+    for (const scoutName of importedScoutNames) {
+      const isNewProfile = !existingLowercase.has(scoutName.toLowerCase());
+      if (isNewProfile) {
+        newProfilesToAdd.push(scoutName);
+      }
+
+      // Ensure profile exists in gamification DB regardless of localStorage list state.
+      const scoutProfile = await getOrCreateScoutByName(scoutName);
+
+      // Imported assignment-created profiles should have Data Scouter and Leaderboard access.
+      if (isNewProfile) {
+        const existingRoles = Array.isArray(scoutProfile.scoutRoles) ? scoutProfile.scoutRoles : [];
+        const mergedRoles = Array.from(new Set([...existingRoles, ...defaultImportedRoles])) as ScoutRole[];
+
+        if (mergedRoles.length !== existingRoles.length) {
+          scoutProfile.scoutRoles = mergedRoles;
+          await gamificationDB.scouts.put(scoutProfile);
+        }
+      }
+    }
+
+    if (newProfilesToAdd.length > 0) {
+      const updatedList = [...existingScouts, ...newProfilesToAdd].sort((a, b) => a.localeCompare(b));
+      localStorage.setItem('scoutsList', JSON.stringify(updatedList));
+
+      // Notify hooks/contexts that scout profiles were added externally.
+      window.dispatchEvent(new Event('scoutDataUpdated'));
+      window.dispatchEvent(new Event('scoutChanged'));
+
+      toast.success(
+        `Created ${newProfilesToAdd.length} new scout profile${newProfilesToAdd.length === 1 ? '' : 's'} from imported assignments.`,
+      );
+    }
+  }, []);
+
+  const handleImportAssignments = (importedBlocks: MatchScoutAssignmentBlock[]) => {
+    setAssignmentBlocks(importedBlocks);
+    setAssignmentsConfirmed(true);
+    setSelectedScoutForAssignment(null);
+    setIsDragAssigning(false);
+
+    void ensureScoutProfilesFromAssignments(importedBlocks);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col lg:flex-row gap-6">
@@ -307,6 +386,7 @@ export const MatchScoutAssignmentSection: React.FC<MatchScoutAssignmentSectionPr
         onStationToggleCompleted={toggleStationCompleted}
         onConfirmAssignments={handleConfirmAssignments}
         onClearAllAssignments={handleClearAssignments}
+        onImportAssignments={handleImportAssignments}
       />
     </div>
   );

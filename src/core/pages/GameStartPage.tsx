@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
@@ -23,6 +23,7 @@ import { AlertTriangle, RefreshCw } from "lucide-react";
 import { useWorkflowNavigation } from "@/core/hooks/useWorkflowNavigation";
 import { useScout } from "@/core/contexts/ScoutContext";
 import { formatTeamDisplayForEvent } from "@/core/lib/teamMetadata";
+import { loadMatchScoutAssignmentBlock, type PlayerStation } from "@/core/lib/matchScoutAssignments";
 
 const AUTO_SWITCH_ONCE_STORAGE_PREFIX = 'autoSwitchToTeleopDone';
 
@@ -45,11 +46,6 @@ const GameStartPage = () => {
   // Check if current scout has commentScouter role (role-based alliance restriction)
   const isCommentScouter = currentScoutRoles?.includes("commentScouter");
 
-  // Debug log when currentScout changes
-  useEffect(() => {
-    console.log('📋 GameStartPage: currentScout =', currentScout);
-  }, [currentScout]);
-
   // Detect re-scout mode from location.state - use useMemo to recalculate when location.state changes
   const rescoutData = useMemo(() => states?.rescout, [states]);
   const isRescoutMode = rescoutData?.isRescout || false;
@@ -60,29 +56,50 @@ const GameStartPage = () => {
   const rescoutTeams = useMemo(() => rescoutData?.teams || [], [rescoutData?.teams]);
   const currentTeamIndex = rescoutData?.currentTeamIndex || 0;
 
-  const parsePlayerStation = () => {
-    const playerStation = localStorage.getItem("playerStation");
-    if (!playerStation) return { alliance: "", teamPosition: 0 };
-
-    if (playerStation === "lead") {
+  const parsePlayerStation = (playerStation: string | null) => {
+    if (!playerStation || playerStation === "lead") {
       return { alliance: "", teamPosition: 0 };
     }
 
     const parts = playerStation.split("-");
     if (parts.length === 2 && parts[1]) {
       const alliance = parts[0];
-      const position = parseInt(parts[1]);
-      return { alliance, teamPosition: position };
+      const position = parseInt(parts[1], 10);
+
+      if ((alliance === "red" || alliance === "blue") && Number.isFinite(position) && position >= 1 && position <= 3) {
+        return { alliance, teamPosition: position };
+      }
     }
 
     return { alliance: "", teamPosition: 0 };
   };
 
-  // Restrict player station selection for comment scouters
-    // Removed duplicate declaration of currentScoutRoles and isCommentScouter
-  const stationInfo = isCommentScouter
-    ? { alliance: "", teamPosition: 0 } // comment scouters only choose alliance, not station
-    : parsePlayerStation();
+  const getMatchAssignedStation = (
+    selectedEventKey: string,
+    selectedMatchNumber: string,
+    scoutName?: string | null,
+  ): PlayerStation | null => {
+    if (!selectedEventKey || !selectedMatchNumber || !scoutName) {
+      return null;
+    }
+
+    const normalizedMatchNumber = Number.parseInt(selectedMatchNumber, 10);
+    if (!Number.isFinite(normalizedMatchNumber) || normalizedMatchNumber <= 0) {
+      return null;
+    }
+
+    const block = loadMatchScoutAssignmentBlock(selectedEventKey, normalizedMatchNumber);
+    if (!block) {
+      return null;
+    }
+
+    const normalizedScout = scoutName.trim().toLowerCase();
+    const assignedStation = Object.entries(block.assignments).find(([, assignedScoutName]) => {
+      return assignedScoutName?.trim().toLowerCase() === normalizedScout;
+    })?.[0] as PlayerStation | undefined;
+
+    return assignedStation ?? null;
+  };
 
   const getInitialMatchNumber = () => {
     if (states?.inputs?.matchNumber) {
@@ -95,12 +112,11 @@ const GameStartPage = () => {
 
   // Alliance state: comment scouters can set freely, others use player station
   const [alliance, setAlliance] = useState(() => {
-    // If restoring from state OR player station has alliance, use that
     if (states?.inputs?.alliance) return states.inputs.alliance;
-    if (stationInfo.alliance) return stationInfo.alliance;
     return "";
   });
   const [matchNumber, setMatchNumber] = useState(getInitialMatchNumber());
+  const hasAppliedStationSuggestionRef = useRef(false);
   const [matchType, setMatchType] = useState<"qm" | "sf" | "f">("qm");
   const [debouncedMatchNumber, setDebouncedMatchNumber] = useState(matchNumber);
   const [selectTeam, setSelectTeam] = useState(() => {
@@ -119,6 +135,21 @@ const GameStartPage = () => {
   const [eventKey, setEventKey] = useState(
     states?.inputs?.eventKey || localStorage.getItem("eventKey") || ""
   );
+
+  const stationInfo = useMemo(() => {
+    if (isCommentScouter) {
+      return { alliance: "", teamPosition: 0 };
+    }
+
+    // Prefer per-match assignment for this scout; fall back to manually selected station.
+    const assignedStation = getMatchAssignedStation(eventKey, matchNumber, currentScout);
+    if (assignedStation) {
+      return parsePlayerStation(assignedStation);
+    }
+
+    return parsePlayerStation(localStorage.getItem("playerStation"));
+  }, [isCommentScouter, eventKey, matchNumber, currentScout]);
+
   const [predictedWinner, setPredictedWinner] = useState<"red" | "blue" | "none">("none");
   const selectedTeamDisplayLabel = useMemo(() => {
     if (isCommentScouter) {
@@ -164,13 +195,30 @@ const GameStartPage = () => {
     loadExistingPrediction();
   }, [matchNumber, eventKey, currentScout]);
 
-  // Effect to auto-set alliance for station-driven scouters from player station
+  // Treat player station as a suggestion: prefill once, but do not enforce.
+  useEffect(() => {
+    if (
+      !isCommentScouter &&
+      stationInfo.alliance &&
+      !alliance &&
+      !hasAppliedStationSuggestionRef.current
+    ) {
+      setAlliance(stationInfo.alliance as 'red' | 'blue');
+      hasAppliedStationSuggestionRef.current = true;
+    }
+  }, [isCommentScouter, stationInfo.alliance, alliance]);
+
+  // Re-suggest alliance when match assignment changes while keeping it freely editable.
   useEffect(() => {
     if (!isCommentScouter && stationInfo.alliance) {
-      // Station-driven scouters automatically use player station alliance
-      setAlliance(stationInfo.alliance as 'red' | 'blue');
+      setAlliance((previousAlliance: string) => {
+        if (!previousAlliance || previousAlliance !== stationInfo.alliance) {
+          return stationInfo.alliance as 'red' | 'blue';
+        }
+        return previousAlliance;
+      });
     }
-  }, [isCommentScouter, stationInfo.alliance]);
+  }, [isCommentScouter, stationInfo.alliance, matchNumber, eventKey, currentScout]);
 
   // Effect to pre-fill fields when in re-scout mode
   useEffect(() => {
@@ -449,55 +497,47 @@ const GameStartPage = () => {
               )}
             </div>
 
-            {/* Alliance Selection with Buttons - Only visible for manual-alliance roles */}
-            {isCommentScouter ? (
-              <div className="space-y-2">
-                <Label>Alliance</Label>
-                <div className="grid grid-cols-2 gap-3">
-                  <Button
-                    variant={alliance === "red" ? "default" : "outline"}
-                    onClick={() => setAlliance("red")}
-                    disabled={isRescoutMode}
-                    className={`h-12 text-lg font-semibold ${alliance === "red"
-                      ? "bg-red-500 hover:bg-red-600 text-white"
-                      : "hover:bg-red-50 hover:text-red-600 hover:border-red-300"
-                      } ${isRescoutMode ? 'cursor-not-allowed' : ''}`}
-                  >
-                    <Badge
-                      variant={alliance === "red" ? "secondary" : "destructive"}
-                      className={`w-3 h-3 p-0 mr-2 ${alliance === "red" ? "bg-white" : "bg-red-500"}`}
-                    />
-                    Red Alliance
-                  </Button>
-                  <Button
-                    variant={alliance === "blue" ? "default" : "outline"}
-                    onClick={() => setAlliance("blue")}
-                    disabled={isRescoutMode}
-                    className={`h-12 text-lg font-semibold ${alliance === "blue"
-                      ? "bg-blue-500 hover:bg-blue-600 text-white"
-                      : "hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300"
-                      } ${isRescoutMode ? 'cursor-not-allowed' : ''}`}
-                  >
-                    <Badge
-                      variant={alliance === "blue" ? "secondary" : "default"}
-                      className={`w-3 h-3 p-0 mr-2 ${alliance === "blue" ? "bg-white" : "bg-blue-500"}`}
-                    />
-                    Blue Alliance
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <Label>Alliance (Auto-set by player station)</Label>
-                <div className="flex items-center gap-2 h-12 px-3 rounded-md border border-input bg-muted">
+            {/* Alliance is always selectable; station only suggests a default for match scouts. */}
+            <div className="space-y-2">
+              <Label>Alliance</Label>
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  variant={alliance === "red" ? "default" : "outline"}
+                  onClick={() => setAlliance("red")}
+                  disabled={isRescoutMode}
+                  className={`h-12 text-lg font-semibold ${alliance === "red"
+                    ? "bg-red-500 hover:bg-red-600 text-white"
+                    : "hover:bg-red-50 hover:text-red-600 hover:border-red-300"
+                    } ${isRescoutMode ? 'cursor-not-allowed' : ''}`}
+                >
                   <Badge
-                    variant={alliance === "red" ? "destructive" : "default"}
-                    className={`w-3 h-3 p-0 ${alliance === "red" ? "bg-red-500" : "bg-blue-500"}`}
+                    variant={alliance === "red" ? "secondary" : "destructive"}
+                    className={`w-3 h-3 p-0 mr-2 ${alliance === "red" ? "bg-white" : "bg-red-500"}`}
                   />
-                  <span className="text-lg font-semibold capitalize">{alliance || "Not set"} Alliance</span>
-                </div>
+                  Red Alliance
+                </Button>
+                <Button
+                  variant={alliance === "blue" ? "default" : "outline"}
+                  onClick={() => setAlliance("blue")}
+                  disabled={isRescoutMode}
+                  className={`h-12 text-lg font-semibold ${alliance === "blue"
+                    ? "bg-blue-500 hover:bg-blue-600 text-white"
+                    : "hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300"
+                    } ${isRescoutMode ? 'cursor-not-allowed' : ''}`}
+                >
+                  <Badge
+                    variant={alliance === "blue" ? "secondary" : "default"}
+                    className={`w-3 h-3 p-0 mr-2 ${alliance === "blue" ? "bg-white" : "bg-blue-500"}`}
+                  />
+                  Blue Alliance
+                </Button>
               </div>
-            )}
+              {!isCommentScouter && stationInfo.alliance && (
+                <p className="text-xs text-muted-foreground">
+                  Suggested from player station: {stationInfo.alliance.toUpperCase()} alliance (you can change this).
+                </p>
+              )}
+            </div>
 
             {/* Alliance Prediction Selection */}
             <div className="space-y-2">

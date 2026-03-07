@@ -100,7 +100,13 @@ export function NavMain({
 
     return { ...item, items: subAccess || [] ,visible:parentAccess}
 
-  }).filter(item => item.visible)
+  }).filter(item => {
+    // Hide section/divider-style parent items when no child links are visible.
+    const isSectionContainer = item.url === "#"
+    const hasVisibleChildren = item.items.length > 0
+
+    return item.visible && (!isSectionContainer || hasVisibleChildren)
+  })
 
 
   return (

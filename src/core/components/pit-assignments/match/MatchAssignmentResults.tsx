@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/core/components/ui/c
 import { Button } from '@/core/components/ui/button';
 import { Badge } from '@/core/components/ui/badge';
 import { Input } from '@/core/components/ui/input';
-import { Download, Search, SortAsc, SortDesc, TableProperties } from 'lucide-react';
+import { Download, Search, SortAsc, SortDesc, TableProperties, Upload } from 'lucide-react';
+import { toast } from 'sonner';
 import { AssignmentActionButtons } from '../shared/AssignmentActionButtons';
 import { MatchAssignmentTable } from './MatchAssignmentTable';
 import { MatchScoutLegend } from './MatchScoutLegend';
@@ -34,6 +35,7 @@ interface MatchAssignmentResultsProps {
   onStationToggleCompleted: (matchNum: number, station: PlayerStation) => void;
   onConfirmAssignments: () => void;
   onClearAllAssignments: () => void;
+  onImportAssignments: (blocks: MatchScoutAssignmentBlock[]) => void;
 }
 
 export const MatchAssignmentResults: React.FC<MatchAssignmentResultsProps> = ({
@@ -52,6 +54,7 @@ export const MatchAssignmentResults: React.FC<MatchAssignmentResultsProps> = ({
   onStationToggleCompleted,
   onConfirmAssignments,
   onClearAllAssignments,
+  onImportAssignments,
 }) => {
   const [searchFilter, setSearchFilter] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('match');
@@ -249,6 +252,136 @@ export const MatchAssignmentResults: React.FC<MatchAssignmentResultsProps> = ({
     window.URL.revokeObjectURL(url);
   };
 
+  const parseCsvLine = (line: string): string[] => {
+    const values: string[] = [];
+    let currentValue = '';
+    let inQuotes = false;
+
+    for (let index = 0; index < line.length; index += 1) {
+      const char = line[index];
+
+      if (char === '"') {
+        if (inQuotes && line[index + 1] === '"') {
+          currentValue += '"';
+          index += 1;
+        } else {
+          inQuotes = !inQuotes;
+        }
+        continue;
+      }
+
+      if (char === ',' && !inQuotes) {
+        values.push(currentValue.trim());
+        currentValue = '';
+        continue;
+      }
+
+      currentValue += char;
+    }
+
+    values.push(currentValue.trim());
+    return values;
+  };
+
+  const importAssignments = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0];
+    event.target.value = '';
+
+    if (!selectedFile) {
+      return;
+    }
+
+    try {
+      const csvText = await selectedFile.text();
+      const lines = csvText
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0);
+
+      if (lines.length < 2) {
+        toast.error('CSV file is empty or missing assignment rows.');
+        return;
+      }
+
+      const header = parseCsvLine(lines[0] ?? '').map((value) => value.toLowerCase());
+      const requiredHeaders = ['match', 'station', 'scout', 'completed'];
+      const hasRequiredHeaders = requiredHeaders.every((requiredHeader) => header.includes(requiredHeader));
+
+      if (!hasRequiredHeaders) {
+        toast.error('CSV must include Match, Station, Scout, and Completed columns.');
+        return;
+      }
+
+      const matchIndex = header.indexOf('match');
+      const stationIndex = header.indexOf('station');
+      const scoutIndex = header.indexOf('scout');
+      const completedIndex = header.indexOf('completed');
+
+      const blockMap = new Map<number, MatchScoutAssignmentBlock>();
+      let importedStationCount = 0;
+
+      for (const line of lines.slice(1)) {
+        const columns = parseCsvLine(line);
+        const matchValue = columns[matchIndex];
+        const stationValue = columns[stationIndex] as PlayerStation | undefined;
+        const scoutValue = columns[scoutIndex]?.trim();
+        const completedValue = columns[completedIndex]?.toLowerCase() ?? '';
+
+        if (!matchValue || !stationValue || !scoutValue) {
+          continue;
+        }
+
+        const matchNumber = Number.parseInt(matchValue, 10);
+        if (!Number.isFinite(matchNumber) || matchNumber <= 0) {
+          continue;
+        }
+
+        if (!PLAYER_STATIONS.includes(stationValue)) {
+          continue;
+        }
+
+        const existingBlock =
+          blockMap.get(matchNumber) ??
+          {
+            matchNumber,
+            assignments: {},
+            completedStations: [],
+            updatedAt: Date.now(),
+          };
+
+        existingBlock.assignments[stationValue] = scoutValue;
+
+        const completedSet = new Set(existingBlock.completedStations ?? []);
+        const isCompleted = ['yes', 'true', '1', 'y'].includes(completedValue);
+        if (isCompleted) {
+          completedSet.add(stationValue);
+        } else {
+          completedSet.delete(stationValue);
+        }
+
+        existingBlock.completedStations = Array.from(completedSet);
+        existingBlock.updatedAt = Date.now();
+        blockMap.set(matchNumber, existingBlock);
+        importedStationCount += 1;
+      }
+
+      const importedBlocks = Array.from(blockMap.values()).sort((a, b) => a.matchNumber - b.matchNumber);
+
+      if (importedBlocks.length === 0) {
+        toast.error('No valid assignment rows found in CSV.');
+        return;
+      }
+
+      onImportAssignments(importedBlocks);
+      toast.success(
+        `Imported ${importedStationCount} assignment${importedStationCount === 1 ? '' : 's'} across ${importedBlocks.length} match${importedBlocks.length === 1 ? '' : 'es'}.`,
+      );
+    } catch (error) {
+      console.error('Failed to import match assignments CSV:', error);
+      toast.error('Failed to import CSV. Please verify the file format.');
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -265,6 +398,22 @@ export const MatchAssignmentResults: React.FC<MatchAssignmentResultsProps> = ({
               onClearAllAssignments={onClearAllAssignments}
               onConfirmAssignments={onConfirmAssignments}
               isMobile={false}
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+              onClick={() => document.getElementById('match-assignment-import-input')?.click()}
+            >
+              <Upload className="h-4 w-4" />
+              Import CSV
+            </Button>
+            <input
+              id="match-assignment-import-input"
+              type="file"
+              accept=".csv,text/csv"
+              className="hidden"
+              onChange={importAssignments}
             />
             <Button
               onClick={exportAssignments}
@@ -316,6 +465,27 @@ export const MatchAssignmentResults: React.FC<MatchAssignmentResultsProps> = ({
                   onConfirmAssignments={onConfirmAssignments}
                   isMobile={true}
                 />
+                <div className="flex gap-2 mt-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2"
+                    onClick={() => document.getElementById('match-assignment-import-input')?.click()}
+                  >
+                    <Upload className="h-4 w-4" />
+                    Import CSV
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2"
+                    onClick={exportAssignments}
+                    disabled={assignedStationsCount === 0}
+                  >
+                    <Download className="h-4 w-4" />
+                    Export CSV
+                  </Button>
+                </div>
               </div>
             }
             helpText={

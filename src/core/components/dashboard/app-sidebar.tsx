@@ -49,8 +49,12 @@ const data = {
           url: "/api-data",
         },
         {
-          title: "WiFi Transfer (Beta)",
-          url: "/peer-transfer",
+          title: "JSON Data Transfer",
+          url: "/json-transfer",
+        },
+        {
+          title: "QR Data Transfer",
+          url: "/qr-transfer",
         },
       ]
     },
@@ -131,12 +135,8 @@ const data = {
           requiredRoles: ["leadership", "mentors"] as ScoutRole[]
         },
         {
-          title: "JSON Data Transfer",
-          url: "/json-transfer",
-        },
-        {
-          title: "QR Data Transfer",
-          url: "/qr-transfer",
+          title: "WiFi Transfer (Beta)",
+          url: "/peer-transfer",
         },
 
 

@@ -1,4 +1,4 @@
-import { Binoculars, Wifi } from 'lucide-react';
+import { Binoculars, QrCode } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { cn } from '@/core/lib/utils';
 import { usePWA } from '@/core/hooks/usePWA';
@@ -42,9 +42,9 @@ const navItems: BottomNavItem[] = [
 },
 
   {
-    icon: Wifi,
-    label: 'WiFi Data',
-    href: '/peer-transfer',
+    icon: QrCode,
+    label: 'QR Transfer',
+    href: '/qr-transfer',
   },
 ];
 
