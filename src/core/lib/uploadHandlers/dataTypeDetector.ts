@@ -30,10 +30,19 @@ const isPitLikeEntry = (entry: Record<string, unknown>): boolean => {
 };
 
 // Function to detect data type from JSON content
-export const detectDataType = (jsonData: unknown): 'scouting' | 'scoutProfiles' | 'pitScouting' | 'pitScoutingImagesOnly' | 'matchSchedule' | null => {
+export const detectDataType = (jsonData: unknown): 'scouting' | 'scoutProfiles' | 'pitScouting' | 'pitScoutingImagesOnly' | 'matchSchedule' | 'command' | null => {
   if (!jsonData || typeof jsonData !== 'object') return null;
 
   const data = jsonData as Record<string, unknown>;
+
+  const commandType = String(data.type || '').trim().toLowerCase();
+  const commandAction = String(data.action || '').trim().toLowerCase();
+  if (
+    (commandType === 'command' || commandType === 'scouter-command') &&
+    (commandAction === 'clear-all-data' || commandAction === 'clear_all_data' || commandAction === 'reset-all-data')
+  ) {
+    return 'command';
+  }
 
   // Check for scout profiles format
   if ('scouts' in data && 'predictions' in data) {

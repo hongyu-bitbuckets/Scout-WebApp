@@ -15,13 +15,28 @@ interface PitDataDisplayProps {
 }
 
 const PIT_GAME_DATA_LABELS: Record<string, string> = {
+    averageScores: 'Average Scored Balls in 25s (one match cycle)',
+    shootingAccuracy: 'Shooting Accuracy (%)',
     canMoveWhileShooting: 'Robot Move While Shooting?',
     canShootAnywhere: 'Robot Dynamic/Can shoot anywhere?',
 };
 
+type NumericPitMetricKey = 'fuelCapacity' | 'averageScores' | 'shootingAccuracy';
+
+function getNumericPitMetric(entry: PitScoutingEntryBase | null, key: NumericPitMetricKey): number | null {
+    const value = entry?.gameData?.[key];
+    return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
+
 export function PitDataDisplay({ teamNumber, selectedEvent }: PitDataDisplayProps) {
     const [entry, setEntry] = useState<PitScoutingEntryBase | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const fuelCapacity = getNumericPitMetric(entry, 'fuelCapacity');
+    const averageScores = getNumericPitMetric(entry, 'averageScores');
+    const shootingAccuracy = getNumericPitMetric(entry, 'shootingAccuracy');
+    const expectedMakesPerCycle = averageScores !== null && shootingAccuracy !== null
+        ? Math.round((averageScores * (shootingAccuracy / 100)) * 10) / 10
+        : null;
 
     // Recorded auto path display is currently disabled.
     // const reportedAutosByStartRaw = entry?.gameData?.reportedAutosByStart;
@@ -211,6 +226,29 @@ export function PitDataDisplay({ teamNumber, selectedEvent }: PitDataDisplayProp
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                                     Game Specific Data
                                 </h4>
+                                <div className="mb-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                                    <div className="rounded-md border bg-muted/20 p-3">
+                                        <p className="text-xs font-medium text-muted-foreground">Cycle Throughput (Pit)</p>
+                                        <p className="mt-1 text-lg font-semibold">
+                                            {averageScores !== null ? `${averageScores} balls / 25s` : 'N/A'}
+                                        </p>
+                                    </div>
+                                    <div className="rounded-md border bg-muted/20 p-3">
+                                        <p className="text-xs font-medium text-muted-foreground">Expected Makes / Cycle</p>
+                                        <p className="mt-1 text-lg font-semibold">
+                                            {expectedMakesPerCycle !== null ? `${expectedMakesPerCycle}` : 'N/A'}
+                                        </p>
+                                        <p className="text-xs text-muted-foreground">
+                                            {shootingAccuracy !== null ? `at ${shootingAccuracy}% accuracy` : 'requires accuracy + cycle data'}
+                                        </p>
+                                    </div>
+                                    <div className="rounded-md border bg-muted/20 p-3 sm:col-span-2 lg:col-span-1 xl:col-span-2">
+                                        <p className="text-xs font-medium text-muted-foreground">Fuel Capacity</p>
+                                        <p className="mt-1 text-lg font-semibold">
+                                            {fuelCapacity !== null ? `${fuelCapacity} pieces` : 'N/A'}
+                                        </p>
+                                    </div>
+                                </div>
                                 <ScrollArea className="flex-1 min-h-0 w-full rounded-md border p-4 bg-muted/10">
                                     {entry.gameData && Object.keys(entry.gameData).some((key) => key !== 'reportedAutosByStart') ? (
                                         <div className="space-y-3">

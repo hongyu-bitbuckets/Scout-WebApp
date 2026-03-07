@@ -76,10 +76,49 @@ export function usePeerTransferImport(options: UsePeerTransferImportOptions) {
         const { gamificationDB } = await import('@/game-template/gamification/database');
         let importedCount = 0;
 
+        const syncImportedScoutsToLocalList = (scouts: unknown[] | undefined) => {
+            if (!Array.isArray(scouts) || scouts.length === 0) {
+                return;
+            }
+
+            const existingScoutsRaw = localStorage.getItem('scoutsList');
+            let existingScouts: string[] = [];
+
+            try {
+                const parsed = existingScoutsRaw ? JSON.parse(existingScoutsRaw) : [];
+                existingScouts = Array.isArray(parsed)
+                    ? parsed.filter((name): name is string => typeof name === 'string')
+                    : [];
+            } catch {
+                existingScouts = [];
+            }
+
+            const merged = new Set(existingScouts.map((name) => name.trim()).filter(Boolean));
+            for (const scout of scouts) {
+                if (!scout || typeof scout !== 'object') {
+                    continue;
+                }
+                const name = (scout as { name?: unknown }).name;
+                if (typeof name !== 'string') {
+                    continue;
+                }
+                const trimmedName = name.trim();
+                if (trimmedName) {
+                    merged.add(trimmedName);
+                }
+            }
+
+            localStorage.setItem(
+                'scoutsList',
+                JSON.stringify(Array.from(merged).sort((a, b) => a.localeCompare(b))),
+            );
+        };
+
         if (scoutData.scouts && Array.isArray(scoutData.scouts)) {
             await gamificationDB.scouts.bulkPut(scoutData.scouts as never[]);
             importedCount += scoutData.scouts.length;
             console.log(`✅ Imported ${scoutData.scouts.length} scouts`);
+            syncImportedScoutsToLocalList(scoutData.scouts);
         }
         if (scoutData.predictions && Array.isArray(scoutData.predictions)) {
             await gamificationDB.predictions.bulkPut(scoutData.predictions as never[]);
@@ -90,6 +129,11 @@ export function usePeerTransferImport(options: UsePeerTransferImportOptions) {
             await gamificationDB.scoutAchievements.bulkPut(scoutData.achievements as never[]);
             importedCount += scoutData.achievements.length;
             console.log(`✅ Imported ${scoutData.achievements.length} achievements`);
+        }
+
+        if (importedCount > 0) {
+            window.dispatchEvent(new Event('scoutDataUpdated'));
+            window.dispatchEvent(new Event('scoutChanged'));
         }
 
         return importedCount;

@@ -12,6 +12,7 @@ import { handleScoutProfilesUpload } from "@/core/lib/uploadHandlers/scoutProfil
 import { handlePitScoutingUpload } from "@/core/lib/uploadHandlers/pitScoutingUploadHandler";
 import { handlePitScoutingImagesUpload } from "@/core/lib/uploadHandlers/pitScoutingImagesUploadHandler";
 import { handleMatchScheduleUpload } from "@/core/lib/uploadHandlers/matchScheduleUploadHandler";
+import { handleCommandUpload } from "@/core/lib/uploadHandlers/commandUploadHandler";
 import ConflictResolutionDialog from "./ConflictResolutionDialog";
 import { BatchConflictDialog } from "./BatchConflictDialog";
 import type { ConflictInfo } from "@/core/lib/scoutingDataUtils";
@@ -24,7 +25,7 @@ type JSONUploaderProps = {
 
 const JSONUploader: React.FC<JSONUploaderProps> = ({ onBack }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [detectedDataType, setDetectedDataType] = useState<'scouting' | 'scoutProfiles' | 'pitScouting' | 'pitScoutingImagesOnly' | 'matchSchedule' | null>(null);
+  const [detectedDataType, setDetectedDataType] = useState<'scouting' | 'scoutProfiles' | 'pitScouting' | 'pitScoutingImagesOnly' | 'matchSchedule' | 'command' | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   
   // Batch review state
@@ -77,7 +78,8 @@ const JSONUploader: React.FC<JSONUploaderProps> = ({ onBack }) => {
         scoutProfiles: 'Scout Profiles',
         pitScouting: 'Pit Scouting Data',
         pitScoutingImagesOnly: 'Pit Scouting Images Only',
-        matchSchedule: 'Match Schedule'
+        matchSchedule: 'Match Schedule',
+        command: 'Scouter Command'
       };
       
       toast.info(`Selected: ${file.name} (${dataTypeNames[dataType]})`);
@@ -134,6 +136,8 @@ const JSONUploader: React.FC<JSONUploaderProps> = ({ onBack }) => {
         await handlePitScoutingImagesUpload(jsonData);
       } else if (detectedDataType === 'matchSchedule') {
         await handleMatchScheduleUpload(jsonData, mode);
+      } else if (detectedDataType === 'command') {
+        await handleCommandUpload(jsonData);
       }
 
       setSelectedFile(null);
@@ -235,7 +239,7 @@ const JSONUploader: React.FC<JSONUploaderProps> = ({ onBack }) => {
               className="w-full min-h-16 text-xl whitespace-normal text-wrap py-3 px-4"
             >
               {selectedFile 
-                ? `Selected: ${selectedFile.name}${detectedDataType ? ` (${detectedDataType === 'scouting' ? 'Scouting Data' : detectedDataType === 'scoutProfiles' ? 'Scout Profiles' : detectedDataType === 'pitScouting' ? 'Pit Scouting Data' : detectedDataType === 'pitScoutingImagesOnly' ? 'Pit Scouting Images Only' : 'Match Schedule'})` : ''}`
+                ? `Selected: ${selectedFile.name}${detectedDataType ? ` (${detectedDataType === 'scouting' ? 'Scouting Data' : detectedDataType === 'scoutProfiles' ? 'Scout Profiles' : detectedDataType === 'pitScouting' ? 'Pit Scouting Data' : detectedDataType === 'pitScoutingImagesOnly' ? 'Pit Scouting Images Only' : detectedDataType === 'matchSchedule' ? 'Match Schedule' : 'Scouter Command'})` : ''}`
                 : "Select JSON Data File"
               }
             </Button>
@@ -268,6 +272,18 @@ const JSONUploader: React.FC<JSONUploaderProps> = ({ onBack }) => {
                       {isProcessing ? '⏳ Processing...' : '📅 Replace Match Schedule'}
                     </Button>
                     <p><strong>Replace Match Schedule</strong>: Overwrites all existing local match schedule data with the uploaded file.</p>
+                  </div>
+                ) : detectedDataType === 'command' ? (
+                  <div className="space-y-3">
+                    <Button
+                      onClick={() => handleUpload("overwrite")}
+                      disabled={isProcessing}
+                      variant="destructive"
+                      className="w-full h-16 text-xl text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isProcessing ? '⏳ Processing...' : '⚠️ Execute Command'}
+                    </Button>
+                    <p><strong>Command</strong>: Executes device control command from JSON (clear all local data).</p>
                   </div>
                 ) : (
                   <div className="space-y-3">

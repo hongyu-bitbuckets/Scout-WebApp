@@ -17,6 +17,11 @@
 import type { DataTransformation } from "@/types/game-interfaces";
 import { toggles, getActionKeys } from "./game-schema";
 
+function toNonNegativeInt(value: unknown): number | null {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return null;
+  return Math.max(0, Math.floor(value));
+}
+
 /**
  * Generate default values for action counters
  * Only includes actions that are actually used in each phase
@@ -327,10 +332,36 @@ export const gameDataTransformation: DataTransformation = {
       });
     }
 
+    // Manual counter fallback from page-level robot status inputs.
+    // This ensures Fuel Scored / Number of Cycles labels are persisted in canonical gameData fields.
+    const autoManualFuel = toNonNegativeInt((matchData.autoRobotStatus as Record<string, unknown> | undefined)?.ballsShotCount);
+    const teleopManualFuel = toNonNegativeInt((matchData.teleopRobotStatus as Record<string, unknown> | undefined)?.ballsShotCount);
+    const autoCycles = toNonNegativeInt((matchData.autoRobotStatus as Record<string, unknown> | undefined)?.cycleCount);
+    const teleopCycles = toNonNegativeInt((matchData.teleopRobotStatus as Record<string, unknown> | undefined)?.cycleCount);
+
+    if (autoManualFuel !== null) {
+      result.auto.fuelScoredCount = autoManualFuel;
+    }
+    if (teleopManualFuel !== null) {
+      result.teleop.fuelScoredCount = teleopManualFuel;
+    }
+    if (autoCycles !== null) {
+      result.auto.cycleCount = autoCycles;
+    }
+    if (teleopCycles !== null) {
+      result.teleop.cycleCount = teleopCycles;
+    }
+
     // Copy robot status flags (from StatusToggles component)
     if (matchData.autoRobotStatus) Object.assign(result.auto, matchData.autoRobotStatus);
     if (matchData.teleopRobotStatus) Object.assign(result.teleop, matchData.teleopRobotStatus);
     if (matchData.endgameRobotStatus) Object.assign(result.endgame, matchData.endgameRobotStatus);
+
+    // Re-apply normalized manual fields so they are not overwritten by unvalidated status payloads.
+    if (autoManualFuel !== null) result.auto.fuelScoredCount = autoManualFuel;
+    if (teleopManualFuel !== null) result.teleop.fuelScoredCount = teleopManualFuel;
+    if (autoCycles !== null) result.auto.cycleCount = autoCycles;
+    if (teleopCycles !== null) result.teleop.cycleCount = teleopCycles;
 
     // Copy any additional fields
     const additionalFields = { ...matchData };

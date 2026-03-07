@@ -37,6 +37,46 @@ export function WebRTCPushedDataDialog() {
   const [importStatus, setImportStatus] = useState<string>('');
   const [pitImportChoiceOpen, setPitImportChoiceOpen] = useState(false);
 
+  const syncImportedScoutsToLocalList = (scouts: unknown[] | undefined) => {
+    if (!Array.isArray(scouts) || scouts.length === 0) {
+      return;
+    }
+
+    const existingScoutsRaw = localStorage.getItem('scoutsList');
+    let existingScouts: string[] = [];
+
+    try {
+      const parsed = existingScoutsRaw ? JSON.parse(existingScoutsRaw) : [];
+      existingScouts = Array.isArray(parsed) ? parsed.filter((name): name is string => typeof name === 'string') : [];
+    } catch {
+      existingScouts = [];
+    }
+
+    const merged = new Set(existingScouts.map((name) => name.trim()).filter(Boolean));
+
+    for (const scout of scouts) {
+      if (!scout || typeof scout !== 'object') {
+        continue;
+      }
+      const name = (scout as { name?: unknown }).name;
+      if (typeof name !== 'string') {
+        continue;
+      }
+      const trimmedName = name.trim();
+      if (trimmedName) {
+        merged.add(trimmedName);
+      }
+    }
+
+    const nextScoutsList = Array.from(merged).sort((a, b) => a.localeCompare(b));
+    localStorage.setItem('scoutsList', JSON.stringify(nextScoutsList));
+  };
+
+  const notifyScoutProfileImported = () => {
+    window.dispatchEvent(new Event('scoutDataUpdated'));
+    window.dispatchEvent(new Event('scoutChanged'));
+  };
+
   const isImportStrategy = (value: unknown): value is PitAssignmentImportStrategy => {
     return value === 'replace' || value === 'merge' || value === 'cancel';
   };
@@ -136,6 +176,7 @@ export function WebRTCPushedDataDialog() {
             }
             importedCount += data.scoutProfiles.scouts.length;
             console.log('✅ Imported', data.scoutProfiles.scouts.length, 'scout profiles');
+            syncImportedScoutsToLocalList(data.scoutProfiles.scouts);
           }
 
           // Import predictions
@@ -145,6 +186,8 @@ export function WebRTCPushedDataDialog() {
             }
             console.log('✅ Imported', data.scoutProfiles.predictions.length, 'predictions');
           }
+
+          notifyScoutProfileImported();
         }
 
       } else if (pushedDataType === 'scouting') {
@@ -247,6 +290,7 @@ export function WebRTCPushedDataDialog() {
           }
           importedCount = data.scouts.length;
           console.log('✅ Imported', importedCount, 'scout profiles');
+          syncImportedScoutsToLocalList(data.scouts);
         }
         if (data.predictions && Array.isArray(data.predictions)) {
           for (const prediction of data.predictions) {
@@ -260,6 +304,8 @@ export function WebRTCPushedDataDialog() {
           }
           console.log('✅ Imported', data.achievements.length, 'achievements');
         }
+
+        notifyScoutProfileImported();
       }
 
       setImportStatus(`✅ Successfully imported ${getDataTypeLabel(pushedDataType)}`);
